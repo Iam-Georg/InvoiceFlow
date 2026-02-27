@@ -1,0 +1,340 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─────────────────────────────────────────
+   TOKENS — German Precision Finance
+───────────────────────────────────────── */
+:root {
+  /* Canvas */
+  --background: #ffffff;
+  --background-2: #f5f7fa;
+  --foreground: #0a0f1e;
+
+  /* Surface */
+  --card: #ffffff;
+  --card-foreground: #0a0f1e;
+  --topbar-bg: #ffffff;
+
+  /* Brand — navy, authoritative */
+  --primary: #1b3a6b;
+  --primary-hover: #142d55;
+  --primary-light: #ebf0fa;
+  --primary-foreground: #ffffff;
+
+  /* Neutrals */
+  --secondary: #f5f7fa;
+  --secondary-foreground: #3d4a5c;
+  --muted: #f0f3f7;
+  --muted-foreground: #6b7a90;
+  --accent: #ebf0fa;
+  --accent-foreground: #1b3a6b;
+  --border: #dde2ea;
+  --border-strong: #b8c4d4;
+  --input: #dde2ea;
+  --ring: #1b3a6b;
+
+  /* Semantic */
+  --success: #0f6b3a;
+  --success-bg: #e8f7ef;
+  --success-border: #9dd4b8;
+  --warning: #8a4f0a;
+  --warning-bg: #fff8ed;
+  --warning-border: #f5c878;
+  --destructive: #a51f1f;
+  --destructive-bg: #fff0f0;
+  --destructive-border: #e8a0a0;
+  --destructive-foreground: #ffffff;
+  --info: #1b3a6b;
+  --info-bg: #ebf0fa;
+  --info-border: #9ab4de;
+
+  /* Layout */
+  --topbar-height: 52px;
+  --radius: 4px;
+
+  /* Shadows — precise, not decorative */
+  --shadow-xs: 0 1px 2px rgba(10, 15, 30, 0.06);
+  --shadow-sm: 0 1px 4px rgba(10, 15, 30, 0.08);
+  --shadow-md: 0 4px 16px rgba(10, 15, 30, 0.1);
+  --shadow-inset: inset 0 0 0 1px rgba(10, 15, 30, 0.06);
+}
+
+.dark {
+  --background: #080c18;
+  --background-2: #0e1424;
+  --foreground: #e8edf5;
+  --card: #0e1424;
+  --card-foreground: #e8edf5;
+  --topbar-bg: #0a0f1e;
+  --primary: #3b66a8;
+  --primary-hover: #4d78be;
+  --primary-light: #0e1e38;
+  --accent: #0e1e38;
+  --accent-foreground: #7aaad8;
+  --border: #1e2a40;
+  --border-strong: #2e3e58;
+  --input: #1e2a40;
+  --muted: #131d30;
+  --muted-foreground: #5a6e8a;
+  --secondary: #131d30;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+/* ─────────────────────────────────────────
+   RESET
+───────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-color: var(--border);
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────
+   BASE TYPOGRAPHY — IBM Plex Sans
+   German financial software uses structured,
+   rational typefaces. No display fonts.
+───────────────────────────────────────── */
+html {
+  font-family:
+    "IBM Plex Sans",
+    -apple-system,
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv01", "ss01";
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+}
+
+/* ─────────────────────────────────────────
+   TRANSITIONS
+───────────────────────────────────────── */
+a,
+button,
+[role="button"],
+input,
+select {
+  transition:
+    color 100ms ease,
+    background-color 100ms ease,
+    border-color 100ms ease,
+    box-shadow 100ms ease,
+    opacity 100ms ease;
+}
+
+/* ─────────────────────────────────────────
+   SCROLLBAR
+───────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* ─────────────────────────────────────────
+   TYPOGRAPHY UTILITIES
+───────────────────────────────────────── */
+.font-mono,
+.tabular-nums {
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.label-caps {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+}
+
+.amount {
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ─────────────────────────────────────────
+   CARD SYSTEM — structured, not soft
+───────────────────────────────────────── */
+.card-base {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.card-elevated {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 120ms ease;
+}
+
+.card-elevated:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ─────────────────────────────────────────
+   INVOICE ROW
+───────────────────────────────────────── */
+.invoice-row {
+  border-left: 3px solid transparent;
+  transition:
+    border-color 100ms ease,
+    background-color 100ms ease;
+}
+.invoice-row:hover {
+  border-left-color: var(--primary);
+  background-color: var(--primary-light);
+}
+
+/* ─────────────────────────────────────────
+   STATUS BADGES
+───────────────────────────────────────── */
+.badge-draft {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+}
+.badge-sent {
+  background: var(--info-bg);
+  color: var(--info);
+  border: 1px solid var(--info-border);
+}
+.badge-open {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
+}
+.badge-overdue {
+  background: var(--destructive-bg);
+  color: var(--destructive);
+  border: 1px solid var(--destructive-border);
+}
+.badge-paid {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+}
+
+@keyframes overdue-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.animate-overdue {
+  animation: overdue-pulse 2.4s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────
+   PRESSURE SCORE
+───────────────────────────────────────── */
+.pressure-low {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+}
+.pressure-mid {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
+}
+.pressure-high {
+  background: var(--destructive-bg);
+  color: var(--destructive);
+  border: 1px solid var(--destructive-border);
+}
+
+/* ─────────────────────────────────────────
+   FOCUS
+───────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────
+   TOP NAV SPECIFICS
+───────────────────────────────────────── */
+.topnav-link {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  padding: 0 12px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 100ms ease,
+    border-color 100ms ease;
+}
+.topnav-link:hover {
+  color: var(--foreground);
+}
+.topnav-link.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Cursor */
+a,
+button,
+[role="button"],
+[role="tab"],
+[role="menuitem"],
+label[for],
+select,
+.cursor-pointer {
+  cursor: pointer;
+}
+
+input,
+textarea {
+  cursor: text;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
