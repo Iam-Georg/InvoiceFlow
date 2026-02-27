@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import type { Customer, Invoice, Profile } from "@/types";
 import { calculatePressure } from "@/lib/pressure";
+import { getDefaultInvoiceEmailTemplate } from "@/lib/email-templates";
 import PressureBadge from "@/components/invoices/PressureBadge";
 import {
   formatCurrency,
@@ -19,6 +20,7 @@ import InvoicePDF from "@/components/invoices/InvoicePDF";
 import {
   ChevronLeft,
   Download,
+  Send,
   CheckCircle,
   Bell,
   Trash2,
@@ -55,6 +57,34 @@ export default function InvoiceDetailPage() {
   const [pdfReady, setPdfReady] = useState(false);
   const [pressure, setPressure] =
     useState<ReturnType<typeof calculatePressure> | null>(null);
+  const [showSendComposer, setShowSendComposer] = useState(false);
+  const [emailSubject, setEmailSubject] = useState(
+    getDefaultInvoiceEmailTemplate().subject,
+  );
+  const [emailBody, setEmailBody] = useState(
+    getDefaultInvoiceEmailTemplate().body,
+  );
+  const [templates, setTemplates] = useState<
+    Array<{ id: string; name: string; subject: string; body: string }>
+  >(() => {
+    if (typeof window === "undefined") return [];
+    const raw = window.localStorage.getItem("invoiceflow:email-templates:v1");
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw) as Array<{
+        id: string;
+        name: string;
+        subject: string;
+        body: string;
+      }>;
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
+
+  const TEMPLATE_STORAGE_KEY = "invoiceflow:email-templates:v1";
 
   useEffect(() => {
     async function load() {
@@ -142,6 +172,57 @@ export default function InvoiceDetailPage() {
     }
     toast.success("Erinnerung gesendet");
     setActionLoading(null);
+  }
+
+  async function sendInvoice() {
+    setActionLoading("send");
+    const res = await fetch(`/api/invoices/${id}/send`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ subject: emailSubject, body: emailBody }),
+    });
+    if (!res.ok) {
+      toast.error("Fehler beim Senden");
+      setActionLoading(null);
+      return;
+    }
+    setInvoice((prev) =>
+      prev
+        ? {
+            ...prev,
+            status: prev.status === "draft" ? "sent" : prev.status,
+            sent_at: new Date().toISOString(),
+          }
+        : prev,
+    );
+    toast.success("Rechnung per E-Mail gesendet");
+    setShowSendComposer(false);
+    setActionLoading(null);
+  }
+
+  function saveCurrentTemplate() {
+    const name = window.prompt("Name der Vorlage?");
+    if (!name?.trim()) return;
+    const next = [
+      ...templates,
+      {
+        id: crypto.randomUUID(),
+        name: name.trim(),
+        subject: emailSubject,
+        body: emailBody,
+      },
+    ];
+    setTemplates(next);
+    window.localStorage.setItem(TEMPLATE_STORAGE_KEY, JSON.stringify(next));
+    toast.success("Vorlage gespeichert");
+  }
+
+  function applyTemplate(templateId: string) {
+    setSelectedTemplateId(templateId);
+    const tpl = templates.find((item) => item.id === templateId);
+    if (!tpl) return;
+    setEmailSubject(tpl.subject);
+    setEmailBody(tpl.body);
   }
 
   async function deleteInvoice() {
@@ -309,6 +390,40 @@ export default function InvoiceDetailPage() {
             </button>
           )}
 
+          {/* Send invoice */}
+          {!isPaid && (
+            <button
+              onClick={() => setShowSendComposer((prev) => !prev)}
+              disabled={actionLoading === "send"}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "7px 14px",
+                fontSize: "13px",
+                fontWeight: 500,
+                background: "var(--card)",
+                color: "var(--foreground)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius)",
+                cursor: "pointer",
+              }}
+            >
+              {actionLoading === "send" ? (
+                <Loader2
+                  style={{
+                    width: 14,
+                    height: 14,
+                    animation: "spin 1s linear infinite",
+                  }}
+                />
+              ) : (
+                <Send style={{ width: 14, height: 14 }} />
+              )}
+              {showSendComposer ? "Composer schließen" : "Rechnung senden"}
+            </button>
+          )}
+
           {/* Mark as Paid */}
           {!isPaid && (
             <button
@@ -344,6 +459,118 @@ export default function InvoiceDetailPage() {
           )}
         </div>
       </div>
+
+      {showSendComposer && (
+        <div
+          style={{
+            marginBottom: "16px",
+            background: "var(--card)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--radius)",
+            padding: "14px",
+            display: "grid",
+            gap: "10px",
+          }}
+        >
+          <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>
+            E-Mail-Text & Vorlagen
+          </p>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+            <select
+              value={selectedTemplateId}
+              onChange={(e) => applyTemplate(e.target.value)}
+              style={{
+                border: "1px solid var(--border)",
+                background: "var(--background)",
+                borderRadius: "var(--radius)",
+                padding: "7px 10px",
+                fontSize: "13px",
+                color: "var(--foreground)",
+              }}
+            >
+              <option value="">Vorhandene Vorlage nutzen...</option>
+              {templates.map((tpl) => (
+                <option key={tpl.id} value={tpl.id}>
+                  {tpl.name}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={saveCurrentTemplate}
+              style={{
+                border: "1px solid var(--border)",
+                background: "var(--card)",
+                borderRadius: "var(--radius)",
+                padding: "7px 10px",
+                fontSize: "12px",
+                color: "var(--foreground)",
+                cursor: "pointer",
+              }}
+            >
+              Vorlage speichern
+            </button>
+          </div>
+          <input
+            value={emailSubject}
+            onChange={(e) => setEmailSubject(e.target.value)}
+            placeholder="Betreff"
+            style={{
+              border: "1px solid var(--border)",
+              background: "var(--background)",
+              borderRadius: "var(--radius)",
+              padding: "8px 10px",
+              fontSize: "13px",
+              color: "var(--foreground)",
+              width: "100%",
+            }}
+          />
+          <textarea
+            value={emailBody}
+            onChange={(e) => setEmailBody(e.target.value)}
+            rows={8}
+            style={{
+              border: "1px solid var(--border)",
+              background: "var(--background)",
+              borderRadius: "var(--radius)",
+              padding: "10px",
+              fontSize: "13px",
+              color: "var(--foreground)",
+              width: "100%",
+              resize: "vertical",
+              lineHeight: 1.5,
+            }}
+          />
+          <p style={{ fontSize: "11px", color: "var(--muted-foreground)" }}>
+            Verfügbare Platzhalter: {`{{invoice_number}}, {{customer_name}}, {{issue_date}}, {{due_date}}, {{total}}, {{sender_name}}`}
+          </p>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button
+              onClick={sendInvoice}
+              disabled={actionLoading === "send"}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 14px",
+                fontSize: "13px",
+                fontWeight: 600,
+                background: "var(--primary)",
+                color: "#fff",
+                border: "none",
+                borderRadius: "var(--radius)",
+                cursor: actionLoading === "send" ? "not-allowed" : "pointer",
+              }}
+            >
+              {actionLoading === "send" ? (
+                <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
+              ) : (
+                <Send style={{ width: 14, height: 14 }} />
+              )}
+              E-Mail mit PDF senden
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Card */}
       <div

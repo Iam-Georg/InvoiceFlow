@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase";
 import { ensureProfile } from "@/lib/profile";
 import type { Profile, SubscriptionPlan } from "@/types";
 import { toast } from "sonner";
-import { Loader2, Save, CreditCard, ArrowUpRight } from "lucide-react";
+import { Loader2, Save, CreditCard, ArrowUpRight, Download } from "lucide-react";
 
 interface SettingsForm {
   full_name: string;
@@ -47,6 +47,8 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [billingLoading, setBillingLoading] = useState<string | null>(null);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportYear, setExportYear] = useState(String(new Date().getFullYear()));
   const [userId, setUserId] = useState("");
   const [currentPlan, setCurrentPlan] = useState<SubscriptionPlan>("free");
   const [form, setForm] = useState<SettingsForm>({
@@ -206,6 +208,33 @@ export default function SettingsPage() {
       toast.error(message);
     } finally {
       setBillingLoading(null);
+    }
+  }
+
+  async function exportTaxCsv() {
+    setExportLoading(true);
+    try {
+      const response = await fetch(`/api/export/tax?year=${encodeURIComponent(exportYear)}`);
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => ({}))) as { error?: string };
+        throw new Error(payload.error || "Steuerexport fehlgeschlagen.");
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `steuerexport-${exportYear}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Steuerexport wurde heruntergeladen");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Steuerexport fehlgeschlagen.";
+      toast.error(message);
+    } finally {
+      setExportLoading(false);
     }
   }
 
@@ -507,6 +536,70 @@ export default function SettingsPage() {
             )}
             Stripe Billing-Portal
             <ArrowUpRight style={{ width: 12, height: 12 }} />
+          </button>
+        </div>
+      </div>
+
+      <div
+        style={{
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius)",
+          boxShadow: "var(--shadow-xs)",
+          overflow: "hidden",
+          marginBottom: "16px",
+        }}
+      >
+        <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
+          <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>
+            Steuerexport
+          </p>
+          <p style={{ fontSize: "12px", color: "var(--muted-foreground)", marginTop: "2px" }}>
+            CSV Export fuer Steuerberater (Business-Plan).
+          </p>
+        </div>
+        <div
+          style={{
+            padding: "20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+          }}
+        >
+          <input
+            type="number"
+            value={exportYear}
+            onChange={(e) => setExportYear(e.target.value)}
+            min={2000}
+            max={new Date().getFullYear() + 1}
+            style={{ ...inputStyle, width: "120px" }}
+          />
+          <button
+            onClick={exportTaxCsv}
+            disabled={exportLoading}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              height: "34px",
+              padding: "0 12px",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius)",
+              background: "var(--card)",
+              color: "var(--foreground)",
+              fontSize: "12px",
+              fontWeight: 600,
+              cursor: exportLoading ? "not-allowed" : "pointer",
+            }}
+          >
+            {exportLoading ? (
+              <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
+            ) : (
+              <Download style={{ width: 14, height: 14 }} />
+            )}
+            Steuer-CSV herunterladen
           </button>
         </div>
       </div>

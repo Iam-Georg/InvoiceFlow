@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase";
 import { generateInvoiceNumber, formatCurrency } from "@/lib/utils";
 import { Customer, InvoiceItem } from "@/types";
 import { toast } from "sonner";
-import { Plus, Trash2, Loader2, ChevronLeft } from "lucide-react";
+import { Plus, Trash2, Loader2, ChevronLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 const emptyItem = (): InvoiceItem => ({
@@ -36,6 +36,8 @@ export default function NewInvoicePage() {
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState("RE-2025-0001");
+  const [aiDescription, setAiDescription] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -132,6 +134,61 @@ export default function NewInvoicePage() {
     }
   }
 
+  async function applyAiDraft() {
+    if (!aiDescription.trim()) {
+      toast.error("Bitte eine Projektbeschreibung eingeben");
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/ai/invoice-draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: aiDescription.trim() }),
+      });
+      const payload = (await res.json()) as {
+        items?: Array<{ description: string; quantity: number; unit_price: number }>;
+        notes?: string;
+        suggested_due_days?: number;
+        source?: "openai" | "heuristic";
+        error?: string;
+      };
+
+      if (!res.ok || !payload.items?.length) {
+        throw new Error(payload.error || "KI-Entwurf fehlgeschlagen");
+      }
+
+      const nextItems: InvoiceItem[] = payload.items.map((item) => ({
+        id: crypto.randomUUID(),
+        description: item.description,
+        quantity: Number(item.quantity) || 1,
+        unit_price: Number(item.unit_price) || 0,
+        total: (Number(item.quantity) || 1) * (Number(item.unit_price) || 0),
+      }));
+
+      setItems(nextItems);
+      if (payload.notes && !notes.trim()) {
+        setNotes(payload.notes);
+      }
+      if (payload.suggested_due_days && Number.isFinite(payload.suggested_due_days)) {
+        const d = new Date(issueDate);
+        d.setDate(d.getDate() + payload.suggested_due_days);
+        setDueDate(d.toISOString().split("T")[0]);
+      }
+      toast.success(
+        payload.source === "openai"
+          ? "KI-Entwurf übernommen"
+          : "Entwurf aus Beschreibung erstellt",
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "KI-Entwurf fehlgeschlagen";
+      toast.error(message);
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
   const inputStyle = {
     border: "1px solid var(--border)",
     background: "var(--background)",
@@ -189,6 +246,51 @@ export default function NewInvoicePage() {
         <ChevronLeft style={{ width: 14, height: 14 }} />
         Zurück
       </Link>
+
+      <div style={card}>
+        <div style={cardHeader}>KI-Rechnungserstellung</div>
+        <div style={{ padding: "20px", display: "grid", gap: "10px" }}>
+          <textarea
+            placeholder="Projektbeschreibung eingeben, z.B. Website-Redesign, 12h Entwicklung, 3h Beratung ..."
+            value={aiDescription}
+            onChange={(e) => setAiDescription(e.target.value)}
+            rows={4}
+            style={{
+              ...inputStyle,
+              height: "auto",
+              resize: "vertical",
+              padding: "10px 12px",
+              lineHeight: 1.5,
+            }}
+          />
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button
+              onClick={applyAiDraft}
+              disabled={aiLoading}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "7px 12px",
+                fontSize: "12px",
+                fontWeight: 600,
+                background: "var(--primary-light)",
+                color: "var(--primary)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius)",
+                cursor: aiLoading ? "not-allowed" : "pointer",
+              }}
+            >
+              {aiLoading ? (
+                <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
+              ) : (
+                <Sparkles style={{ width: 14, height: 14 }} />
+              )}
+              Positionen per KI erzeugen
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Kopfdaten */}
       <div style={card}>
