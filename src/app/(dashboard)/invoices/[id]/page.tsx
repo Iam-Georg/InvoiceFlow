@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import type { Customer, Invoice, Profile } from "@/types";
+import { calculatePressure } from "@/lib/pressure";
+import PressureBadge from "@/components/invoices/PressureBadge";
 import {
   formatCurrency,
   formatDate,
@@ -12,7 +14,8 @@ import {
 } from "@/lib/utils";
 import { toast } from "sonner";
 import Link from "next/link";
-import dynamic from "next/dynamic";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import InvoicePDF from "@/components/invoices/InvoicePDF";
 import {
   ChevronLeft,
   Download,
@@ -25,15 +28,6 @@ import {
   Hash,
   AlertCircle,
 } from "lucide-react";
-
-// PDF nur client-side laden
-const PDFDownloadLink = dynamic(
-  () => import("@react-pdf/renderer").then((m) => m.PDFDownloadLink),
-  { ssr: false },
-);
-const InvoicePDF = dynamic(() => import("@/components/invoices/InvoicePDF"), {
-  ssr: false,
-});
 
 export default function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -59,6 +53,8 @@ export default function InvoiceDetailPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [pdfReady, setPdfReady] = useState(false);
+  const [pressure, setPressure] =
+    useState<ReturnType<typeof calculatePressure> | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -79,6 +75,33 @@ export default function InvoiceDetailPage() {
           .single(),
         sb.from("profiles").select("*").eq("id", user.id).single(),
       ]);
+      if (inv) {
+        const [{ data: reminders }, { data: customerInvoices }] =
+          await Promise.all([
+            sb.from("reminders").select("id").eq("invoice_id", inv.id),
+            sb
+              .from("invoices")
+              .select("status, due_date, paid_at")
+              .eq("user_id", user.id)
+              .eq("customer_id", inv.customer_id),
+          ]);
+
+        const customerRows = customerInvoices ?? [];
+        const lateCount = customerRows.filter((row) => {
+          const paidLate =
+            row.status === "paid" && row.paid_at
+              ? new Date(row.paid_at).getTime() > new Date(row.due_date).getTime()
+              : false;
+          return row.status === "overdue" || paidLate;
+        }).length;
+        const lateRatio =
+          customerRows.length > 0 ? lateCount / customerRows.length : 0;
+
+        setPressure(
+          calculatePressure(inv as Invoice, reminders?.length ?? 0, lateRatio),
+        );
+      }
+
       setInvoice((inv as InvoiceWithRelations | null) ?? null);
       setProfile((prof as Profile | null) ?? null);
       setLoading(false);
@@ -406,7 +429,8 @@ export default function InvoiceDetailPage() {
             padding: "20px 32px",
             borderBottom: "1px solid var(--border)",
             display: "flex",
-            gap: "32px",
+            gap: "24px",
+            flexWrap: "wrap",
           }}
         >
           {[
@@ -463,6 +487,18 @@ export default function InvoiceDetailPage() {
               )}
             </div>
           ))}
+          <div style={{ flex: 1 }}>
+            <div style={{ marginBottom: "6px" }}>
+              <span className="label-caps">Druck-Score</span>
+            </div>
+            {pressure ? (
+              <PressureBadge pressure={pressure} />
+            ) : (
+              <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
+                –
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Line Items */}

@@ -3,13 +3,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import type { Invoice } from "@/types";
 import StatusBadge from "@/components/invoices/StatusBadge";
+import PressureBadge from "@/components/invoices/PressureBadge";
+import { calculatePressure } from "@/lib/pressure";
 import { Plus, FileText, ChevronRight, Loader2 } from "lucide-react";
 
 type InvoiceRow = Invoice & {
   customer?: { name?: string | null; email?: string | null } | null;
+  pressureScore?: ReturnType<typeof calculatePressure>;
 };
 
 export default function InvoicesPage() {
@@ -23,7 +26,57 @@ export default function InvoicesPage() {
         .from("invoices")
         .select("*, customer:customers(name, email)")
         .order("created_at", { ascending: false });
-      setInvoices((data as InvoiceRow[] | null) ?? []);
+
+      const rows = (data as InvoiceRow[] | null) ?? [];
+      const invoiceIds = rows.map((row) => row.id);
+
+      const reminderCountByInvoice = new Map<string, number>();
+      if (invoiceIds.length > 0) {
+        const { data: reminders } = await supabase
+          .from("reminders")
+          .select("invoice_id")
+          .in("invoice_id", invoiceIds);
+
+        for (const reminder of reminders ?? []) {
+          const invoiceId = String(reminder.invoice_id);
+          reminderCountByInvoice.set(
+            invoiceId,
+            (reminderCountByInvoice.get(invoiceId) ?? 0) + 1,
+          );
+        }
+      }
+
+      const customerTotals = new Map<string, number>();
+      const customerLates = new Map<string, number>();
+      for (const row of rows) {
+        const customerId = row.customer_id;
+        customerTotals.set(customerId, (customerTotals.get(customerId) ?? 0) + 1);
+
+        const paidLate =
+          row.status === "paid" && row.paid_at
+            ? new Date(row.paid_at).getTime() > new Date(row.due_date).getTime()
+            : false;
+        const late = row.status === "overdue" || paidLate;
+        if (late) {
+          customerLates.set(customerId, (customerLates.get(customerId) ?? 0) + 1);
+        }
+      }
+
+      const enriched = rows.map((row) => {
+        const total = customerTotals.get(row.customer_id) ?? 1;
+        const late = customerLates.get(row.customer_id) ?? 0;
+        const ratio = total > 0 ? late / total : 0;
+        return {
+          ...row,
+          pressureScore: calculatePressure(
+            row,
+            reminderCountByInvoice.get(row.id) ?? 0,
+            ratio,
+          ),
+        };
+      });
+
+      setInvoices(enriched);
       setLoading(false);
     }
     load();
@@ -174,13 +227,13 @@ export default function InvoicesPage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1.5fr 1fr 120px 120px 36px",
+                gridTemplateColumns: "1.5fr 1fr 160px 120px 36px",
                 padding: "10px 20px",
                 borderBottom: "1px solid var(--border)",
                 background: "var(--background-2)",
               }}
             >
-              {["Rechnung", "Kunde", "Faellig", "Betrag", ""].map((h, i) => (
+              {["Rechnung", "Kunde", "Druck-Score", "Betrag", ""].map((h, i) => (
                 <span
                   key={i}
                   className="label-caps"
@@ -203,7 +256,7 @@ export default function InvoicesPage() {
                   className="invoice-row"
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "1.5fr 1fr 120px 120px 36px",
+                    gridTemplateColumns: "1.5fr 1fr 160px 120px 36px",
                     padding: "13px 20px",
                     alignItems: "center",
                     borderBottom:
@@ -243,14 +296,20 @@ export default function InvoicesPage() {
                   <p style={{ fontSize: "13px", color: "var(--foreground)" }}>
                     {invoice.customer?.name ?? "-"}
                   </p>
-                  <p
-                    style={{
-                      fontSize: "13px",
-                      color: "var(--muted-foreground)",
-                    }}
-                  >
-                    {formatDate(invoice.due_date)}
-                  </p>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    {invoice.pressureScore ? (
+                      <PressureBadge pressure={invoice.pressureScore} />
+                    ) : (
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          color: "var(--muted-foreground)",
+                        }}
+                      >
+                        -
+                      </span>
+                    )}
+                  </div>
                   <p
                     className="amount"
                     style={{

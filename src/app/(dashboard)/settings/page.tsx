@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { ensureProfile } from "@/lib/profile";
-import type { Profile } from "@/types";
+import type { Profile, SubscriptionPlan } from "@/types";
 import { toast } from "sonner";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, CreditCard, ArrowUpRight } from "lucide-react";
 
 interface SettingsForm {
   full_name: string;
@@ -21,11 +21,34 @@ interface SettingsForm {
   default_notes: string;
 }
 
+const PLAN_META: Record<
+  Exclude<SubscriptionPlan, "free">,
+  { label: string; monthly: string; description: string }
+> = {
+  starter: {
+    label: "Starter",
+    monthly: "9 EUR / Monat",
+    description: "Für Einzelunternehmer mit geringem Rechnungsvolumen.",
+  },
+  professional: {
+    label: "Professional",
+    monthly: "19 EUR / Monat",
+    description: "Für wachsende Freelancer mit Automatisierung.",
+  },
+  business: {
+    label: "Business",
+    monthly: "39 EUR / Monat",
+    description: "Für Teams mit höherem Volumen und Priorität.",
+  },
+};
+
 export default function SettingsPage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [billingLoading, setBillingLoading] = useState<string | null>(null);
   const [userId, setUserId] = useState("");
+  const [currentPlan, setCurrentPlan] = useState<SubscriptionPlan>("free");
   const [form, setForm] = useState<SettingsForm>({
     full_name: "",
     email: "",
@@ -53,6 +76,7 @@ export default function SettingsPage() {
 
       setUserId(user.id);
       const profile = (await ensureProfile(supabase, user)) as Profile | null;
+      setCurrentPlan(profile?.plan ?? "free");
 
       setForm({
         full_name: profile?.full_name ?? "",
@@ -74,6 +98,13 @@ export default function SettingsPage() {
 
     load();
   }, [supabase]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const billing = params.get("billing");
+    if (billing === "success") toast.success("Abo erfolgreich gestartet.");
+    if (billing === "cancel") toast.message("Checkout wurde abgebrochen.");
+  }, []);
 
   function set(k: keyof SettingsForm, v: string) {
     setForm((p) => ({ ...p, [k]: v }));
@@ -113,6 +144,68 @@ export default function SettingsPage() {
       toast.error("Unerwarteter Fehler");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function startStripeCheckout(plan: Exclude<SubscriptionPlan, "free">) {
+    setBillingLoading(`stripe-${plan}`);
+    try {
+      const response = await fetch("/api/billing/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+      const payload = (await response.json()) as { url?: string; error?: string };
+      if (!response.ok || !payload.url) {
+        throw new Error(payload.error || "Stripe Checkout konnte nicht gestartet werden.");
+      }
+      window.location.href = payload.url;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Stripe Checkout fehlgeschlagen.";
+      toast.error(message);
+    } finally {
+      setBillingLoading(null);
+    }
+  }
+
+  async function startPayPalCheckout(plan: Exclude<SubscriptionPlan, "free">) {
+    setBillingLoading(`paypal-${plan}`);
+    try {
+      const response = await fetch("/api/billing/paypal/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+      const payload = (await response.json()) as { url?: string; error?: string };
+      if (!response.ok || !payload.url) {
+        throw new Error(payload.error || "PayPal Checkout konnte nicht gestartet werden.");
+      }
+      window.location.href = payload.url;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "PayPal Checkout fehlgeschlagen.";
+      toast.error(message);
+    } finally {
+      setBillingLoading(null);
+    }
+  }
+
+  async function openStripePortal() {
+    setBillingLoading("portal");
+    try {
+      const response = await fetch("/api/billing/stripe/portal", { method: "POST" });
+      const payload = (await response.json()) as { url?: string; error?: string };
+      if (!response.ok || !payload.url) {
+        throw new Error(payload.error || "Stripe-Portal konnte nicht geöffnet werden.");
+      }
+      window.location.href = payload.url;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Billing-Portal fehlgeschlagen.";
+      toast.error(message);
+    } finally {
+      setBillingLoading(null);
     }
   }
 
@@ -203,50 +296,26 @@ export default function SettingsPage() {
           marginBottom: "16px",
         }}
       >
-        <div
-          style={{
-            padding: "16px 20px",
-            borderBottom: "1px solid var(--border)",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "13px",
-              fontWeight: 600,
-              color: "var(--foreground)",
-            }}
-          >
+        <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
+          <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>
             {title}
           </p>
-          <p
-            style={{
-              fontSize: "12px",
-              color: "var(--muted-foreground)",
-              marginTop: "2px",
-            }}
-          >
+          <p style={{ fontSize: "12px", color: "var(--muted-foreground)", marginTop: "2px" }}>
             {description}
           </p>
         </div>
-        <div
-          style={{
-            padding: "20px",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "14px",
-          }}
-        >
+        <div className="settings-fields-grid" style={{ padding: "20px", display: "grid", gap: "14px" }}>
           {children}
         </div>
       </div>
     );
   }
 
+  const planCards = useMemo(() => Object.entries(PLAN_META), []);
+
   if (loading) {
     return (
-      <div
-        style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}
-      >
+      <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
         <Loader2
           style={{
             width: 18,
@@ -260,7 +329,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div style={{ maxWidth: "680px" }}>
+    <div style={{ maxWidth: "900px" }}>
       <div style={{ marginBottom: "24px" }}>
         <h1
           style={{
@@ -272,14 +341,8 @@ export default function SettingsPage() {
         >
           Einstellungen
         </h1>
-        <p
-          style={{
-            fontSize: "13px",
-            color: "var(--muted-foreground)",
-            marginTop: "4px",
-          }}
-        >
-          Profil, Unternehmen und Rechnungsstandards.
+        <p style={{ fontSize: "13px", color: "var(--muted-foreground)", marginTop: "4px" }}>
+          Profil, Unternehmen, Rechnungsstandards und Billing.
         </p>
       </div>
 
@@ -288,22 +351,9 @@ export default function SettingsPage() {
         <Field label="E-Mail" k="email" disabled />
       </Section>
 
-      <Section
-        title="Unternehmen"
-        description="Erscheint auf all deinen Rechnungen."
-      >
-        <Field
-          label="Firmenname"
-          k="company_name"
-          placeholder="Muster GmbH"
-          fullWidth
-        />
-        <Field
-          label="Adresse"
-          k="company_address"
-          placeholder="Musterstrasse 1"
-          fullWidth
-        />
+      <Section title="Unternehmen" description="Erscheint auf all deinen Rechnungen.">
+        <Field label="Firmenname" k="company_name" placeholder="Muster GmbH" fullWidth />
+        <Field label="Adresse" k="company_address" placeholder="Musterstrasse 1" fullWidth />
         <Field label="PLZ" k="company_zip" placeholder="10115" />
         <Field label="Stadt" k="company_city" placeholder="Berlin" />
         <Field
@@ -314,30 +364,15 @@ export default function SettingsPage() {
         <Field label="Land" k="company_country" placeholder="DE" />
       </Section>
 
-      <Section
-        title="Rechnungsstandards"
-        description="Voreinstellungen fuer neue Rechnungen."
-      >
-        <Field
-          label="Standard-MwSt. (%)"
-          k="default_tax_rate"
-          type="number"
-          placeholder="19"
-        />
+      <Section title="Rechnungsstandards" description="Voreinstellungen für neue Rechnungen.">
+        <Field label="Standard-MwSt. (%)" k="default_tax_rate" type="number" placeholder="19" />
         <Field
           label="Zahlungsziel (Tage)"
           k="default_payment_days"
           type="number"
           placeholder="14"
         />
-        <div
-          style={{
-            gridColumn: "1 / -1",
-            display: "flex",
-            flexDirection: "column",
-            gap: "4px",
-          }}
-        >
+        <div style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: "4px" }}>
           <label style={labelStyle}>Standard-Anmerkung</label>
           <textarea
             value={form.default_notes}
@@ -363,11 +398,120 @@ export default function SettingsPage() {
 
       <div
         style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          paddingBottom: "40px",
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius)",
+          boxShadow: "var(--shadow-xs)",
+          overflow: "hidden",
+          marginBottom: "16px",
         }}
       >
+        <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)" }}>
+          <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>
+            Abo & Billing
+          </p>
+          <p style={{ fontSize: "12px", color: "var(--muted-foreground)", marginTop: "2px" }}>
+            Aktueller Plan: {currentPlan.toUpperCase()}
+          </p>
+        </div>
+
+        <div className="settings-billing-grid" style={{ padding: "20px", display: "grid", gap: "12px" }}>
+          {planCards.map(([plan, meta]) => {
+            const typedPlan = plan as Exclude<SubscriptionPlan, "free">;
+            const isCurrent = currentPlan === typedPlan;
+            return (
+              <div
+                key={plan}
+                style={{
+                  border: "1px solid var(--border)",
+                  borderRadius: "var(--radius)",
+                  padding: "14px",
+                  background: isCurrent ? "var(--primary-light)" : "var(--background)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--foreground)" }}>
+                    {meta.label}
+                  </p>
+                  <span className="label-caps">{meta.monthly}</span>
+                </div>
+                <p style={{ marginTop: "6px", fontSize: "12px", color: "var(--muted-foreground)" }}>
+                  {meta.description}
+                </p>
+                <div className="settings-billing-actions" style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
+                  <button
+                    disabled={isCurrent || billingLoading === `stripe-${plan}`}
+                    onClick={() => startStripeCheckout(typedPlan)}
+                    style={{
+                      flex: 1,
+                      height: "34px",
+                      border: "none",
+                      borderRadius: "var(--radius)",
+                      background: "var(--primary)",
+                      color: "#fff",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      cursor: isCurrent ? "not-allowed" : "pointer",
+                      opacity: isCurrent ? 0.6 : 1,
+                    }}
+                  >
+                    {billingLoading === `stripe-${plan}` ? "Stripe..." : "Mit Stripe"}
+                  </button>
+                  <button
+                    disabled={isCurrent || billingLoading === `paypal-${plan}`}
+                    onClick={() => startPayPalCheckout(typedPlan)}
+                    style={{
+                      flex: 1,
+                      height: "34px",
+                      border: "1px solid var(--border)",
+                      borderRadius: "var(--radius)",
+                      background: "var(--card)",
+                      color: "var(--foreground)",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      cursor: isCurrent ? "not-allowed" : "pointer",
+                      opacity: isCurrent ? 0.6 : 1,
+                    }}
+                  >
+                    {billingLoading === `paypal-${plan}` ? "PayPal..." : "Mit PayPal"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ padding: "0 20px 20px", display: "flex", justifyContent: "flex-end" }}>
+          <button
+            onClick={openStripePortal}
+            disabled={billingLoading === "portal"}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              height: "34px",
+              padding: "0 12px",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius)",
+              background: "var(--card)",
+              color: "var(--foreground)",
+              fontSize: "12px",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            {billingLoading === "portal" ? (
+              <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
+            ) : (
+              <CreditCard style={{ width: 14, height: 14 }} />
+            )}
+            Stripe Billing-Portal
+            <ArrowUpRight style={{ width: 12, height: 12 }} />
+          </button>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "flex-end", paddingBottom: "40px" }}>
         <button
           onClick={handleSave}
           disabled={saving}
@@ -386,13 +530,7 @@ export default function SettingsPage() {
           }}
         >
           {saving ? (
-            <Loader2
-              style={{
-                width: 14,
-                height: 14,
-                animation: "spin 1s linear infinite",
-              }}
-            />
+            <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
           ) : (
             <Save style={{ width: 14, height: 14 }} />
           )}

@@ -71,6 +71,7 @@ export default function DashboardLayout({
       <TopNav />
       <main style={{ paddingTop: "52px" }}>
         <div
+          className="app-main-container"
           style={{ maxWidth: "1280px", margin: "0 auto", padding: "32px 40px" }}
         >
           {children}

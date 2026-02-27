@@ -338,3 +338,72 @@ textarea {
     transform: rotate(360deg);
   }
 }
+
+.settings-fields-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.settings-billing-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1024px) {
+  .app-main-container {
+    padding: 24px 20px !important;
+  }
+
+  .topnav-shell {
+    padding: 0 16px !important;
+  }
+
+  .topnav-main-nav {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .topnav-main-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .settings-billing-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .app-main-container {
+    padding: 16px 12px !important;
+  }
+
+  .topnav-shell {
+    gap: 8px;
+    padding: 0 10px !important;
+  }
+
+  .topnav-free-badge,
+  .topnav-new-label {
+    display: none;
+  }
+
+  .topnav-brand {
+    margin-right: 8px !important;
+  }
+
+  .topnav-new-btn {
+    width: 32px;
+    padding: 0 !important;
+    justify-content: center;
+  }
+
+  .settings-fields-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-billing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-billing-actions {
+    flex-direction: column;
+  }
+}

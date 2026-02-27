@@ -3,13 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
-import {
-  Plus,
-  LogOut,
-  Settings,
-  FileText,
-  ChevronDown,
-} from "lucide-react";
+import { Plus, LogOut, Settings, FileText, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const navItems = [
@@ -40,9 +34,7 @@ export default function TopNav() {
         .eq("id", user.id)
         .single();
       const name = profile?.full_name || user.email || "?";
-      setUserName(
-        profile?.company_name || profile?.full_name || user.email || "",
-      );
+      setUserName(profile?.company_name || profile?.full_name || user.email || "");
       setUserInitial(name.charAt(0).toUpperCase());
     }
     loadUser();
@@ -83,6 +75,7 @@ export default function TopNav() {
       }}
     >
       <div
+        className="topnav-shell"
         style={{
           maxWidth: "1280px",
           margin: "0 auto",
@@ -92,15 +85,15 @@ export default function TopNav() {
           alignItems: "center",
         }}
       >
-        {/* Logo */}
         <Link
           href="/dashboard"
+          className="topnav-brand"
           style={{
             display: "flex",
             alignItems: "center",
             gap: "8px",
             textDecoration: "none",
-            marginRight: "32px",
+            marginRight: "24px",
             flexShrink: 0,
           }}
         >
@@ -128,6 +121,7 @@ export default function TopNav() {
             InvoiceFlow
           </span>
           <span
+            className="topnav-free-badge"
             style={{
               fontSize: "10px",
               fontWeight: 700,
@@ -142,13 +136,14 @@ export default function TopNav() {
           </span>
         </Link>
 
-        {/* Nav */}
         <nav
+          className="topnav-main-nav"
           style={{
             display: "flex",
             alignItems: "stretch",
             height: "52px",
             flex: 1,
+            minWidth: 0,
           }}
         >
           {navItems.map(({ href, label }) => {
@@ -167,6 +162,7 @@ export default function TopNav() {
                   textDecoration: "none",
                   borderBottom: `2px solid ${active ? "var(--primary)" : "transparent"}`,
                   transition: "color 100ms ease, border-color 100ms ease",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {label}
@@ -175,17 +171,10 @@ export default function TopNav() {
           })}
         </nav>
 
-        {/* Right */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            flexShrink: 0,
-          }}
-        >
+        <div className="topnav-right" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <Link href="/invoices/new" style={{ textDecoration: "none" }}>
             <button
+              className="topnav-new-btn"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -202,11 +191,10 @@ export default function TopNav() {
               }}
             >
               <Plus style={{ width: 13, height: 13 }} strokeWidth={2.5} />
-              Neue Rechnung
+              <span className="topnav-new-label">Neue Rechnung</span>
             </button>
           </Link>
 
-          {/* User Menu */}
           <div ref={menuRef} style={{ position: "relative" }}>
             <button
               onClick={() => setMenuOpen((o) => !o)}
@@ -220,17 +208,6 @@ export default function TopNav() {
                 border: "1px solid var(--border)",
                 borderRadius: "var(--radius)",
                 cursor: "pointer",
-                transition: "background 100ms",
-              }}
-              onMouseEnter={(e) => {
-                if (!menuOpen)
-                  (e.currentTarget as HTMLElement).style.background =
-                    "var(--muted)";
-              }}
-              onMouseLeave={(e) => {
-                if (!menuOpen)
-                  (e.currentTarget as HTMLElement).style.background =
-                    "transparent";
               }}
             >
               <div
@@ -244,19 +221,11 @@ export default function TopNav() {
                   justifyContent: "center",
                 }}
               >
-                <span
-                  style={{ fontSize: "10px", fontWeight: 700, color: "white" }}
-                >
+                <span style={{ fontSize: "10px", fontWeight: 700, color: "white" }}>
                   {userInitial}
                 </span>
               </div>
-              <ChevronDown
-                style={{
-                  width: 12,
-                  height: 12,
-                  color: "var(--muted-foreground)",
-                }}
-              />
+              <ChevronDown style={{ width: 12, height: 12, color: "var(--muted-foreground)" }} />
             </button>
 
             {menuOpen && (
@@ -274,7 +243,6 @@ export default function TopNav() {
                   overflow: "hidden",
                 }}
               >
-                {/* User info */}
                 <div
                   style={{
                     padding: "12px 14px",
@@ -296,13 +264,7 @@ export default function TopNav() {
                       justifyContent: "center",
                     }}
                   >
-                    <span
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: 700,
-                        color: "white",
-                      }}
-                    >
+                    <span style={{ fontSize: "12px", fontWeight: 700, color: "white" }}>
                       {userInitial}
                     </span>
                   </div>
@@ -322,49 +284,20 @@ export default function TopNav() {
                   </div>
                 </div>
 
-                {/* Menu items */}
-                {[
-                  { icon: Settings, label: "Einstellungen", href: "/settings" },
-                ].map(({ icon: Icon, label, href }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    onClick={() => setMenuOpen(false)}
-                    style={{ textDecoration: "none" }}
+                <Link href="/settings" onClick={() => setMenuOpen(false)} style={{ textDecoration: "none" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "9px 14px",
+                      cursor: "pointer",
+                    }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        padding: "9px 14px",
-                        cursor: "pointer",
-                        transition: "background 100ms",
-                      }}
-                      onMouseEnter={(e) =>
-                        ((e.currentTarget as HTMLElement).style.background =
-                          "var(--muted)")
-                      }
-                      onMouseLeave={(e) =>
-                        ((e.currentTarget as HTMLElement).style.background =
-                          "transparent")
-                      }
-                    >
-                      <Icon
-                        style={{
-                          width: 14,
-                          height: 14,
-                          color: "var(--muted-foreground)",
-                        }}
-                      />
-                      <span
-                        style={{ fontSize: "13px", color: "var(--foreground)" }}
-                      >
-                        {label}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
+                    <Settings style={{ width: 14, height: 14, color: "var(--muted-foreground)" }} />
+                    <span style={{ fontSize: "13px", color: "var(--foreground)" }}>Einstellungen</span>
+                  </div>
+                </Link>
 
                 <div style={{ borderTop: "1px solid var(--border)" }}>
                   <div
@@ -375,31 +308,10 @@ export default function TopNav() {
                       gap: "8px",
                       padding: "9px 14px",
                       cursor: "pointer",
-                      transition: "background 100ms",
                     }}
-                    onMouseEnter={(e) =>
-                      ((e.currentTarget as HTMLElement).style.background =
-                        "var(--destructive-bg)")
-                    }
-                    onMouseLeave={(e) =>
-                      ((e.currentTarget as HTMLElement).style.background =
-                        "transparent")
-                    }
                   >
-                    <LogOut
-                      style={{
-                        width: 14,
-                        height: 14,
-                        color: "var(--destructive)",
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontSize: "13px",
-                        color: "var(--destructive)",
-                        fontWeight: 500,
-                      }}
-                    >
+                    <LogOut style={{ width: 14, height: 14, color: "var(--destructive)" }} />
+                    <span style={{ fontSize: "13px", color: "var(--destructive)", fontWeight: 500 }}>
                       Abmelden
                     </span>
                   </div>
