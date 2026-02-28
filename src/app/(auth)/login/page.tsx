@@ -72,7 +72,7 @@ export default function LoginPage() {
           padding: "0 12px",
           fontSize: "13px",
           border: "1px solid var(--border)",
-          borderRadius: "var(--radius)",
+          // borderRadius: "var(--radius)",
           background: "var(--background)",
           color: "var(--foreground)",
           outline: "none",
@@ -110,7 +110,7 @@ export default function LoginPage() {
               width: "32px",
               height: "32px",
               background: "var(--primary)",
-              borderRadius: "4px",
+              // borderRadius: "4px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -126,7 +126,7 @@ export default function LoginPage() {
               letterSpacing: "-0.01em",
             }}
           >
-            InvoiceFlow
+            Faktura
           </span>
         </div>
 
@@ -135,7 +135,7 @@ export default function LoginPage() {
           style={{
             background: "var(--card)",
             border: "1px solid var(--border)",
-            borderRadius: "8px",
+            // borderRadius: "8px",
             boxShadow: "var(--shadow-sm)",
             overflow: "hidden",
           }}
@@ -201,7 +201,7 @@ export default function LoginPage() {
                 background: loading ? "var(--muted)" : "var(--primary)",
                 color: loading ? "var(--muted-foreground)" : "white",
                 border: "none",
-                borderRadius: "var(--radius)",
+                // borderRadius: "var(--radius)",
                 cursor: loading ? "not-allowed" : "pointer",
                 display: "flex",
                 alignItems: "center",

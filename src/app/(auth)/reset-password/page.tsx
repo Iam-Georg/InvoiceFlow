@@ -1,13 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { toast } from "sonner";
 import { FileText, Loader2 } from "lucide-react";
 
 export default function ResetPasswordPage() {
-  const supabase = createClient();
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+  function getSupabase() {
+    if (!supabaseRef.current) supabaseRef.current = createClient();
+    return supabaseRef.current;
+  }
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
@@ -15,6 +20,8 @@ export default function ResetPasswordPage() {
   const [mode, setMode] = useState<"request" | "update">("request");
 
   useEffect(() => {
+    const supabase = getSupabase();
+
     async function checkSession() {
       const {
         data: { user },
@@ -35,7 +42,7 @@ export default function ResetPasswordPage() {
     return () => {
       authSub.subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, []);
 
   async function requestReset() {
     if (!email.trim()) {
@@ -44,7 +51,7 @@ export default function ResetPasswordPage() {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      const { error } = await getSupabase().auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) {
@@ -73,7 +80,7 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const { error } = await getSupabase().auth.updateUser({ password });
       if (error) {
         toast.error(error.message);
         return;
@@ -111,7 +118,7 @@ export default function ResetPasswordPage() {
               width: "32px",
               height: "32px",
               background: "var(--primary)",
-              borderRadius: "4px",
+              // borderRadius: "4px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -120,7 +127,7 @@ export default function ResetPasswordPage() {
             <FileText style={{ width: 16, height: 16, color: "white" }} />
           </div>
           <span style={{ fontSize: "16px", fontWeight: 700, color: "var(--foreground)" }}>
-            InvoiceFlow
+            Faktura
           </span>
         </div>
 
@@ -128,7 +135,7 @@ export default function ResetPasswordPage() {
           style={{
             background: "var(--card)",
             border: "1px solid var(--border)",
-            borderRadius: "8px",
+            // borderRadius: "8px",
             boxShadow: "var(--shadow-sm)",
             padding: "24px",
             display: "grid",
@@ -156,7 +163,7 @@ export default function ResetPasswordPage() {
                   padding: "0 12px",
                   fontSize: "13px",
                   border: "1px solid var(--border)",
-                  borderRadius: "var(--radius)",
+                  // borderRadius: "var(--radius)",
                   background: "var(--background)",
                   color: "var(--foreground)",
                   outline: "none",
@@ -172,7 +179,7 @@ export default function ResetPasswordPage() {
                   background: loading ? "var(--muted)" : "var(--primary)",
                   color: loading ? "var(--muted-foreground)" : "white",
                   border: "none",
-                  borderRadius: "var(--radius)",
+                  // borderRadius: "var(--radius)",
                   cursor: loading ? "not-allowed" : "pointer",
                   display: "inline-flex",
                   alignItems: "center",
@@ -204,7 +211,7 @@ export default function ResetPasswordPage() {
                   padding: "0 12px",
                   fontSize: "13px",
                   border: "1px solid var(--border)",
-                  borderRadius: "var(--radius)",
+                  // borderRadius: "var(--radius)",
                   background: "var(--background)",
                   color: "var(--foreground)",
                   outline: "none",
@@ -220,7 +227,7 @@ export default function ResetPasswordPage() {
                   padding: "0 12px",
                   fontSize: "13px",
                   border: "1px solid var(--border)",
-                  borderRadius: "var(--radius)",
+                  // borderRadius: "var(--radius)",
                   background: "var(--background)",
                   color: "var(--foreground)",
                   outline: "none",
@@ -236,7 +243,7 @@ export default function ResetPasswordPage() {
                   background: loading ? "var(--muted)" : "var(--primary)",
                   color: loading ? "var(--muted-foreground)" : "white",
                   border: "none",
-                  borderRadius: "var(--radius)",
+                  // borderRadius: "var(--radius)",
                   cursor: loading ? "not-allowed" : "pointer",
                   display: "inline-flex",
                   alignItems: "center",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { generateInvoiceNumber, formatCurrency } from "@/lib/utils";
@@ -19,7 +19,11 @@ const emptyItem = (): InvoiceItem => ({
 
 export default function NewInvoicePage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+  function getSupabase() {
+    if (!supabaseRef.current) supabaseRef.current = createClient();
+    return supabaseRef.current;
+  }
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [customerId, setCustomerId] = useState("");
@@ -41,6 +45,7 @@ export default function NewInvoicePage() {
 
   useEffect(() => {
     async function load() {
+      const supabase = getSupabase();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -56,11 +61,12 @@ export default function NewInvoicePage() {
       const { data: custs } = await supabase
         .from("customers")
         .select("*")
+        .eq("user_id", user.id)
         .order("name");
       setCustomers(custs ?? []);
     }
     load();
-  }, [supabase]);
+  }, []);
 
   function updateItem(
     id: string,
@@ -92,6 +98,7 @@ export default function NewInvoicePage() {
     }
     setSaving(true);
     try {
+      const supabase = getSupabase();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -122,7 +129,7 @@ export default function NewInvoicePage() {
         return;
       }
 
-      await supabase.rpc("increment_invoice_counter", { user_id_input: user.id });
+      await getSupabase().rpc("increment_invoice_counter", { user_id_input: user.id });
       toast.success(
         status === "draft" ? "Entwurf gespeichert" : "Rechnung erstellt",
       );
@@ -150,7 +157,7 @@ export default function NewInvoicePage() {
         items?: Array<{ description: string; quantity: number; unit_price: number }>;
         notes?: string;
         suggested_due_days?: number;
-        source?: "openai" | "heuristic";
+        source?: "groq" | "heuristic";
         error?: string;
       };
 
@@ -176,7 +183,7 @@ export default function NewInvoicePage() {
         setDueDate(d.toISOString().split("T")[0]);
       }
       toast.success(
-        payload.source === "openai"
+        payload.source === "groq"
           ? "KI-Entwurf übernommen"
           : "Entwurf aus Beschreibung erstellt",
       );
@@ -553,7 +560,7 @@ export default function NewInvoicePage() {
                       style={{
                         fontSize: "12px",
                         border: "1px solid var(--border)",
-                        borderRadius: "3px",
+                        // borderRadius: "3px",
                         padding: "1px 4px",
                         background: "var(--background)",
                         color: "var(--foreground)",

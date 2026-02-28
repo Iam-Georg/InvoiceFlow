@@ -1,10 +1,4 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-} from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { Invoice } from "@/types";
 
 const styles = StyleSheet.create({
@@ -31,7 +25,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     backgroundColor: "#1B3A6B",
-    borderRadius: 3,
+    // borderRadius: 3,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 6,
@@ -116,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F7FA",
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 3,
+    // borderRadius: 3,
     marginBottom: 1,
   },
   tableRow: {
@@ -176,7 +170,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
     backgroundColor: "#1B3A6B",
-    borderRadius: 3,
+    // borderRadius: 3,
     marginTop: 4,
   },
   totalFinalLabel: {
@@ -193,7 +187,7 @@ const styles = StyleSheet.create({
   // Notes
   notesBlock: {
     backgroundColor: "#F5F7FA",
-    borderRadius: 3,
+    // borderRadius: 3,
     padding: 14,
     marginBottom: 36,
   },
@@ -284,7 +278,7 @@ export default function InvoicePDF({ invoice, profile }: Props) {
                   fontFamily: "Helvetica-Bold",
                 }}
               >
-                IF
+                F
               </Text>
             </View>
             <Text style={styles.companyName}>{companyLine}</Text>
@@ -408,7 +402,7 @@ export default function InvoicePDF({ invoice, profile }: Props) {
           <Text style={styles.footerText}>
             Vielen Dank für Ihren Auftrag. · {invoice.invoice_number}
           </Text>
-          <Text style={styles.footerBrand}>InvoiceFlow</Text>
+          <Text style={styles.footerBrand}>Faktura</Text>
         </View>
       </Page>
     </Document>

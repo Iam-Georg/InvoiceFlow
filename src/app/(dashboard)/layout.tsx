@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import TopNav from "@/components/layout/TopNav";
+import FloatingSidebar from "@/components/layout/FloatingSidebar";
 import { Loader2 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -12,39 +13,45 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const supabase = createClient();
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+  function getSupabase() {
+    if (!supabaseRef.current) supabaseRef.current = createClient();
+    return supabaseRef.current;
+  }
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
+    const supabase = getSupabase();
+
     async function checkAuth() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+
       if (!user) {
         router.replace("/login");
         return;
       }
+
       setChecked(true);
     }
 
     checkAuth();
 
-    const { data: authSubscription } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (!session) {
-          router.replace("/login");
-          return;
-        }
-        setChecked(true);
-      },
-    );
+    const { data: authSubscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        router.replace("/login");
+        return;
+      }
+      setChecked(true);
+    });
 
     return () => {
       authSubscription.subscription.unsubscribe();
     };
-  }, [router, supabase]);
+  }, [router]);
 
-  if (!checked)
+  if (!checked) {
     return (
       <div
         style={{
@@ -52,30 +59,20 @@ export default function DashboardLayout({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "var(--background)",
+          background: "var(--page-bg)",
         }}
       >
-        <Loader2
-          style={{
-            width: 18,
-            height: 18,
-            color: "var(--muted-foreground)",
-            animation: "spin 1s linear infinite",
-          }}
-        />
+        <Loader2 style={{ width: 18, height: 18, color: "var(--text-secondary)", animation: "spin 1s linear infinite" }} />
       </div>
     );
+  }
 
   return (
-    <div style={{ background: "var(--background)", minHeight: "100vh" }}>
+    <div className="dashboard-shell">
       <TopNav />
-      <main style={{ paddingTop: "52px" }}>
-        <div
-          className="app-main-container"
-          style={{ maxWidth: "1280px", margin: "0 auto", padding: "32px 40px" }}
-        >
-          {children}
-        </div>
+      <FloatingSidebar />
+      <main>
+        <div className="app-main-container dashboard-main-container">{children}</div>
       </main>
     </div>
   );

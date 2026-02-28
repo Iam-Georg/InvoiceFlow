@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,11 @@ interface CustomerForm {
 
 export default function NewCustomerPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+  function getSupabase() {
+    if (!supabaseRef.current) supabaseRef.current = createClient();
+    return supabaseRef.current;
+  }
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<CustomerForm>({
     name: "",
@@ -47,6 +51,7 @@ export default function NewCustomerPage() {
     setSaving(true);
 
     try {
+      const supabase = getSupabase();
       const {
         data: { user },
         error: authError,

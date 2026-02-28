@@ -27,7 +27,7 @@ export function getStatusLabel(status: string): string {
     draft: 'Entwurf',
     sent: 'Gesendet',
     open: 'Offen',
-    overdue: 'Überfällig',
+    overdue: 'Ueberfaellig',
     paid: 'Bezahlt',
   }
   return labels[status] ?? status
@@ -35,11 +35,12 @@ export function getStatusLabel(status: string): string {
 
 export function getStatusColors(status: string): { bg: string; text: string } {
   const colors: Record<string, { bg: string; text: string }> = {
-    draft:   { bg: '#F1F5F9', text: '#64748B' },
-    sent:    { bg: '#EFF6FF', text: '#2563EB' },
-    open:    { bg: '#FFF7ED', text: '#C2410C' },
-    overdue: { bg: '#FEF2F2', text: '#DC2626' },
-    paid:    { bg: '#F0FDF4', text: '#16A34A' },
+    draft: { bg: 'var(--badge-draft-bg)', text: 'var(--badge-draft-text)' },
+    sent: { bg: 'var(--badge-sent-bg)', text: 'var(--badge-sent-text)' },
+    open: { bg: 'var(--badge-open-bg)', text: 'var(--badge-open-text)' },
+    overdue: { bg: 'var(--badge-overdue-bg)', text: 'var(--badge-overdue-text)' },
+    paid: { bg: 'var(--badge-paid-bg)', text: 'var(--badge-paid-text)' },
   }
-  return colors[status] ?? { bg: '#F1F5F9', text: '#64748B' }
+
+  return colors[status] ?? { bg: 'var(--badge-draft-bg)', text: 'var(--badge-draft-text)' }
 }

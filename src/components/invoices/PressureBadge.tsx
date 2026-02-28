@@ -9,7 +9,7 @@ export default function PressureBadge({ pressure }: { pressure: PressureResult }
   return (
     <div className="relative inline-flex">
       <span
-        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium cursor-default tabular-nums ${pressure.className}`}
+        className={`badge cursor-default amount ${pressure.className}`}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
       >
@@ -17,23 +17,28 @@ export default function PressureBadge({ pressure }: { pressure: PressureResult }
       </span>
       {showTooltip && (
         <div
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs rounded-lg whitespace-nowrap z-50"
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-xs whitespace-nowrap z-50"
           style={{
-            background: 'var(--card)',
-            color: 'var(--foreground)',
+            background: 'var(--surface)',
+            color: 'var(--text-1)',
             border: '1px solid var(--border)',
             boxShadow: 'var(--shadow-md)',
           }}
         >
           <div className="font-medium mb-1">Druck-Score: {pressure.score}/100</div>
-          <div style={{ color: 'var(--muted-foreground)' }}>
+          <div style={{ color: 'var(--text-2)' }}>
             Basierend auf Zahlungsverzug, Kundenhistorie,
             <br />
             Erinnerungen und Rechnungsbetrag.
           </div>
           <div
             className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 rotate-45"
-            style={{ background: 'var(--card)', borderRight: '1px solid var(--border)', borderBottom: '1px solid var(--border)', marginTop: '-4px' }}
+            style={{
+              background: 'var(--surface)',
+              borderRight: '1px solid var(--border)',
+              borderBottom: '1px solid var(--border)',
+              marginTop: '-4px',
+            }}
           />
         </div>
       )}

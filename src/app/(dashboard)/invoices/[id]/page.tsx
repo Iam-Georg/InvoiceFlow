@@ -55,8 +55,9 @@ export default function InvoiceDetailPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [pdfReady, setPdfReady] = useState(false);
-  const [pressure, setPressure] =
-    useState<ReturnType<typeof calculatePressure> | null>(null);
+  const [pressure, setPressure] = useState<ReturnType<
+    typeof calculatePressure
+  > | null>(null);
   const [showSendComposer, setShowSendComposer] = useState(false);
   const [emailSubject, setEmailSubject] = useState(
     getDefaultInvoiceEmailTemplate().subject,
@@ -68,7 +69,7 @@ export default function InvoiceDetailPage() {
     Array<{ id: string; name: string; subject: string; body: string }>
   >(() => {
     if (typeof window === "undefined") return [];
-    const raw = window.localStorage.getItem("invoiceflow:email-templates:v1");
+    const raw = window.localStorage.getItem("faktura:email-templates:v1");
     if (!raw) return [];
     try {
       const parsed = JSON.parse(raw) as Array<{
@@ -84,7 +85,7 @@ export default function InvoiceDetailPage() {
   });
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
 
-  const TEMPLATE_STORAGE_KEY = "invoiceflow:email-templates:v1";
+  const TEMPLATE_STORAGE_KEY = "faktura:email-templates:v1";
 
   useEffect(() => {
     async function load() {
@@ -120,7 +121,8 @@ export default function InvoiceDetailPage() {
         const lateCount = customerRows.filter((row) => {
           const paidLate =
             row.status === "paid" && row.paid_at
-              ? new Date(row.paid_at).getTime() > new Date(row.due_date).getTime()
+              ? new Date(row.paid_at).getTime() >
+                new Date(row.due_date).getTime()
               : false;
           return row.status === "overdue" || paidLate;
         }).length;
@@ -277,16 +279,43 @@ export default function InvoiceDetailPage() {
   const customer = invoice.customer;
   const { bg, text } = getStatusColors(invoice.status);
   const isPaid = invoice.status === "paid";
+  const topSecondaryActionStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    height: "48px",
+    padding: "0 12px",
+    fontSize: "15px",
+    fontWeight: 600,
+    // borderRadius: "8px",
+    border: "1px solid var(--border)",
+    background: "var(--surface)",
+    color: "var(--ios-label)",
+    cursor: "pointer",
+  } as const;
+  const topPrimaryActionStyle = {
+    ...topSecondaryActionStyle,
+    background: "var(--accent)",
+    color: "#fff",
+    border: "none",
+  } as const;
+  const glassCardStyle = {
+    background: "var(--surface)",
+    border: "1px solid var(--border)",
+    // borderRadius: "10px",
+    boxShadow: "var(--shadow-card)",
+  } as const;
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+    <div style={{ maxWidth: "920px", margin: "0 auto" }}>
       {/* Back + Actions */}
       <div
         style={{
           display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "24px",
+          flexDirection: "column",
+          alignItems: "stretch",
+          gap: "12px",
+          marginBottom: "28px",
         }}
       >
         <Link
@@ -295,7 +324,7 @@ export default function InvoiceDetailPage() {
             display: "inline-flex",
             alignItems: "center",
             gap: "4px",
-            fontSize: "13px",
+            fontSize: "15px",
             color: "var(--muted-foreground)",
             textDecoration: "none",
           }}
@@ -304,25 +333,24 @@ export default function InvoiceDetailPage() {
           Rechnungen
         </Link>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <Link href={`/invoices/${invoice.id}/edit`} style={{ textDecoration: "none" }}>
-            <button
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "7px 14px",
-                fontSize: "13px",
-                fontWeight: 500,
-                background: "var(--card)",
-                color: "var(--foreground)",
-                border: "1px solid var(--border)",
-                borderRadius: "var(--radius)",
-                cursor: "pointer",
-              }}
-            >
-              Bearbeiten
-            </button>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+            justifyContent: "flex-start",
+            padding: "10px",
+            // borderRadius: "10px",
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+          }}
+        >
+          <Link
+            href={`/invoices/${invoice.id}/edit`}
+            style={{ textDecoration: "none" }}
+          >
+            <button style={topSecondaryActionStyle}>Bearbeiten</button>
           </Link>
 
           {/* PDF Download */}
@@ -333,22 +361,7 @@ export default function InvoiceDetailPage() {
               style={{ textDecoration: "none" }}
             >
               {({ loading: pdfLoading }) => (
-                <button
-                  disabled={pdfLoading}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    padding: "7px 14px",
-                    fontSize: "13px",
-                    fontWeight: 500,
-                    background: "var(--card)",
-                    color: "var(--foreground)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "var(--radius)",
-                    cursor: "pointer",
-                  }}
-                >
+                <button disabled={pdfLoading} style={topSecondaryActionStyle}>
                   <Download style={{ width: 14, height: 14 }} />
                   {pdfLoading ? "Wird erstellt..." : "PDF herunterladen"}
                 </button>
@@ -361,19 +374,7 @@ export default function InvoiceDetailPage() {
             <button
               onClick={sendReminder}
               disabled={actionLoading === "reminder"}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "7px 14px",
-                fontSize: "13px",
-                fontWeight: 500,
-                background: "var(--card)",
-                color: "var(--foreground)",
-                border: "1px solid var(--border)",
-                borderRadius: "var(--radius)",
-                cursor: "pointer",
-              }}
+              style={topSecondaryActionStyle}
             >
               {actionLoading === "reminder" ? (
                 <Loader2
@@ -395,19 +396,7 @@ export default function InvoiceDetailPage() {
             <button
               onClick={() => setShowSendComposer((prev) => !prev)}
               disabled={actionLoading === "send"}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "7px 14px",
-                fontSize: "13px",
-                fontWeight: 500,
-                background: "var(--card)",
-                color: "var(--foreground)",
-                border: "1px solid var(--border)",
-                borderRadius: "var(--radius)",
-                cursor: "pointer",
-              }}
+              style={topSecondaryActionStyle}
             >
               {actionLoading === "send" ? (
                 <Loader2
@@ -429,19 +418,7 @@ export default function InvoiceDetailPage() {
             <button
               onClick={markAsPaid}
               disabled={actionLoading === "paid"}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "7px 14px",
-                fontSize: "13px",
-                fontWeight: 500,
-                background: "var(--primary)",
-                color: "white",
-                border: "none",
-                borderRadius: "var(--radius)",
-                cursor: "pointer",
-              }}
+              style={topPrimaryActionStyle}
             >
               {actionLoading === "paid" ? (
                 <Loader2
@@ -463,29 +440,41 @@ export default function InvoiceDetailPage() {
       {showSendComposer && (
         <div
           style={{
-            marginBottom: "16px",
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius)",
-            padding: "14px",
+            marginBottom: "20px",
+            ...glassCardStyle,
+            padding: "20px",
             display: "grid",
-            gap: "10px",
+            gap: "12px",
           }}
         >
-          <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>
+          <p
+            style={{
+              fontSize: "13px",
+              fontWeight: 600,
+              color: "var(--foreground)",
+            }}
+          >
             E-Mail-Text & Vorlagen
           </p>
-          <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
             <select
               value={selectedTemplateId}
               onChange={(e) => applyTemplate(e.target.value)}
               style={{
-                border: "1px solid var(--border)",
-                background: "var(--background)",
-                borderRadius: "var(--radius)",
-                padding: "7px 10px",
-                fontSize: "13px",
-                color: "var(--foreground)",
+                minHeight: "44px",
+                border: "1px solid rgba(60,60,67,0.18)",
+                background: "rgba(255,255,255,0.8)",
+                // borderRadius: "10px",
+                padding: "10px 12px",
+                fontSize: "17px",
+                color: "var(--ios-label)",
               }}
             >
               <option value="">Vorhandene Vorlage nutzen...</option>
@@ -498,13 +487,8 @@ export default function InvoiceDetailPage() {
             <button
               onClick={saveCurrentTemplate}
               style={{
-                border: "1px solid var(--border)",
-                background: "var(--card)",
-                borderRadius: "var(--radius)",
-                padding: "7px 10px",
-                fontSize: "12px",
-                color: "var(--foreground)",
-                cursor: "pointer",
+                ...topSecondaryActionStyle,
+                fontSize: "15px",
               }}
             >
               Vorlage speichern
@@ -515,12 +499,13 @@ export default function InvoiceDetailPage() {
             onChange={(e) => setEmailSubject(e.target.value)}
             placeholder="Betreff"
             style={{
-              border: "1px solid var(--border)",
-              background: "var(--background)",
-              borderRadius: "var(--radius)",
-              padding: "8px 10px",
-              fontSize: "13px",
-              color: "var(--foreground)",
+              minHeight: "44px",
+              border: "1px solid rgba(60,60,67,0.18)",
+              background: "rgba(255,255,255,0.8)",
+              // borderRadius: "10px",
+              padding: "10px 12px",
+              fontSize: "17px",
+              color: "var(--ios-label)",
               width: "100%",
             }}
           />
@@ -529,40 +514,35 @@ export default function InvoiceDetailPage() {
             onChange={(e) => setEmailBody(e.target.value)}
             rows={8}
             style={{
-              border: "1px solid var(--border)",
-              background: "var(--background)",
-              borderRadius: "var(--radius)",
-              padding: "10px",
-              fontSize: "13px",
-              color: "var(--foreground)",
+              border: "1px solid rgba(60,60,67,0.18)",
+              background: "rgba(255,255,255,0.8)",
+              // borderRadius: "10px",
+              padding: "10px 12px",
+              fontSize: "17px",
+              color: "var(--ios-label)",
               width: "100%",
               resize: "vertical",
               lineHeight: 1.5,
             }}
           />
           <p style={{ fontSize: "11px", color: "var(--muted-foreground)" }}>
-            Verfügbare Platzhalter: {`{{invoice_number}}, {{customer_name}}, {{issue_date}}, {{due_date}}, {{total}}, {{sender_name}}`}
+            Verfügbare Platzhalter:{" "}
+            {`{{invoice_number}}, {{customer_name}}, {{issue_date}}, {{due_date}}, {{total}}, {{sender_name}}`}
           </p>
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <button
               onClick={sendInvoice}
               disabled={actionLoading === "send"}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 14px",
-                fontSize: "13px",
-                fontWeight: 600,
-                background: "var(--primary)",
-                color: "#fff",
-                border: "none",
-                borderRadius: "var(--radius)",
-                cursor: actionLoading === "send" ? "not-allowed" : "pointer",
-              }}
+              style={topPrimaryActionStyle}
             >
               {actionLoading === "send" ? (
-                <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
+                <Loader2
+                  style={{
+                    width: 14,
+                    height: 14,
+                    animation: "spin 1s linear infinite",
+                  }}
+                />
               ) : (
                 <Send style={{ width: 14, height: 14 }} />
               )}
@@ -575,10 +555,7 @@ export default function InvoiceDetailPage() {
       {/* Main Card */}
       <div
         style={{
-          background: "var(--card)",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius)",
-          boxShadow: "var(--shadow-sm)",
+          ...glassCardStyle,
           overflow: "hidden",
         }}
       >
@@ -614,14 +591,11 @@ export default function InvoiceDetailPage() {
               <span
                 style={{
                   padding: "3px 10px",
-                  borderRadius: "99px",
+                  // borderRadius: "6px",
                   fontSize: "11px",
                   fontWeight: 600,
                   background: bg,
                   color: text,
-                  ...(invoice.status === "overdue"
-                    ? { animation: "overdue-pulse 2.4s ease-in-out infinite" }
-                    : {}),
                 }}
               >
                 {getStatusLabel(invoice.status)}
@@ -721,7 +695,9 @@ export default function InvoiceDetailPage() {
             {pressure ? (
               <PressureBadge pressure={pressure} />
             ) : (
-              <span style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
+              <span
+                style={{ fontSize: "13px", color: "var(--muted-foreground)" }}
+              >
                 –
               </span>
             )}
@@ -729,7 +705,7 @@ export default function InvoiceDetailPage() {
         </div>
 
         {/* Line Items */}
-        <div style={{ padding: "0 32px 24px" }}>
+        <div style={{ padding: "0 32px 30px" }}>
           <table
             style={{
               width: "100%",
@@ -933,7 +909,7 @@ export default function InvoiceDetailPage() {
                 style={{
                   width: "6px",
                   height: "6px",
-                  borderRadius: "99px",
+                  // borderRadius: "6px",
                   background: date ? "var(--success)" : "var(--border-strong)",
                   flexShrink: 0,
                 }}

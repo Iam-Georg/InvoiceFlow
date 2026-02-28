@@ -1,20 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { Plus, LogOut, Settings, FileText, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-
-const navItems = [
-  { href: "/dashboard", label: "Übersicht" },
-  { href: "/invoices", label: "Rechnungen" },
-  { href: "/customers", label: "Kunden" },
-  { href: "/statistics", label: "Statistiken" },
-];
+import { DarkModeToggle } from "./DarkModeToggle";
 
 export default function TopNav() {
-  const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userInitial, setUserInitial] = useState("?");
@@ -33,10 +26,14 @@ export default function TopNav() {
         .select("full_name, company_name")
         .eq("id", user.id)
         .single();
+
       const name = profile?.full_name || user.email || "?";
-      setUserName(profile?.company_name || profile?.full_name || user.email || "");
+      setUserName(
+        profile?.company_name || profile?.full_name || user.email || "",
+      );
       setUserInitial(name.charAt(0).toUpperCase());
     }
+
     loadUser();
   }, []);
 
@@ -46,6 +43,7 @@ export default function TopNav() {
         setMenuOpen(false);
       }
     }
+
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
@@ -62,151 +60,82 @@ export default function TopNav() {
   }
 
   return (
-    <header
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        background: "var(--topbar-bg)",
-        borderBottom: "1px solid var(--border)",
-        backdropFilter: "blur(8px)",
-      }}
-    >
-      <div
-        className="topnav-shell"
-        style={{
-          maxWidth: "1280px",
-          margin: "0 auto",
-          padding: "0 40px",
-          height: "52px",
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
+    <header className="topnav-frame">
+      <div className="topnav-shell">
         <Link
           href="/dashboard"
-          className="topnav-brand"
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "8px",
+            gap: "10px",
             textDecoration: "none",
-            marginRight: "24px",
-            flexShrink: 0,
+            minWidth: 0,
           }}
         >
           <div
             style={{
-              width: "26px",
-              height: "26px",
-              background: "var(--primary)",
-              borderRadius: "3px",
+              width: "28px",
+              height: "28px",
+              /* borderRadius: "8px", */
+              background: "var(--accent-theme)",
+              color: "#fff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              flexShrink: 0,
             }}
           >
-            <FileText style={{ width: 13, height: 13, color: "white" }} />
+            <FileText style={{ width: 14, height: 14 }} />
           </div>
           <span
             style={{
-              fontSize: "14px",
-              fontWeight: 700,
-              color: "var(--foreground)",
-              letterSpacing: "-0.01em",
+              fontSize: "16px",
+              fontWeight: 600,
+              color: "var(--text-primary-theme)",
             }}
           >
-            InvoiceFlow
-          </span>
-          <span
-            className="topnav-free-badge"
-            style={{
-              fontSize: "10px",
-              fontWeight: 700,
-              padding: "1px 6px",
-              background: "var(--primary-light)",
-              color: "var(--primary)",
-              borderRadius: "3px",
-              letterSpacing: "0.04em",
-            }}
-          >
-            FREE
+            Faktura
           </span>
         </Link>
 
-        <nav
-          className="topnav-main-nav"
-          style={{
-            display: "flex",
-            alignItems: "stretch",
-            height: "52px",
-            flex: 1,
-            minWidth: 0,
-          }}
-        >
-          {navItems.map(({ href, label }) => {
-            const active = pathname === href || pathname.startsWith(href + "/");
-            return (
-              <Link
-                key={href}
-                href={href}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0 14px",
-                  fontSize: "13.5px",
-                  fontWeight: active ? 600 : 400,
-                  color: active ? "var(--primary)" : "var(--muted-foreground)",
-                  textDecoration: "none",
-                  borderBottom: `2px solid ${active ? "var(--primary)" : "transparent"}`,
-                  transition: "color 100ms ease, border-color 100ms ease",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="topnav-right" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <DarkModeToggle />
+          
           <Link href="/invoices/new" style={{ textDecoration: "none" }}>
             <button
               className="topnav-new-btn"
               style={{
+                height: "36px",
+                padding: "0 12px",
+                /* borderRadius: "8px", */
+                border: "none",
+                background: "var(--accent-theme)",
+                color: "#fff",
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "5px",
-                height: "32px",
-                padding: "0 14px",
-                fontSize: "13px",
+                gap: "6px",
+                fontSize: "14px",
                 fontWeight: 600,
-                background: "var(--primary)",
-                color: "white",
-                border: "none",
-                borderRadius: "var(--radius)",
                 cursor: "pointer",
               }}
             >
-              <Plus style={{ width: 13, height: 13 }} strokeWidth={2.5} />
+              <Plus size={14} />
               <span className="topnav-new-label">Neue Rechnung</span>
             </button>
           </Link>
 
           <div ref={menuRef} style={{ position: "relative" }}>
             <button
-              onClick={() => setMenuOpen((o) => !o)}
+              onClick={() => setMenuOpen((open) => !open)}
               style={{
-                display: "flex",
+                height: "36px",
+                padding: "0 10px",
+                /* borderRadius: "8px", */
+                border: "1px solid var(--border)",
+                background: "var(--surface)",
+                display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
-                height: "32px",
-                padding: "0 10px",
-                background: menuOpen ? "var(--muted)" : "transparent",
-                border: "1px solid var(--border)",
-                borderRadius: "var(--radius)",
                 cursor: "pointer",
               }}
             >
@@ -214,108 +143,99 @@ export default function TopNav() {
                 style={{
                   width: "22px",
                   height: "22px",
-                  borderRadius: "50%",
-                  background: "var(--primary)",
+                  /* borderRadius: "8px", */
+                  background: "var(--accent-theme)",
+                  color: "#ffffff",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  fontSize: "11px",
+                  fontWeight: 700,
                 }}
               >
-                <span style={{ fontSize: "10px", fontWeight: 700, color: "white" }}>
-                  {userInitial}
-                </span>
+                {userInitial}
               </div>
-              <ChevronDown style={{ width: 12, height: 12, color: "var(--muted-foreground)" }} />
+              <ChevronDown
+                style={{
+                  width: 12,
+                  height: 12,
+                  color: "var(--text-secondary)",
+                }}
+              />
             </button>
 
             {menuOpen && (
               <div
                 style={{
                   position: "absolute",
-                  top: "calc(100% + 6px)",
+                  top: "calc(100% + 8px)",
                   right: 0,
-                  background: "var(--card)",
+                  minWidth: "220px",
+                  /* borderRadius: "10px", */
+                  background: "var(--surface)",
                   border: "1px solid var(--border)",
-                  borderRadius: "var(--radius)",
-                  boxShadow: "var(--shadow-md)",
-                  minWidth: "200px",
-                  zIndex: 100,
+                  boxShadow: "var(--shadow-card)",
                   overflow: "hidden",
+                  zIndex: 100,
                 }}
               >
                 <div
                   style={{
-                    padding: "12px 14px",
-                    borderBottom: "1px solid var(--border)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
+                    padding: "12px",
+                    borderBottom: "1px solid var(--divider)",
                   }}
+                >
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      color: "var(--text-primary-theme)",
+                    }}
+                  >
+                    {userName || "-"}
+                  </p>
+                </div>
+
+                <Link
+                  href="/settings"
+                  onClick={() => setMenuOpen(false)}
+                  style={{ textDecoration: "none" }}
                 >
                   <div
                     style={{
-                      width: "32px",
-                      height: "32px",
-                      borderRadius: "50%",
-                      flexShrink: 0,
-                      background: "var(--primary)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <span style={{ fontSize: "12px", fontWeight: 700, color: "white" }}>
-                      {userInitial}
-                    </span>
-                  </div>
-                  <div style={{ overflow: "hidden" }}>
-                    <p
-                      style={{
-                        fontSize: "13px",
-                        fontWeight: 600,
-                        color: "var(--foreground)",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {userName || "–"}
-                    </p>
-                  </div>
-                </div>
-
-                <Link href="/settings" onClick={() => setMenuOpen(false)} style={{ textDecoration: "none" }}>
-                  <div
-                    style={{
                       display: "flex",
                       alignItems: "center",
                       gap: "8px",
-                      padding: "9px 14px",
-                      cursor: "pointer",
+                      padding: "10px 12px",
+                      color: "var(--text-primary-theme)",
+                      fontSize: "14px",
                     }}
                   >
-                    <Settings style={{ width: 14, height: 14, color: "var(--muted-foreground)" }} />
-                    <span style={{ fontSize: "13px", color: "var(--foreground)" }}>Einstellungen</span>
+                    <Settings size={14} color="var(--text-secondary-theme)" />
+                    Einstellungen
                   </div>
                 </Link>
 
-                <div style={{ borderTop: "1px solid var(--border)" }}>
-                  <div
-                    onClick={handleLogout}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      padding: "9px 14px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <LogOut style={{ width: 14, height: 14, color: "var(--destructive)" }} />
-                    <span style={{ fontSize: "13px", color: "var(--destructive)", fontWeight: 500 }}>
-                      Abmelden
-                    </span>
-                  </div>
-                </div>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: "100%",
+                    border: "none",
+                    borderTop: "1px solid var(--divider)",
+                    background: "transparent",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "10px 12px",
+                    color: "var(--danger)",
+                    fontSize: "14px",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <LogOut size={14} />
+                  Abmelden
+                </button>
               </div>
             )}
           </div>
