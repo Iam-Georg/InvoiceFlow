@@ -14,12 +14,12 @@
   --surface: #ffffff;
   --surface-2: #f7f7fa;
 
-  /* Sidebar */
-  --sidebar-bg: #0b1628;
-  --sidebar-text: rgba(255, 255, 255, 0.5);
-  --sidebar-active: #ffffff;
-  --sidebar-active-bg: rgba(255, 255, 255, 0.08);
-  --sidebar-hover: rgba(255, 255, 255, 0.05);
+  /* Sidebar – hell im Light Mode */
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #5c5c6e;
+  --sidebar-active: #0c0c14;
+  --sidebar-active-bg: rgba(0, 64, 204, 0.08);
+  --sidebar-hover: rgba(0, 0, 0, 0.04);
 
   /* Accent – ein einziger, präziser Blauton */
   --accent: #0040cc;
@@ -73,6 +73,17 @@
 
   /* Zero radius – das definiert den Charakter */
   --radius: 0px;
+
+  /* ── Animation Timing Functions ── */
+  --ease-out:    cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Animation Durations ── */
+  --duration-fast:   120ms;
+  --duration-normal: 220ms;
+  --duration-slow:   380ms;
 }
 
 /* ═══════════════════════════════════════
@@ -84,8 +95,12 @@
   --surface: #131320;
   --surface-2: #1a1a2a;
 
-  --sidebar-bg: #060610;
+  /* Sidebar – dunkel im Dark Mode */
+  --sidebar-bg: #0b1628;
+  --sidebar-text: rgba(255, 255, 255, 0.5);
+  --sidebar-active: #ffffff;
   --sidebar-active-bg: rgba(255, 255, 255, 0.07);
+  --sidebar-hover: rgba(255, 255, 255, 0.05);
 
   --accent: #4d80ff;
   --accent-hover: #6b96ff;
@@ -184,12 +199,20 @@ input,
 select,
 textarea {
   transition:
-    color 120ms ease,
-    background-color 120ms ease,
-    border-color 120ms ease,
-    box-shadow 120ms ease,
-    opacity 120ms ease,
-    transform 120ms ease;
+    color       var(--duration-fast) var(--ease-smooth),
+    background-color var(--duration-fast) var(--ease-smooth),
+    border-color var(--duration-fast) var(--ease-smooth),
+    box-shadow  var(--duration-fast) var(--ease-smooth),
+    opacity     var(--duration-fast) var(--ease-smooth),
+    transform   var(--duration-fast) var(--ease-spring);
+}
+
+/* Links – smooth color fade, kein harter Wechsel */
+a {
+  transition:
+    color       var(--duration-fast) var(--ease-smooth),
+    opacity     var(--duration-fast) var(--ease-smooth),
+    text-decoration-color var(--duration-fast) var(--ease-smooth);
 }
 
 /* ═══════════════════════════════════════
@@ -215,6 +238,8 @@ textarea {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 64, 204, 0.12);
+  transition: box-shadow var(--duration-fast) var(--ease-smooth);
 }
 
 /* ═══════════════════════════════════════
@@ -241,6 +266,10 @@ textarea:focus {
   background: var(--surface);
   border-bottom-color: var(--accent);
   box-shadow: 0 3px 10px rgba(0, 64, 204, 0.1);
+  transition:
+    background     var(--duration-fast) var(--ease-smooth),
+    border-color   var(--duration-fast) var(--ease-smooth),
+    box-shadow     var(--duration-fast) var(--ease-smooth);
 }
 
 textarea {
@@ -269,13 +298,13 @@ textarea::placeholder {
   box-shadow: var(--shadow-md);
   border: none;
   transition:
-    box-shadow 150ms ease,
-    transform 150ms ease;
+    box-shadow var(--duration-normal) var(--ease-smooth),
+    transform  var(--duration-normal) var(--ease-smooth);
 }
 
 .card-hover:hover {
   box-shadow: var(--shadow-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 /* ═══════════════════════════════════════
@@ -294,11 +323,22 @@ textarea::placeholder {
   border: none;
   cursor: pointer;
   white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) var(--ease-smooth),
+    box-shadow       var(--duration-fast) var(--ease-smooth),
+    transform        var(--duration-fast) var(--ease-spring),
+    color            var(--duration-fast) var(--ease-smooth),
+    opacity          var(--duration-fast) var(--ease-smooth);
 }
 
-.btn:active {
-  transform: scale(0.97);
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
+
+.btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+}
+
 .btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
@@ -310,6 +350,7 @@ textarea::placeholder {
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-hover);
+  box-shadow: 0 4px 16px rgba(0, 64, 204, 0.25);
 }
 
 .btn-secondary {
@@ -349,6 +390,11 @@ textarea::placeholder {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
+  transition: opacity var(--duration-fast) var(--ease-smooth);
+}
+
+.badge:hover {
+  opacity: 0.8;
 }
 
 .badge-draft {
@@ -379,7 +425,9 @@ textarea::placeholder {
   position: relative;
   min-height: 56px;
   border-bottom: 1px solid var(--divider);
-  transition: background 120ms ease;
+  transition:
+    background  var(--duration-fast) var(--ease-smooth),
+    transform   var(--duration-fast) var(--ease-smooth);
 }
 
 .invoice-row::before {
@@ -388,9 +436,9 @@ textarea::placeholder {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 3px;
-  background: transparent;
-  transition: background 120ms ease;
+  width: 0;
+  background: var(--accent);
+  transition: width var(--duration-normal) var(--ease-spring);
 }
 
 .invoice-row:hover {
@@ -398,7 +446,12 @@ textarea::placeholder {
 }
 
 .invoice-row:hover::before {
-  background: var(--accent);
+  width: 3px;
+}
+
+.invoice-row:active {
+  transform: scale(0.998);
+  background: var(--bg-2);
 }
 
 /* ═══════════════════════════════════════
@@ -474,6 +527,49 @@ textarea::placeholder {
 }
 
 /* ═══════════════════════════════════════
+   SIDEBAR NAV ITEMS
+═══════════════════════════════════════ */
+.sidebar-nav-item {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--sidebar-text);
+  background: transparent;
+  border-left: 2px solid transparent;
+  transition:
+    background    var(--duration-fast) var(--ease-smooth),
+    color         var(--duration-fast) var(--ease-smooth),
+    border-color  var(--duration-normal) var(--ease-spring);
+}
+
+.sidebar-nav-item:hover {
+  background: var(--sidebar-hover);
+  color: var(--sidebar-active);
+}
+
+/* Icon in nav items: leichtes scale beim hover */
+.sidebar-nav-item:hover svg {
+  transform: scale(1.08);
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.sidebar-nav-item svg {
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.sidebar-nav-item.active {
+  /* background + border handled by the sliding pill */
+  color: var(--sidebar-active);
+  font-weight: 600;
+  border-left-color: transparent;
+}
+
+/* ═══════════════════════════════════════
    PRESSURE SCORE
 ═══════════════════════════════════════ */
 .pressure-low {
@@ -492,6 +588,50 @@ textarea::placeholder {
 /* ═══════════════════════════════════════
    ANIMATIONS
 ═══════════════════════════════════════ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.anim-fade-in-up {
+  animation: fadeInUp var(--duration-slow) var(--ease-smooth) both;
+}
+.anim-fade-in {
+  animation: fadeIn var(--duration-slow) var(--ease-smooth) both;
+}
+.anim-delay-1 { animation-delay: 100ms; }
+.anim-delay-2 { animation-delay: 200ms; }
+.anim-delay-3 { animation-delay: 300ms; }
+.anim-delay-4 { animation-delay: 400ms; }
+
+/* Stagger-Varianten für Stats-Karten (0 / 80 / 160 / 240ms) */
+.anim-delay-80  { animation-delay: 80ms; }
+.anim-delay-160 { animation-delay: 160ms; }
+.anim-delay-240 { animation-delay: 240ms; }
+
+/* Page-Enter: jede Seite fadet beim Laden ein */
+.page-enter {
+  animation: fadeInUp 240ms var(--ease-spring) both;
+}
+
+/* Wenn View Transitions aktiv sind, übernimmt ::view-transition-new – kein Doppeleffekt */
+@supports (view-transition-name: initial) {
+  .page-enter {
+    animation: none;
+  }
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -594,10 +734,19 @@ textarea::placeholder {
   border: none;
   cursor: pointer;
   white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) var(--ease-smooth),
+    box-shadow       var(--duration-fast) var(--ease-smooth),
+    transform        var(--duration-fast) var(--ease-spring),
+    opacity          var(--duration-fast) var(--ease-smooth);
 }
 
-.ios-btn:active {
-  transform: scale(0.97);
+.ios-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.ios-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
 }
 
 .ios-btn-primary {
@@ -607,6 +756,7 @@ textarea::placeholder {
 
 .ios-btn-primary:hover:not(:disabled) {
   background: var(--accent-hover);
+  box-shadow: 0 4px 16px rgba(0, 64, 204, 0.25);
 }
 
 .ios-btn-secondary {
@@ -640,6 +790,22 @@ textarea::placeholder {
 }
 
 /* ═══════════════════════════════════════
+   SETTINGS GRID
+═══════════════════════════════════════ */
+.settings-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .settings-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ═══════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════ */
 @media (max-width: 1024px) {
@@ -652,5 +818,191 @@ textarea::placeholder {
   .dashboard-main-container {
     padding-left: var(--gap);
     padding-bottom: 80px;
+  }
+}
+
+/* ═══════════════════════════════════════
+   DROPDOWN / MODAL ANIMATIONEN
+═══════════════════════════════════════ */
+@keyframes dropdownEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes dropdownExit {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+}
+
+.dropdown-enter {
+  animation: dropdownEnter var(--duration-fast) var(--ease-spring) both;
+  transform-origin: top right;
+}
+
+/* ═══════════════════════════════════════
+   TOPBAR BUTTONS
+═══════════════════════════════════════ */
+.topnav-new-btn {
+  transition:
+    background-color var(--duration-fast) var(--ease-smooth),
+    box-shadow       var(--duration-fast) var(--ease-smooth),
+    transform        var(--duration-fast) var(--ease-spring);
+}
+
+.topnav-new-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 64, 204, 0.25);
+}
+
+.topnav-new-btn:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none;
+}
+
+/* Sidebar User-Bereich hover */
+.sidebar-user-area {
+  transition: background var(--duration-fast) var(--ease-smooth);
+}
+
+.sidebar-user-area:hover {
+  background: var(--sidebar-hover);
+}
+
+/* ═══════════════════════════════════════
+   ACCORDION
+═══════════════════════════════════════ */
+.accordion-trigger {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  text-align: left;
+  transition: background var(--duration-fast) var(--ease-smooth);
+}
+
+.accordion-trigger:hover {
+  background: var(--surface-2);
+}
+
+.accordion-chevron {
+  color: var(--text-3);
+  flex-shrink: 0;
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+
+.accordion-trigger[aria-expanded="true"] .accordion-chevron {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  overflow: hidden;
+  height: 0;
+  transition: height var(--duration-normal) var(--ease-smooth);
+}
+
+/* ═══════════════════════════════════════
+   VIEW TRANSITIONS – Seitenübergänge
+═══════════════════════════════════════ */
+@keyframes vt-out {
+  to { opacity: 0; transform: translateY(-4px); }
+}
+@keyframes vt-in {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+::view-transition-old(root) {
+  animation: 160ms var(--ease-smooth) both vt-out;
+}
+::view-transition-new(root) {
+  animation: 260ms var(--ease-spring) both vt-in;
+}
+
+/* ═══════════════════════════════════════
+   DARK MODE – sanfte Übergänge
+═══════════════════════════════════════ */
+body {
+  transition:
+    background-color var(--duration-slow) var(--ease-smooth);
+}
+
+.floating-sidebar {
+  transition:
+    background-color var(--duration-slow) var(--ease-smooth),
+    box-shadow       var(--duration-slow) var(--ease-smooth);
+}
+
+.topnav-shell {
+  transition:
+    background-color var(--duration-slow) var(--ease-smooth),
+    box-shadow       var(--duration-slow) var(--ease-smooth);
+}
+
+.card-elevated,
+.card-base {
+  transition:
+    background-color var(--duration-slow) var(--ease-smooth),
+    box-shadow       var(--duration-slow) var(--ease-smooth);
+}
+
+/* ═══════════════════════════════════════
+   DROPDOWN ITEMS – CSS hover statt inline JS
+═══════════════════════════════════════ */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  border: none;
+  width: 100%;
+  background: transparent;
+  color: var(--text-1);
+  text-decoration: none;
+  transition: background-color var(--duration-fast) var(--ease-smooth);
+}
+
+.dropdown-item:hover {
+  background: var(--surface-2);
+}
+
+.dropdown-item-danger {
+  color: var(--danger);
+  border-top: 1px solid var(--divider);
+}
+
+.dropdown-item-danger:hover {
+  background: var(--danger-bg);
+}
+
+/* ═══════════════════════════════════════
+   REDUCED MOTION – Barrierefreiheit
+═══════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
   }
 }

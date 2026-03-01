@@ -1,135 +1,146 @@
-'use client'
+"use client";
 
-import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'next/navigation'
-import Link from 'next/link'
-import { createClient } from '@/lib/supabase'
-import { formatCurrency, formatDate } from '@/lib/utils'
-import type { Customer, Invoice } from '@/types'
-import StatusBadge from '@/components/invoices/StatusBadge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { toast } from 'sonner'
+import { useEffect, useMemo, useState, useRef } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase";
 import {
-  ChevronLeft, ChevronRight, FileText, Users,
-  Loader2, Save, TrendingUp, AlertTriangle, Clock,
-} from 'lucide-react'
+  formatCurrency,
+  formatDate,
+  getStatusColors,
+  getStatusLabel,
+} from "@/lib/utils";
+import type { Customer, Invoice } from "@/types";
+import { toast } from "sonner";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Loader2,
+  Save,
+  TrendingUp,
+  AlertTriangle,
+  Clock,
+  CheckCircle,
+} from "lucide-react";
+import { usePlan } from "@/hooks/usePlan";
+import LockedFeature from "@/components/LockedFeature";
 
 interface CustomerForm {
-  name: string
-  email: string
-  company: string
-  address: string
-  city: string
-  zip: string
-  country: string
-}
-
-function ReliabilityIndicator({ ratio }: { ratio: number }) {
-  let color = '#16A34A'
-  let label = 'Zuverlässig'
-
-  if (ratio > 0.5) {
-    color = '#DC2626'
-    label = 'Häufig verspätet'
-  } else if (ratio > 0.2) {
-    color = '#B45309'
-    label = 'Gelegentlich verspätet'
-  }
-
-  return (
-    <div className="flex items-center gap-2">
-      <div className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
-      <span className="text-sm" style={{ color }}>{label}</span>
-    </div>
-  )
+  name: string;
+  email: string;
+  company: string;
+  address: string;
+  city: string;
+  zip: string;
+  country: string;
 }
 
 export default function CustomerDetailPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
 
-  const [customer, setCustomer] = useState<Customer | null>(null)
-  const [invoices, setInvoices] = useState<Invoice[]>([])
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [editing, setEditing] = useState(false)
-  const [reloadKey, setReloadKey] = useState(0)
+  function getSupabase() {
+    if (!supabaseRef.current) {
+      supabaseRef.current = createClient();
+    }
+    return supabaseRef.current;
+  }
+
+  const { can, loading: planLoading } = usePlan();
+  const [accordionOpen, setAccordionOpen] = useState(false);
+  const [discount, setDiscount] = useState("");
+  const [creditLimit, setCreditLimit] = useState("");
+  const [taxExempt, setTaxExempt] = useState(false);
+  const accordionRef = useRef<HTMLDivElement>(null);
+
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<CustomerForm>({
-    name: '',
-    email: '',
-    company: '',
-    address: '',
-    city: '',
-    zip: '',
-    country: 'DE',
-  })
+    name: "",
+    email: "",
+    company: "",
+    address: "",
+    city: "",
+    zip: "",
+    country: "DE",
+  });
 
   useEffect(() => {
     async function loadData() {
-      setLoading(true)
-      const supabase = createClient()
+      setLoading(true);
+      const sb = getSupabase();
       const {
         data: { user },
-      } = await supabase.auth.getUser()
+      } = await sb.auth.getUser();
 
       if (!user) {
-        setLoading(false)
-        return
+        router.replace("/login");
+        return;
       }
 
-      const { data: cust } = await supabase
-        .from('customers')
-        .select('*')
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .single()
+      const [{ data: cust }, { data: invs }] = await Promise.all([
+        sb
+          .from("customers")
+          .select("*")
+          .eq("id", id)
+          .eq("user_id", user.id)
+          .single(),
+        sb
+          .from("invoices")
+          .select("*")
+          .eq("customer_id", id)
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false }),
+      ]);
 
       if (cust) {
-        setCustomer(cust)
+        setCustomer(cust);
         setForm({
-          name: cust.name || '',
-          email: cust.email || '',
-          company: cust.company || '',
-          address: cust.address || '',
-          city: cust.city || '',
-          zip: cust.zip || '',
-          country: cust.country || 'DE',
-        })
+          name: cust.name || "",
+          email: cust.email || "",
+          company: cust.company || "",
+          address: cust.address || "",
+          city: cust.city || "",
+          zip: cust.zip || "",
+          country: cust.country || "DE",
+        });
       } else {
-        setCustomer(null)
+        setCustomer(null);
       }
 
-      const { data: invs } = await supabase
-        .from('invoices')
-        .select('*')
-        .eq('customer_id', id)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      setInvoices(invs ?? [])
-      setLoading(false)
+      setInvoices(invs ?? []);
+      setLoading(false);
     }
 
-    loadData()
-  }, [id, reloadKey])
+    loadData();
+  }, [id, router]);
+
+  useEffect(() => {
+    const el = accordionRef.current;
+    if (!el) return;
+    el.style.height = accordionOpen ? `${el.scrollHeight}px` : "0px";
+  }, [accordionOpen]);
 
   function set(field: keyof CustomerForm, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }))
+    setForm((prev) => ({ ...prev, [field]: value }));
   }
 
   async function handleSave() {
     if (!form.name.trim() || !form.email.trim() || !customer) {
-      toast.error('Name und E-Mail sind Pflichtfelder')
-      return
+      toast.error("Name und E-Mail sind Pflichtfelder");
+      return;
     }
 
-    setSaving(true)
-    const supabase = createClient()
-    const { error } = await supabase
-      .from('customers')
+    setSaving(true);
+    const sb = getSupabase();
+    const { error } = await sb
+      .from("customers")
       .update({
         name: form.name.trim(),
         email: form.email.trim(),
@@ -139,229 +150,565 @@ export default function CustomerDetailPage() {
         zip: form.zip.trim() || null,
         country: form.country.trim() || null,
       })
-      .eq('id', customer.id)
+      .eq("id", customer.id);
 
     if (error) {
-      toast.error(`Fehler beim Speichern: ${error.message}`)
+      toast.error(`Fehler beim Speichern: ${error.message}`);
     } else {
-      toast.success('Kunde aktualisiert')
-      setEditing(false)
-      setReloadKey((v) => v + 1)
+      toast.success("Kunde aktualisiert");
+      setEditing(false);
+      setCustomer((prev) => (prev ? { ...prev, ...form } : prev));
     }
 
-    setSaving(false)
+    setSaving(false);
   }
 
-  const totalBilled = useMemo(() => invoices.reduce((sum, inv) => sum + inv.total, 0), [invoices])
-  const totalPaid = useMemo(
-    () => invoices.filter((inv) => inv.status === 'paid').reduce((sum, inv) => sum + inv.total, 0),
+  const totalBilled = useMemo(
+    () => invoices.reduce((sum, inv) => sum + inv.total, 0),
     [invoices],
-  )
-  const outstanding = totalBilled - totalPaid
+  );
+
+  const totalPaid = useMemo(
+    () =>
+      invoices
+        .filter((inv) => inv.status === "paid")
+        .reduce((sum, inv) => sum + inv.total, 0),
+    [invoices],
+  );
+
+  const outstanding = totalBilled - totalPaid;
 
   const avgPaymentDays = useMemo(() => {
-    const paid = invoices.filter((inv) => inv.status === 'paid' && inv.paid_at)
-    if (paid.length === 0) return null
+    const paid = invoices.filter((inv) => inv.status === "paid" && inv.paid_at);
+    if (paid.length === 0) return null;
     const totalDays = paid.reduce((sum, inv) => {
-      const issued = new Date(inv.issue_date)
-      const paidDate = new Date(inv.paid_at as string)
-      return sum + Math.max(0, Math.floor((paidDate.getTime() - issued.getTime()) / (1000 * 60 * 60 * 24)))
-    }, 0)
-    return Math.round(totalDays / paid.length)
-  }, [invoices])
-
-  const lateRatio = useMemo(() => {
-    if (invoices.length === 0) return 0
-    const lateCount = invoices.filter((inv) => {
-      if (inv.status === 'paid' && inv.paid_at) return new Date(inv.paid_at) > new Date(inv.due_date)
-      return inv.status === 'overdue'
-    }).length
-    return lateCount / invoices.length
-  }, [invoices])
+      const issued = new Date(inv.issue_date);
+      const paidDate = new Date(inv.paid_at as string);
+      return (
+        sum +
+        Math.max(
+          0,
+          Math.floor(
+            (paidDate.getTime() - issued.getTime()) / (1000 * 60 * 60 * 24),
+          ),
+        )
+      );
+    }, 0);
+    return Math.round(totalDays / paid.length);
+  }, [invoices]);
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto space-y-5">
-        <Skeleton className="h-5 w-16" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i}><CardContent className="pt-6">
-              <Skeleton className="h-4 w-20 mb-3" />
-              <Skeleton className="h-7 w-24" />
-            </CardContent></Card>
-          ))}
-        </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "60vh",
+        }}
+      >
+        <Loader2
+          style={{
+            width: 20,
+            height: 20,
+            color: "var(--muted-foreground)",
+            animation: "spin 1s linear infinite",
+          }}
+        />
       </div>
-    )
+    );
   }
 
   if (!customer) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'var(--accent)' }}>
-          <Users className="w-7 h-7" style={{ color: 'var(--primary)' }} />
-        </div>
-        <h3 className="text-base font-semibold mb-2" style={{ color: 'var(--foreground)' }}>
-          Kunde nicht gefunden
-        </h3>
-        <Link href="/customers">
-          <Button variant="outline" size="sm">Zurück zu Kunden</Button>
+      <div style={{ textAlign: "center", padding: "80px 0" }}>
+        <p style={{ color: "var(--muted-foreground)" }}>
+          Kunde nicht gefunden.
+        </p>
+        <Link
+          href="/customers"
+          style={{ color: "var(--accent)", fontSize: "13px" }}
+        >
+          Zurück zur Liste
         </Link>
       </div>
-    )
+    );
   }
 
-  const field = (label: string, key: keyof CustomerForm, placeholder: string, type = 'text') => (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <Input
-        type={type}
-        placeholder={placeholder}
-        value={form[key]}
-        onChange={(e) => set(key, e.target.value)}
-        disabled={!editing}
-        style={{ background: editing ? 'var(--background)' : 'var(--muted)' }}
-      />
-    </div>
-  )
+  const cardStyle = {
+    background: "var(--surface)",
+    border: "1px solid var(--border)",
+    boxShadow: "var(--shadow-md)",
+  } as const;
+
+  const statCards = [
+    {
+      label: "Gesamt berechnet",
+      value: formatCurrency(totalBilled),
+      icon: TrendingUp,
+      iconColor: "var(--accent)",
+    },
+    {
+      label: "Bezahlt",
+      value: formatCurrency(totalPaid),
+      icon: CheckCircle,
+      iconColor: "var(--success)",
+    },
+    {
+      label: "Ausstehend",
+      value: formatCurrency(outstanding),
+      icon: AlertTriangle,
+      iconColor: "var(--danger)",
+    },
+    {
+      label: "Ø Zahlung",
+      value: avgPaymentDays !== null ? `${avgPaymentDays} Tage` : "–",
+      icon: Clock,
+      iconColor: "var(--text-2)",
+    },
+  ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5">
-      <Link href="/customers" className="inline-flex items-center gap-1 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-        <ChevronLeft className="w-4 h-4" /> Zurück
+    <div style={{ maxWidth: "920px", margin: "0 auto" }}>
+      {/* Zurück-Link */}
+      <Link
+        href="/customers"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "4px",
+          fontSize: "15px",
+          color: "var(--muted-foreground)",
+          textDecoration: "none",
+          marginBottom: "28px",
+        }}
+      >
+        <ChevronLeft style={{ width: 15, height: 15 }} />
+        Kunden
       </Link>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium label-caps">Gesamt berechnet</CardTitle>
-            <TrendingUp className="w-4 h-4" style={{ color: 'var(--primary)' }} />
-          </CardHeader>
-          <CardContent><p className="text-xl font-bold tabular-nums">{formatCurrency(totalBilled)}</p></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium label-caps">Bezahlt</CardTitle>
-            <TrendingUp className="w-4 h-4" style={{ color: '#16A34A' }} />
-          </CardHeader>
-          <CardContent><p className="text-xl font-bold tabular-nums">{formatCurrency(totalPaid)}</p></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium label-caps">Ausstehend</CardTitle>
-            <AlertTriangle className="w-4 h-4" style={{ color: '#DC2626' }} />
-          </CardHeader>
-          <CardContent><p className="text-xl font-bold tabular-nums">{formatCurrency(outstanding)}</p></CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium label-caps">Ø Zahlung</CardTitle>
-            <Clock className="w-4 h-4" style={{ color: 'var(--muted-foreground)' }} />
-          </CardHeader>
-          <CardContent><p className="text-xl font-bold tabular-nums">{avgPaymentDays !== null ? `${avgPaymentDays} T.` : '–'}</p></CardContent>
-        </Card>
+      {/* Stats Cards */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gap: "12px",
+          marginBottom: "20px",
+        }}
+      >
+        {statCards.map(({ label, value, icon: Icon, iconColor }) => (
+          <div key={label} style={{ ...cardStyle, padding: "16px 20px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "10px",
+              }}
+            >
+              <span className="label-caps">{label}</span>
+              <Icon style={{ width: 14, height: 14, color: iconColor }} />
+            </div>
+            <p
+              className="amount"
+              style={{
+                fontSize: "20px",
+                fontWeight: 700,
+                color: "var(--foreground)",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {value}
+            </p>
+          </div>
+        ))}
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm label-caps" style={{ fontWeight: 600 }}>Zuverlässigkeit</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {invoices.length === 0 ? (
-            <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>Noch keine Rechnungsdaten vorhanden.</p>
-          ) : (
-            <ReliabilityIndicator ratio={lateRatio} />
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="pb-3 flex flex-row items-center justify-between">
-          <CardTitle className="text-sm label-caps" style={{ fontWeight: 600 }}>Kundendaten</CardTitle>
-          {!editing ? (
-            <Button variant="outline" size="sm" onClick={() => setEditing(true)}>Bearbeiten</Button>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setEditing(false)
-                  setForm({
-                    name: customer.name || '',
-                    email: customer.email || '',
-                    company: customer.company || '',
-                    address: customer.address || '',
-                    city: customer.city || '',
-                    zip: customer.zip || '',
-                    country: customer.country || 'DE',
-                  })
-                }}
+      {/* Zwei Spalten */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "3fr 2fr",
+          gap: "16px",
+          alignItems: "start",
+        }}
+      >
+        {/* Links: Kundendaten */}
+        <div style={{ ...cardStyle, overflow: "hidden" }}>
+          <div
+            style={{
+              padding: "16px 24px",
+              borderBottom: "1px solid var(--border)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "13px",
+                fontWeight: 600,
+                color: "var(--foreground)",
+              }}
+            >
+              Kundendaten
+            </p>
+            {!editing ? (
+              <button
+                onClick={() => setEditing(true)}
+                className="btn btn-secondary"
               >
-                Abbrechen
-              </Button>
-              <Button size="sm" onClick={handleSave} disabled={saving}>
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                {saving ? 'Speichern...' : 'Speichern'}
-              </Button>
-            </div>
-          )}
-        </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-4">
-          {field('Name *', 'name', 'Max Mustermann')}
-          {field('E-Mail *', 'email', 'max@firma.de', 'email')}
-          <div className="col-span-2">{field('Firma', 'company', 'Muster GmbH')}</div>
-          <div className="col-span-2">{field('Adresse', 'address', 'Musterstraße 1')}</div>
-          {field('Stadt', 'city', 'Berlin')}
-          {field('PLZ', 'zip', '10115')}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-3">
-          <CardTitle className="text-sm label-caps" style={{ fontWeight: 600 }}>Rechnungen</CardTitle>
-          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{invoices.length} gesamt</span>
-        </CardHeader>
-        <CardContent className="p-0">
-          {invoices.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center px-5">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style={{ background: 'var(--accent)' }}>
-                <FileText className="w-6 h-6" style={{ color: 'var(--primary)' }} />
+                Bearbeiten
+              </button>
+            ) : (
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  onClick={() => {
+                    setEditing(false);
+                    setForm({
+                      name: customer.name || "",
+                      email: customer.email || "",
+                      company: customer.company || "",
+                      address: customer.address || "",
+                      city: customer.city || "",
+                      zip: customer.zip || "",
+                      country: customer.country || "DE",
+                    });
+                  }}
+                  className="btn btn-secondary"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="btn btn-primary"
+                >
+                  {saving ? (
+                    <Loader2
+                      style={{
+                        width: 14,
+                        height: 14,
+                        animation: "spin 1s linear infinite",
+                      }}
+                    />
+                  ) : (
+                    <Save style={{ width: 14, height: 14 }} />
+                  )}
+                  {saving ? "Speichern..." : "Speichern"}
+                </button>
               </div>
-              <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                Noch keine Rechnungen für diesen Kunden.
+            )}
+          </div>
+
+          <div
+            style={{
+              padding: "20px 24px",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "16px",
+            }}
+          >
+            <div>
+              <p className="label-caps" style={{ marginBottom: "6px" }}>
+                Name *
+              </p>
+              <input
+                value={form.name}
+                onChange={(e) => set("name", e.target.value)}
+                placeholder="Max Mustermann"
+                disabled={!editing}
+              />
+            </div>
+            <div>
+              <p className="label-caps" style={{ marginBottom: "6px" }}>
+                E-Mail *
+              </p>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => set("email", e.target.value)}
+                placeholder="max@firma.de"
+                disabled={!editing}
+              />
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <p className="label-caps" style={{ marginBottom: "6px" }}>
+                Firma
+              </p>
+              <input
+                value={form.company}
+                onChange={(e) => set("company", e.target.value)}
+                placeholder="Muster GmbH"
+                disabled={!editing}
+              />
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <p className="label-caps" style={{ marginBottom: "6px" }}>
+                Adresse
+              </p>
+              <input
+                value={form.address}
+                onChange={(e) => set("address", e.target.value)}
+                placeholder="Musterstraße 1"
+                disabled={!editing}
+              />
+            </div>
+            <div>
+              <p className="label-caps" style={{ marginBottom: "6px" }}>
+                PLZ
+              </p>
+              <input
+                value={form.zip}
+                onChange={(e) => set("zip", e.target.value)}
+                placeholder="10115"
+                disabled={!editing}
+              />
+            </div>
+            <div>
+              <p className="label-caps" style={{ marginBottom: "6px" }}>
+                Stadt
+              </p>
+              <input
+                value={form.city}
+                onChange={(e) => set("city", e.target.value)}
+                placeholder="Berlin"
+                disabled={!editing}
+              />
+            </div>
+            <div>
+              <p className="label-caps" style={{ marginBottom: "6px" }}>
+                Land
+              </p>
+              <input
+                value={form.country}
+                onChange={(e) => set("country", e.target.value)}
+                placeholder="DE"
+                disabled={!editing}
+              />
+            </div>
+          </div>
+
+          {/* Erweiterte Einstellungen – nur ab Starter */}
+          {!planLoading && can("starter") && (
+            <>
+              <button
+                className="accordion-trigger"
+                aria-expanded={accordionOpen}
+                onClick={() => setAccordionOpen((o) => !o)}
+              >
+                <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>
+                  Erweiterte Einstellungen
+                </span>
+                <ChevronDown size={14} className="accordion-chevron" />
+              </button>
+
+              <div ref={accordionRef} className="accordion-content">
+                <div
+                  style={{
+                    padding: "20px 24px",
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "16px",
+                  }}
+                >
+                  {/* Kundenrabatt – ab Starter */}
+                  <div>
+                    <p className="label-caps" style={{ marginBottom: "6px" }}>Kundenrabatt (%)</p>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      placeholder="0"
+                      value={discount}
+                      onChange={(e) => setDiscount(e.target.value)}
+                      disabled={!editing}
+                    />
+                  </div>
+
+                  {/* Kreditlimit – ab Professional */}
+                  <div>
+                    <p className="label-caps" style={{ marginBottom: "6px" }}>Kreditlimit (€)</p>
+                    <LockedFeature
+                      locked={!can("professional")}
+                      featureName="Kreditlimit"
+                      requiredPlan="professional"
+                    >
+                      <input
+                        type="number"
+                        min="0"
+                        step="100"
+                        placeholder="0"
+                        value={creditLimit}
+                        onChange={(e) => setCreditLimit(e.target.value)}
+                        disabled={!editing}
+                      />
+                    </LockedFeature>
+                  </div>
+
+                  {/* Steuerbefreiung – ab Professional */}
+                  <div style={{ gridColumn: "1 / -1" }}>
+                    <LockedFeature
+                      locked={!can("professional")}
+                      featureName="Steuerbefreiung"
+                      requiredPlan="professional"
+                    >
+                      <label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          cursor: editing ? "pointer" : "default",
+                          fontSize: "13px",
+                          color: "var(--foreground)",
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={taxExempt}
+                          onChange={(e) => setTaxExempt(e.target.checked)}
+                          disabled={!editing}
+                          style={{ width: "15px", height: "15px", cursor: "inherit" }}
+                        />
+                        Steuerbefreit (keine MwSt. auf Rechnungen)
+                      </label>
+                    </LockedFeature>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Rechts: Rechnungshistorie */}
+        <div style={{ ...cardStyle, overflow: "hidden" }}>
+          <div
+            style={{
+              padding: "16px 24px",
+              borderBottom: "1px solid var(--border)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "13px",
+                fontWeight: 600,
+                color: "var(--foreground)",
+              }}
+            >
+              Rechnungshistorie
+            </p>
+            <span
+              style={{ fontSize: "11px", color: "var(--muted-foreground)" }}
+            >
+              {invoices.length} gesamt
+            </span>
+          </div>
+
+          {invoices.length === 0 ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "48px 24px",
+                gap: "8px",
+              }}
+            >
+              <FileText
+                style={{ width: 24, height: 24, color: "var(--text-3)" }}
+              />
+              <p
+                style={{ fontSize: "13px", color: "var(--muted-foreground)" }}
+              >
+                Noch keine Rechnungen.
               </p>
             </div>
           ) : (
-            <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
-              {invoices.map((inv) => (
-                <Link key={inv.id} href={`/invoices/${inv.id}`} className="flex items-center justify-between px-5 py-3.5 invoice-row">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--accent)' }}>
-                      <FileText className="w-3.5 h-3.5" style={{ color: 'var(--primary)' }} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>{inv.invoice_number}</p>
-                      <p className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
-                        Fällig {formatDate(inv.due_date)}
-                      </p>
-                    </div>
+            invoices.map((inv, idx) => {
+              const { bg, text } = getStatusColors(inv.status);
+              return (
+                <Link
+                  key={inv.id}
+                  href={`/invoices/${inv.id}`}
+                  className="invoice-row"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "12px 20px",
+                    textDecoration: "none",
+                    borderBottom:
+                      idx < invoices.length - 1
+                        ? "1px solid var(--border)"
+                        : "none",
+                  }}
+                >
+                  <div>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        color: "var(--foreground)",
+                      }}
+                    >
+                      {inv.invoice_number}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--muted-foreground)",
+                        marginTop: "2px",
+                      }}
+                    >
+                      {formatDate(inv.issue_date)}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <StatusBadge status={inv.status} />
-                    <span className="text-sm font-semibold tabular-nums" style={{ color: 'var(--foreground)' }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        padding: "2px 8px",
+                        fontSize: "10px",
+                        fontWeight: 600,
+                        background: bg,
+                        color: text,
+                        letterSpacing: "0.05em",
+                        textTransform: "uppercase",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {getStatusLabel(inv.status)}
+                    </span>
+                    <span
+                      className="amount"
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        color: "var(--foreground)",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
                       {formatCurrency(inv.total)}
                     </span>
-                    <ChevronRight className="w-4 h-4" style={{ color: 'var(--muted-foreground)' }} />
+                    <ChevronRight
+                      style={{ width: 13, height: 13, color: "var(--text-3)" }}
+                    />
                   </div>
                 </Link>
-              ))}
-            </div>
+              );
+            })
           )}
-        </CardContent>
-      </Card>
-
-      <div className="pb-8" />
+        </div>
+      </div>
     </div>
-  )
+  );
 }

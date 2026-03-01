@@ -269,7 +269,7 @@ export default function InvoiceDetailPage() {
         </p>
         <Link
           href="/invoices"
-          style={{ color: "var(--primary)", fontSize: "13px" }}
+          style={{ color: "var(--accent)", fontSize: "13px" }}
         >
           Zurück zur Liste
         </Link>
@@ -279,31 +279,10 @@ export default function InvoiceDetailPage() {
   const customer = invoice.customer;
   const { bg, text } = getStatusColors(invoice.status);
   const isPaid = invoice.status === "paid";
-  const topSecondaryActionStyle = {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "8px",
-    height: "48px",
-    padding: "0 12px",
-    fontSize: "15px",
-    fontWeight: 600,
-    // borderRadius: "8px",
-    border: "1px solid var(--border)",
-    background: "var(--surface)",
-    color: "var(--ios-label)",
-    cursor: "pointer",
-  } as const;
-  const topPrimaryActionStyle = {
-    ...topSecondaryActionStyle,
-    background: "var(--accent)",
-    color: "#fff",
-    border: "none",
-  } as const;
   const glassCardStyle = {
     background: "var(--surface)",
     border: "1px solid var(--border)",
-    // borderRadius: "10px",
-    boxShadow: "var(--shadow-card)",
+    boxShadow: "var(--shadow-md)",
   } as const;
 
   return (
@@ -350,7 +329,7 @@ export default function InvoiceDetailPage() {
             href={`/invoices/${invoice.id}/edit`}
             style={{ textDecoration: "none" }}
           >
-            <button style={topSecondaryActionStyle}>Bearbeiten</button>
+            <button className="btn btn-secondary">Bearbeiten</button>
           </Link>
 
           {/* PDF Download */}
@@ -361,7 +340,7 @@ export default function InvoiceDetailPage() {
               style={{ textDecoration: "none" }}
             >
               {({ loading: pdfLoading }) => (
-                <button disabled={pdfLoading} style={topSecondaryActionStyle}>
+                <button disabled={pdfLoading} className="btn btn-secondary">
                   <Download style={{ width: 14, height: 14 }} />
                   {pdfLoading ? "Wird erstellt..." : "PDF herunterladen"}
                 </button>
@@ -374,7 +353,7 @@ export default function InvoiceDetailPage() {
             <button
               onClick={sendReminder}
               disabled={actionLoading === "reminder"}
-              style={topSecondaryActionStyle}
+              className="btn btn-secondary"
             >
               {actionLoading === "reminder" ? (
                 <Loader2
@@ -396,7 +375,7 @@ export default function InvoiceDetailPage() {
             <button
               onClick={() => setShowSendComposer((prev) => !prev)}
               disabled={actionLoading === "send"}
-              style={topSecondaryActionStyle}
+              className="btn btn-secondary"
             >
               {actionLoading === "send" ? (
                 <Loader2
@@ -418,7 +397,7 @@ export default function InvoiceDetailPage() {
             <button
               onClick={markAsPaid}
               disabled={actionLoading === "paid"}
-              style={topPrimaryActionStyle}
+              className="btn btn-primary"
             >
               {actionLoading === "paid" ? (
                 <Loader2
@@ -469,12 +448,11 @@ export default function InvoiceDetailPage() {
               onChange={(e) => applyTemplate(e.target.value)}
               style={{
                 minHeight: "44px",
-                border: "1px solid rgba(60,60,67,0.18)",
-                background: "rgba(255,255,255,0.8)",
-                // borderRadius: "10px",
+                border: "1px solid var(--border)",
+                background: "var(--surface)",
                 padding: "10px 12px",
-                fontSize: "17px",
-                color: "var(--ios-label)",
+                fontSize: "14px",
+                color: "var(--text-1)",
               }}
             >
               <option value="">Vorhandene Vorlage nutzen...</option>
@@ -486,10 +464,7 @@ export default function InvoiceDetailPage() {
             </select>
             <button
               onClick={saveCurrentTemplate}
-              style={{
-                ...topSecondaryActionStyle,
-                fontSize: "15px",
-              }}
+              className="btn btn-secondary"
             >
               Vorlage speichern
             </button>
@@ -500,12 +475,11 @@ export default function InvoiceDetailPage() {
             placeholder="Betreff"
             style={{
               minHeight: "44px",
-              border: "1px solid rgba(60,60,67,0.18)",
-              background: "rgba(255,255,255,0.8)",
-              // borderRadius: "10px",
+              border: "1px solid var(--border)",
+              background: "var(--surface)",
               padding: "10px 12px",
-              fontSize: "17px",
-              color: "var(--ios-label)",
+              fontSize: "14px",
+              color: "var(--text-1)",
               width: "100%",
             }}
           />
@@ -514,12 +488,11 @@ export default function InvoiceDetailPage() {
             onChange={(e) => setEmailBody(e.target.value)}
             rows={8}
             style={{
-              border: "1px solid rgba(60,60,67,0.18)",
-              background: "rgba(255,255,255,0.8)",
-              // borderRadius: "10px",
+              border: "1px solid var(--border)",
+              background: "var(--surface)",
               padding: "10px 12px",
-              fontSize: "17px",
-              color: "var(--ios-label)",
+              fontSize: "14px",
+              color: "var(--text-1)",
               width: "100%",
               resize: "vertical",
               lineHeight: 1.5,
@@ -533,7 +506,7 @@ export default function InvoiceDetailPage() {
             <button
               onClick={sendInvoice}
               disabled={actionLoading === "send"}
-              style={topPrimaryActionStyle}
+              className="btn btn-primary"
             >
               {actionLoading === "send" ? (
                 <Loader2
@@ -840,18 +813,17 @@ export default function InvoiceDetailPage() {
                   justifyContent: "space-between",
                   padding: "12px 16px",
                   marginTop: "8px",
-                  background: "var(--primary)",
-                  borderRadius: "var(--radius)",
+                  background: "var(--accent)",
                 }}
               >
                 <span
-                  style={{ fontSize: "13px", fontWeight: 700, color: "white" }}
+                  style={{ fontSize: "13px", fontWeight: 700, color: "#fff" }}
                 >
                   Gesamt
                 </span>
                 <span
                   className="amount"
-                  style={{ fontSize: "15px", fontWeight: 700, color: "white" }}
+                  style={{ fontSize: "15px", fontWeight: 700, color: "#fff" }}
                 >
                   {formatCurrency(invoice.total)}
                 </span>
@@ -910,7 +882,7 @@ export default function InvoiceDetailPage() {
                   width: "6px",
                   height: "6px",
                   // borderRadius: "6px",
-                  background: date ? "var(--success)" : "var(--border-strong)",
+                  background: date ? "var(--success)" : "var(--border)",
                   flexShrink: 0,
                 }}
               />
@@ -939,19 +911,7 @@ export default function InvoiceDetailPage() {
         {!showDeleteConfirm ? (
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "7px 14px",
-              fontSize: "13px",
-              fontWeight: 500,
-              background: "transparent",
-              color: "var(--destructive)",
-              border: "1px solid var(--destructive-border)",
-              borderRadius: "var(--radius)",
-              cursor: "pointer",
-            }}
+            className="btn btn-danger"
           >
             <Trash2 style={{ width: 14, height: 14 }} />
             Rechnung löschen
@@ -982,32 +942,14 @@ export default function InvoiceDetailPage() {
             </span>
             <button
               onClick={() => setShowDeleteConfirm(false)}
-              style={{
-                padding: "5px 12px",
-                fontSize: "12px",
-                fontWeight: 500,
-                background: "white",
-                border: "1px solid var(--border)",
-                borderRadius: "var(--radius)",
-                cursor: "pointer",
-                color: "var(--foreground)",
-              }}
+              className="btn btn-secondary"
             >
               Abbrechen
             </button>
             <button
               onClick={deleteInvoice}
               disabled={actionLoading === "delete"}
-              style={{
-                padding: "5px 12px",
-                fontSize: "12px",
-                fontWeight: 500,
-                background: "var(--destructive)",
-                color: "white",
-                border: "none",
-                borderRadius: "var(--radius)",
-                cursor: "pointer",
-              }}
+              className="btn btn-danger"
             >
               {actionLoading === "delete" ? "Löschen..." : "Ja, löschen"}
             </button>

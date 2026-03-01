@@ -109,14 +109,13 @@ export default function LoginPage() {
             style={{
               width: "32px",
               height: "32px",
-              background: "var(--primary)",
-              // borderRadius: "4px",
+              background: "var(--accent)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <FileText style={{ width: 16, height: 16, color: "white" }} />
+            <FileText style={{ width: 16, height: 16, color: "#fff" }} />
           </div>
           <span
             style={{
@@ -131,15 +130,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div
-          style={{
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            // borderRadius: "8px",
-            boxShadow: "var(--shadow-sm)",
-            overflow: "hidden",
-          }}
-        >
+        <div className="card-elevated" style={{ overflow: "hidden" }}>
           <div style={{ padding: "24px 24px 0" }}>
             <h1
               style={{
@@ -173,7 +164,7 @@ export default function LoginPage() {
                 href="/reset-password"
                 style={{
                   fontSize: "12px",
-                  color: "var(--primary)",
+                  color: "var(--accent)",
                   textDecoration: "none",
                 }}
               >
@@ -193,30 +184,11 @@ export default function LoginPage() {
             <button
               onClick={handleLogin}
               disabled={loading}
-              style={{
-                height: "38px",
-                width: "100%",
-                fontSize: "13px",
-                fontWeight: 600,
-                background: loading ? "var(--muted)" : "var(--primary)",
-                color: loading ? "var(--muted-foreground)" : "white",
-                border: "none",
-                // borderRadius: "var(--radius)",
-                cursor: loading ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-              }}
+              className="btn btn-primary"
+              style={{ width: "100%" }}
             >
               {loading && (
-                <Loader2
-                  style={{
-                    width: 14,
-                    height: 14,
-                    animation: "spin 1s linear infinite",
-                  }}
-                />
+                <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
               )}
               {loading ? "Anmelden..." : "Anmelden"}
             </button>
@@ -232,7 +204,7 @@ export default function LoginPage() {
               <Link
                 href="/register"
                 style={{
-                  color: "var(--primary)",
+                  color: "var(--accent)",
                   fontWeight: 600,
                   textDecoration: "none",
                 }}

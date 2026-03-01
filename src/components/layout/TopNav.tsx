@@ -3,15 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
-import { Plus, LogOut, Settings, FileText, ChevronDown } from "lucide-react";
+import { Plus, LogOut, Settings, FileText, ChevronDown, Moon, Sun } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { DarkModeToggle } from "./DarkModeToggle";
 
 export default function TopNav() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userInitial, setUserInitial] = useState("?");
   const [userName, setUserName] = useState("");
+  const [isDark, setIsDark] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,6 +36,29 @@ export default function TopNav() {
 
     loadUser();
   }, []);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (saved === "dark" || (!saved && prefersDark)) {
+      document.documentElement.classList.add("dark");
+      setIsDark(true);
+    } else {
+      setIsDark(false);
+    }
+  }, []);
+
+  function toggleTheme() {
+    const next = !isDark;
+    if (next) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+    setIsDark(next);
+  }
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -99,15 +122,12 @@ export default function TopNav() {
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <DarkModeToggle />
-          
           <Link href="/invoices/new" style={{ textDecoration: "none" }}>
             <button
               className="topnav-new-btn"
               style={{
                 height: "36px",
                 padding: "0 12px",
-                /* borderRadius: "8px", */
                 border: "none",
                 background: "var(--accent-theme)",
                 color: "#fff",
@@ -130,14 +150,18 @@ export default function TopNav() {
               style={{
                 height: "36px",
                 padding: "0 10px",
-                /* borderRadius: "8px", */
                 border: "1px solid var(--border)",
                 background: "var(--surface)",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "6px",
                 cursor: "pointer",
+                transition: `background-color var(--duration-fast) var(--ease-smooth), box-shadow var(--duration-fast) var(--ease-smooth), transform var(--duration-fast) var(--ease-spring)`,
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "var(--shadow-sm)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = ""; }}
+              onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.97)"; }}
+              onMouseUp={(e) => { e.currentTarget.style.transform = ""; }}
             >
               <div
                 style={{
@@ -159,22 +183,24 @@ export default function TopNav() {
                 style={{
                   width: 12,
                   height: 12,
-                  color: "var(--text-secondary)",
+                  color: "var(--text-2)",
+                  transform: menuOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: `transform var(--duration-normal) var(--ease-spring)`,
                 }}
               />
             </button>
 
             {menuOpen && (
               <div
+                className="dropdown-enter"
                 style={{
                   position: "absolute",
                   top: "calc(100% + 8px)",
                   right: 0,
                   minWidth: "220px",
-                  /* borderRadius: "10px", */
                   background: "var(--surface)",
                   border: "1px solid var(--border)",
-                  boxShadow: "var(--shadow-card)",
+                  boxShadow: "var(--shadow-lg)",
                   overflow: "hidden",
                   zIndex: 100,
                 }}
@@ -199,40 +225,20 @@ export default function TopNav() {
                 <Link
                   href="/settings"
                   onClick={() => setMenuOpen(false)}
-                  style={{ textDecoration: "none" }}
+                  className="dropdown-item"
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      padding: "10px 12px",
-                      color: "var(--text-primary-theme)",
-                      fontSize: "14px",
-                    }}
-                  >
-                    <Settings size={14} color="var(--text-secondary-theme)" />
-                    Einstellungen
-                  </div>
+                  <Settings size={14} color="var(--text-2)" />
+                  Einstellungen
                 </Link>
 
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    width: "100%",
-                    border: "none",
-                    borderTop: "1px solid var(--divider)",
-                    background: "transparent",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "10px 12px",
-                    color: "var(--danger)",
-                    fontSize: "14px",
-                    cursor: "pointer",
-                    textAlign: "left",
-                  }}
-                >
+                <button onClick={toggleTheme} className="dropdown-item">
+                  {isDark
+                    ? <Sun size={14} color="var(--text-2)" />
+                    : <Moon size={14} color="var(--text-2)" />}
+                  {isDark ? "Hell" : "Dunkel"}
+                </button>
+
+                <button onClick={handleLogout} className="dropdown-item dropdown-item-danger">
                   <LogOut size={14} />
                   Abmelden
                 </button>

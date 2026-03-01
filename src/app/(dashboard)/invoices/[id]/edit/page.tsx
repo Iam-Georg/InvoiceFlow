@@ -239,7 +239,7 @@ export default function EditInvoicePage() {
 
         <button
           onClick={() => setInvoice({ ...invoice, items: [...invoice.items, EMPTY_ITEM()] })}
-          style={{ marginTop: "6px", border: "1px solid var(--border)", background: "transparent", borderRadius: "4px", padding: "6px 10px", fontSize: "12px" }}
+          style={{ marginTop: "6px", border: "1px solid var(--border)", background: "transparent", padding: "6px 10px", fontSize: "12px" }}
         >
           <Plus style={{ width: 12, height: 12, display: "inline" }} /> Position
         </button>

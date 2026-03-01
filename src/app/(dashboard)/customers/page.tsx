@@ -13,7 +13,10 @@ export default function CustomersPage() {
   useEffect(() => {
     async function load() {
       const supabase = createClient();
-      const { data } = await supabase.from("customers").select("*").order("name");
+      const { data } = await supabase
+        .from("customers")
+        .select("*")
+        .order("name");
       setCustomers(data ?? []);
       setLoading(false);
     }
@@ -36,7 +39,7 @@ export default function CustomersPage() {
               fontSize: "18px",
               fontWeight: 700,
               color: "var(--foreground)",
-              letterSpacing: "-0.01em",
+              letterSpacing: "-0.03em",
             }}
           >
             Kunden
@@ -54,38 +57,22 @@ export default function CustomersPage() {
           </p>
         </div>
         <Link href="/customers/new">
-          <button
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "7px 16px",
-              fontSize: "13px",
-              fontWeight: 600,
-              background: "var(--primary)",
-              color: "white",
-              border: "none",
-              borderRadius: "var(--radius)",
-              cursor: "pointer",
-            }}
-          >
-            <Plus style={{ width: 14, height: 14 }} />
+          <button className="btn btn-primary">
+            <Plus size={15} />
             Neuer Kunde
           </button>
         </Link>
       </div>
 
-      <div
-        style={{
-          background: "var(--card)",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius)",
-          boxShadow: "var(--shadow-xs)",
-          overflow: "hidden",
-        }}
-      >
+      <div className="card-elevated" style={{ overflow: "hidden" }}>
         {loading ? (
-          <div style={{ display: "flex", justifyContent: "center", padding: "64px" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "64px",
+            }}
+          >
             <Loader2
               style={{
                 width: 18,
@@ -109,17 +96,25 @@ export default function CustomersPage() {
               style={{
                 width: "44px",
                 height: "44px",
-                borderRadius: "10px",
-                background: "var(--primary-light)",
+                // borderRadius: "10px",
+                background: "var(--accent-soft)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 marginBottom: "4px",
               }}
             >
-              <Users style={{ width: 20, height: 20, color: "var(--primary)" }} />
+              <Users
+                style={{ width: 20, height: 20, color: "var(--accent)" }}
+              />
             </div>
-            <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--foreground)" }}>
+            <p
+              style={{
+                fontSize: "14px",
+                fontWeight: 600,
+                color: "var(--foreground)",
+              }}
+            >
               Noch keine Kunden
             </p>
             <p
@@ -132,20 +127,7 @@ export default function CustomersPage() {
               Lege deinen ersten Kunden an.
             </p>
             <Link href="/customers/new">
-              <button
-                style={{
-                  padding: "7px 18px",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  background: "var(--primary)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "var(--radius)",
-                  cursor: "pointer",
-                }}
-              >
-                Jetzt anlegen
-              </button>
+              <button className="btn btn-primary">Jetzt anlegen</button>
             </Link>
           </div>
         ) : (
@@ -185,28 +167,52 @@ export default function CustomersPage() {
                         : "none",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
                     <div
                       style={{
                         width: "30px",
                         height: "30px",
-                        borderRadius: "50%",
-                        background: "var(--primary)",
+                        // borderRadius: "8px",
+                        background: "var(--accent)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         flexShrink: 0,
                       }}
                     >
-                      <span style={{ fontSize: "11px", fontWeight: 700, color: "white" }}>
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          color: "#fff",
+                        }}
+                      >
                         {customer.name.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        color: "var(--foreground)",
+                      }}
+                    >
                       {customer.name}
                     </p>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                    }}
+                  >
                     <Mail
                       style={{
                         width: 12,
@@ -215,11 +221,21 @@ export default function CustomersPage() {
                         flexShrink: 0,
                       }}
                     />
-                    <p style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        color: "var(--muted-foreground)",
+                      }}
+                    >
                       {customer.email}
                     </p>
                   </div>
-                  <p style={{ fontSize: "13px", color: "var(--muted-foreground)" }}>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      color: "var(--muted-foreground)",
+                    }}
+                  >
                     {customer.company ?? "-"}
                   </p>
                   <div style={{ display: "flex", justifyContent: "flex-end" }}>

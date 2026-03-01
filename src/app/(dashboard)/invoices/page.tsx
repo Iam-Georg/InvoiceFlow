@@ -8,7 +8,7 @@ import type { Invoice } from "@/types";
 import StatusBadge from "@/components/invoices/StatusBadge";
 import PressureBadge from "@/components/invoices/PressureBadge";
 import { calculatePressure } from "@/lib/pressure";
-import { Plus, FileText, ChevronRight, Loader2 } from "lucide-react";
+import { FileText, ChevronRight, Loader2, Upload } from "lucide-react";
 
 type InvoiceRow = Invoice & {
   customer?: { name?: string | null; email?: string | null } | null;
@@ -50,7 +50,10 @@ export default function InvoicesPage() {
       const customerLates = new Map<string, number>();
       for (const row of rows) {
         const customerId = row.customer_id;
-        customerTotals.set(customerId, (customerTotals.get(customerId) ?? 0) + 1);
+        customerTotals.set(
+          customerId,
+          (customerTotals.get(customerId) ?? 0) + 1,
+        );
 
         const paidLate =
           row.status === "paid" && row.paid_at
@@ -58,7 +61,10 @@ export default function InvoicesPage() {
             : false;
         const late = row.status === "overdue" || paidLate;
         if (late) {
-          customerLates.set(customerId, (customerLates.get(customerId) ?? 0) + 1);
+          customerLates.set(
+            customerId,
+            (customerLates.get(customerId) ?? 0) + 1,
+          );
         }
       }
 
@@ -84,21 +90,14 @@ export default function InvoicesPage() {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "20px",
-        }}
-      >
+      <div style={{ marginBottom: "20px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
         <div>
           <h1
             style={{
               fontSize: "18px",
               fontWeight: 700,
               color: "var(--foreground)",
-              letterSpacing: "-0.01em",
+              letterSpacing: "-0.03em",
             }}
           >
             Rechnungen
@@ -115,37 +114,15 @@ export default function InvoicesPage() {
               : `${invoices.length} ${invoices.length === 1 ? "Rechnung" : "Rechnungen"}`}
           </p>
         </div>
-        <Link href="/invoices/new">
-          <button
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "7px 16px",
-              fontSize: "13px",
-              fontWeight: 600,
-              background: "var(--primary)",
-              color: "white",
-              border: "none",
-              borderRadius: "var(--radius)",
-              cursor: "pointer",
-            }}
-          >
-            <Plus style={{ width: 14, height: 14 }} />
-            Neue Rechnung
+        <Link href="/invoices/import">
+          <button className="btn btn-secondary" style={{ gap: "6px" }}>
+            <Upload size={13} />
+            Importieren
           </button>
         </Link>
       </div>
 
-      <div
-        style={{
-          background: "var(--card)",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius)",
-          boxShadow: "var(--shadow-xs)",
-          overflow: "hidden",
-        }}
-      >
+      <div className="card-elevated" style={{ overflow: "hidden" }}>
         {loading ? (
           <div
             style={{
@@ -177,15 +154,16 @@ export default function InvoicesPage() {
               style={{
                 width: "44px",
                 height: "44px",
-                borderRadius: "10px",
-                background: "var(--primary-light)",
+                background: "var(--accent-soft)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 marginBottom: "4px",
               }}
             >
-              <FileText style={{ width: 20, height: 20, color: "var(--primary)" }} />
+              <FileText
+                style={{ width: 20, height: 20, color: "var(--accent)" }}
+              />
             </div>
             <p
               style={{
@@ -206,20 +184,7 @@ export default function InvoicesPage() {
               Erstelle deine erste Rechnung in unter 30 Sekunden.
             </p>
             <Link href="/invoices/new">
-              <button
-                style={{
-                  padding: "7px 18px",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  background: "var(--primary)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "var(--radius)",
-                  cursor: "pointer",
-                }}
-              >
-                Jetzt erstellen
-              </button>
+              <button className="btn btn-primary">Jetzt erstellen</button>
             </Link>
           </div>
         ) : (
@@ -233,17 +198,20 @@ export default function InvoicesPage() {
                 background: "var(--background-2)",
               }}
             >
-              {["Rechnung", "Kunde", "Druck-Score", "Betrag", ""].map((h, i) => (
-                <span
-                  key={i}
-                  className="label-caps"
-                  style={{
-                    textAlign: i >= 3 ? ("right" as const) : ("left" as const),
-                  }}
-                >
-                  {h}
-                </span>
-              ))}
+              {["Rechnung", "Kunde", "Druck-Score", "Betrag", ""].map(
+                (h, i) => (
+                  <span
+                    key={i}
+                    className="label-caps"
+                    style={{
+                      textAlign:
+                        i >= 3 ? ("right" as const) : ("left" as const),
+                    }}
+                  >
+                    {h}
+                  </span>
+                ),
+              )}
             </div>
 
             {invoices.map((invoice, idx) => (
@@ -265,20 +233,32 @@ export default function InvoicesPage() {
                         : "none",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
                     <div
                       style={{
                         width: "30px",
                         height: "30px",
                         borderRadius: "var(--radius)",
-                        background: "var(--primary-light)",
+                        background: "var(--accent-soft)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         flexShrink: 0,
                       }}
                     >
-                      <FileText style={{ width: 13, height: 13, color: "var(--primary)" }} />
+                      <FileText
+                        style={{
+                          width: 13,
+                          height: 13,
+                          color: "var(--accent)",
+                        }}
+                      />
                     </div>
                     <div>
                       <p

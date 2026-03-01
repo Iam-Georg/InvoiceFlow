@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import TopNav from "@/components/layout/TopNav";
-import FloatingSidebar from "@/components/layout/FloatingSidebar";
+import Sidebar from "@/components/layout/Sidebar";
+import FeedbackWidget from "@/components/FeedbackWidget";
+import KeyboardShortcuts from "@/components/KeyboardShortcuts";
 import { Loader2 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -59,10 +61,10 @@ export default function DashboardLayout({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "var(--page-bg)",
+          background: "var(--bg)",
         }}
       >
-        <Loader2 style={{ width: 18, height: 18, color: "var(--text-secondary)", animation: "spin 1s linear infinite" }} />
+        <Loader2 style={{ width: 18, height: 18, color: "var(--text-2)", animation: "spin 1s linear infinite" }} />
       </div>
     );
   }
@@ -70,10 +72,12 @@ export default function DashboardLayout({
   return (
     <div className="dashboard-shell">
       <TopNav />
-      <FloatingSidebar />
+      <Sidebar />
       <main>
-        <div className="app-main-container dashboard-main-container">{children}</div>
+        <div className="app-main-container dashboard-main-container page-enter">{children}</div>
       </main>
+      <FeedbackWidget />
+      <KeyboardShortcuts />
     </div>
   );
 }

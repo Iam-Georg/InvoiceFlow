@@ -11,8 +11,45 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Faktura – Rechnungen für Selbstständige',
-  description: 'Rechnungen erstellen, verwalten und schneller bezahlt werden.',
+  title: {
+    default: "Faktura – Rechnungen für Selbstständige",
+    template: "%s | Faktura",
+  },
+  description:
+    "Das Rechnungsprogramm für Freelancer und Selbstständige. Professionelle Rechnungen erstellen, per E-Mail versenden und schneller bezahlt werden.",
+  keywords: [
+    "Rechnungsprogramm",
+    "Rechnungssoftware",
+    "Freelancer",
+    "Selbstständige",
+    "Rechnung erstellen",
+    "Rechnungsvorlage",
+    "Online Rechnung",
+    "PDF Rechnung",
+  ],
+  authors: [{ name: "Faktura" }],
+  creator: "Faktura",
+  metadataBase: new URL("https://faktura.app"),
+  openGraph: {
+    type: "website",
+    locale: "de_DE",
+    url: "https://faktura.app",
+    siteName: "Faktura",
+    title: "Faktura – Rechnungen für Selbstständige",
+    description:
+      "Professionelle Rechnungen erstellen, versenden und verwalten. Für Freelancer und Selbstständige.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Faktura – Rechnungen für Selbstständige",
+    description: "Professionelle Rechnungen erstellen und schneller bezahlt werden.",
+    creator: "@fakturaapp",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
 }
 
 export default function RootLayout({

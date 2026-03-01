@@ -6,19 +6,22 @@ import { formatCurrency } from "@/lib/utils";
 import {
   Bar,
   BarChart,
-  Cell,
+  CartesianGrid,
   Line,
   LineChart,
-  Pie,
-  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
+  Cell,
+  Pie,
+  PieChart,
+  Legend,
 } from "recharts";
-import { Loader2 } from "lucide-react";
+import { Loader2, TrendingUp, AlertTriangle, Send, Clock, BarChart3 } from "lucide-react";
 
-type InvoiceStatsRow = {
+/* ── Types ──────────────────────────────────────── */
+type InvoiceRow = {
   status: "draft" | "sent" | "open" | "overdue" | "paid";
   total: number;
   issue_date: string;
@@ -27,30 +30,67 @@ type InvoiceStatsRow = {
   created_at: string;
 };
 
-type MonthlyPoint = {
-  month: string;
-  paid: number;
+/* ── Recharts tooltip styling ────────────────────── */
+const tooltipStyle = {
+  contentStyle: {
+    background: "#ffffff",
+    border: "1px solid rgba(0,0,0,0.07)",
+    borderRadius: 0,
+    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+    fontSize: 12,
+    padding: "8px 12px",
+  },
+  labelStyle: { color: "#5c5c6e", fontSize: 11, fontWeight: 600 },
+  itemStyle: { color: "#0c0c14", fontWeight: 600 },
+  cursor: { fill: "rgba(0,64,204,0.04)" },
 };
 
-type PiePoint = {
-  name: string;
-  value: number;
+/* ── KPI Card ────────────────────────────────────── */
+function KpiCard({
+  title,
+  value,
+  sub,
+  icon: Icon,
+  color,
+  bg,
+  delay,
+}: {
+  title: string;
+  value: string;
+  sub?: string;
+  icon: React.ElementType;
   color: string;
-};
+  bg: string;
+  delay: number;
+}) {
+  return (
+    <article
+      className="card-elevated card-hover anim-fade-in-up"
+      style={{ padding: "20px 24px", animationDelay: `${delay}ms` }}
+    >
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+        <p className="label-caps">{title}</p>
+        <div style={{ width: 30, height: 30, background: bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Icon size={14} color={color} />
+        </div>
+      </div>
+      <p style={{ fontSize: "26px", fontWeight: 700, color: "var(--text-1)", letterSpacing: "-0.02em", lineHeight: 1.1, marginBottom: "4px" }}>
+        {value}
+      </p>
+      {sub && <p style={{ fontSize: "12px", color: "var(--text-3)" }}>{sub}</p>}
+    </article>
+  );
+}
 
-type AgingPoint = {
-  bucket: string;
-  count: number;
-  total: number;
-};
-
+/* ── Main ────────────────────────────────────────── */
 export default function StatisticsPage() {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [monthly, setMonthly] = useState<MonthlyPoint[]>([]);
-  const [statusData, setStatusData] = useState<PiePoint[]>([]);
-  const [aging, setAging] = useState<AgingPoint[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState<string | null>(null);
+  const [monthly, setMonthly]     = useState<{ month: string; paid: number }[]>([]);
+  const [statusData, setStatusData] = useState<{ name: string; value: number; color: string }[]>([]);
+  const [aging, setAging]         = useState<{ bucket: string; count: number; total: number }[]>([]);
   const [reminderCount, setReminderCount] = useState(0);
+  const [avgPayDays, setAvgPayDays] = useState<number | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -58,7 +98,7 @@ export default function StatisticsPage() {
       setLoading(true);
       setError(null);
 
-      const [{ data: invoices, error: invoiceError }, { count }] = await Promise.all([
+      const [{ data: invoices, error: invoiceErr }, { count }] = await Promise.all([
         supabase
           .from("invoices")
           .select("status, total, issue_date, due_date, paid_at, created_at")
@@ -66,283 +106,283 @@ export default function StatisticsPage() {
         supabase.from("reminders").select("id", { head: true, count: "exact" }),
       ]);
 
-      if (invoiceError) {
-        setError(invoiceError.message);
-        setLoading(false);
-        return;
-      }
+      if (invoiceErr) { setError(invoiceErr.message); setLoading(false); return; }
 
-      const rows = (invoices as InvoiceStatsRow[] | null) ?? [];
+      const rows = (invoices as InvoiceRow[] | null) ?? [];
       setReminderCount(count ?? 0);
-
       const now = new Date();
 
-      const nextMonthly: MonthlyPoint[] = [];
-      for (let i = 11; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const monthStart = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
-        const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 1).toISOString();
-        const paid = rows
-          .filter(
-            (row) =>
-              row.status === "paid" &&
-              row.paid_at &&
-              row.paid_at >= monthStart &&
-              row.paid_at < monthEnd,
-          )
-          .reduce((sum, row) => sum + Number(row.total ?? 0), 0);
-
-        nextMonthly.push({
-          month: d.toLocaleString("de-DE", { month: "short" }),
-          paid,
-        });
-      }
+      /* Monthly paid revenue (last 12 months) */
+      const nextMonthly = Array.from({ length: 12 }, (_, i) => {
+        const d = new Date(now.getFullYear(), now.getMonth() - (11 - i), 1);
+        const start = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+        const end   = new Date(d.getFullYear(), d.getMonth() + 1, 1).toISOString();
+        const paid  = rows
+          .filter((r) => r.status === "paid" && r.paid_at && r.paid_at >= start && r.paid_at < end)
+          .reduce((s, r) => s + Number(r.total ?? 0), 0);
+        return { month: d.toLocaleString("de-DE", { month: "short", year: "2-digit" }), paid };
+      });
       setMonthly(nextMonthly);
 
-      const statusLabels: Record<InvoiceStatsRow["status"], string> = {
-        draft: "Entwurf",
-        sent: "Gesendet",
-        open: "Offen",
-        overdue: "Überfällig",
-        paid: "Bezahlt",
+      /* Status distribution */
+      const statusLabels: Record<InvoiceRow["status"], string> = {
+        draft: "Entwurf", sent: "Gesendet", open: "Offen", overdue: "Überfällig", paid: "Bezahlt",
       };
-      const statusColors: Record<InvoiceStatsRow["status"], string> = {
-        draft: "#94A3B8",
-        sent: "#2563EB",
-        open: "#B45309",
-        overdue: "#DC2626",
-        paid: "#16A34A",
+      const statusColors: Record<InvoiceRow["status"], string> = {
+        draft: "#9898AA", sent: "#0040CC", open: "#CC7000", overdue: "#CC2020", paid: "#00A060",
       };
       setStatusData(
-        (Object.keys(statusLabels) as InvoiceStatsRow["status"][]).map((status) => ({
-          name: statusLabels[status],
-          value: rows.filter((row) => row.status === status).length,
-          color: statusColors[status],
-        })),
+        (Object.keys(statusLabels) as InvoiceRow["status"][]).map((s) => ({
+          name: statusLabels[s],
+          value: rows.filter((r) => r.status === s).length,
+          color: statusColors[s],
+        })).filter((d) => d.value > 0),
       );
 
-      const ageRows: AgingPoint[] = [
-        { bucket: "1-14 Tage", count: 0, total: 0 },
-        { bucket: "15-30 Tage", count: 0, total: 0 },
-        { bucket: "31-60 Tage", count: 0, total: 0 },
-        { bucket: "> 60 Tage", count: 0, total: 0 },
+      /* Overdue aging */
+      const ageRows = [
+        { bucket: "1–14 Tage",  count: 0, total: 0 },
+        { bucket: "15–30 Tage", count: 0, total: 0 },
+        { bucket: "31–60 Tage", count: 0, total: 0 },
+        { bucket: "> 60 Tage",  count: 0, total: 0 },
       ];
-      for (const row of rows) {
-        if (row.status === "paid") continue;
-        const days = Math.floor(
-          (now.getTime() - new Date(row.due_date).getTime()) / (1000 * 60 * 60 * 24),
-        );
+      for (const r of rows) {
+        if (r.status === "paid") continue;
+        const days = Math.floor((now.getTime() - new Date(r.due_date).getTime()) / 864e5);
         if (days <= 0) continue;
-        const value = Number(row.total ?? 0);
-        if (days <= 14) {
-          ageRows[0].count += 1;
-          ageRows[0].total += value;
-        } else if (days <= 30) {
-          ageRows[1].count += 1;
-          ageRows[1].total += value;
-        } else if (days <= 60) {
-          ageRows[2].count += 1;
-          ageRows[2].total += value;
-        } else {
-          ageRows[3].count += 1;
-          ageRows[3].total += value;
-        }
+        const val = Number(r.total ?? 0);
+        if      (days <= 14) { ageRows[0].count++; ageRows[0].total += val; }
+        else if (days <= 30) { ageRows[1].count++; ageRows[1].total += val; }
+        else if (days <= 60) { ageRows[2].count++; ageRows[2].total += val; }
+        else                 { ageRows[3].count++; ageRows[3].total += val; }
       }
       setAging(ageRows);
+
+      /* Avg payment days */
+      const paidWithDates = rows.filter((r): r is InvoiceRow & { paid_at: string } =>
+        r.status === "paid" && !!r.paid_at && !!r.issue_date,
+      );
+      if (paidWithDates.length > 0) {
+        const sum = paidWithDates.reduce((s, r) =>
+          s + (new Date(r.paid_at).getTime() - new Date(r.issue_date).getTime()) / 864e5, 0);
+        setAvgPayDays(Math.round(sum / paidWithDates.length));
+      }
+
       setLoading(false);
     }
-
     load();
   }, []);
 
   const kpis = useMemo(() => {
-    const paidTotal = monthly.reduce((sum, p) => sum + p.paid, 0);
-    const overdueTotal = aging.reduce((sum, row) => sum + row.total, 0);
-    const overdueCount = aging.reduce((sum, row) => sum + row.count, 0);
-    const peakMonth = monthly.reduce(
-      (best, point) => (point.paid > best.paid ? point : best),
-      { month: "-", paid: 0 },
-    );
-
-    return {
-      paidTotal,
-      overdueTotal,
-      overdueCount,
-      peakMonth,
-    };
+    const paidTotal    = monthly.reduce((s, p) => s + p.paid, 0);
+    const overdueTotal = aging.reduce((s, r) => s + r.total, 0);
+    const overdueCount = aging.reduce((s, r) => s + r.count, 0);
+    const peakMonth    = monthly.reduce((best, p) => (p.paid > best.paid ? p : best), { month: "–", paid: 0 });
+    return { paidTotal, overdueTotal, overdueCount, peakMonth };
   }, [monthly, aging]);
 
+  /* ── Render ──────────────────────────────────────── */
   if (loading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", padding: "80px" }}>
-        <Loader2
-          style={{
-            width: 20,
-            height: 20,
-            color: "var(--muted-foreground)",
-            animation: "spin 1s linear infinite",
-          }}
-        />
+        <Loader2 style={{ width: 20, height: 20, color: "var(--text-3)", animation: "spin 1s linear infinite" }} />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ padding: "24px", color: "var(--destructive)" }}>
-        Fehler beim Laden der Statistiken: {error}
+      <div className="card-elevated" style={{ padding: "24px", color: "var(--danger)" }}>
+        Fehler beim Laden: {error}
       </div>
     );
   }
 
   return (
-    <div style={{ display: "grid", gap: "16px" }}>
-      <div
-        style={{
-          background: "var(--card)",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius)",
-          padding: "18px 20px",
-        }}
-      >
-        <h1 style={{ fontSize: "18px", fontWeight: 700, color: "var(--foreground)" }}>
+    <div style={{ display: "grid", gap: "20px" }}>
+
+      {/* Page Header */}
+      <div>
+        <h1 style={{ fontSize: "20px", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--text-1)", marginBottom: "4px" }}>
           Statistiken
         </h1>
-        <p style={{ fontSize: "13px", color: "var(--muted-foreground)", marginTop: "6px" }}>
-          Umsatztrend, Statusverteilung und Überfälligkeits-Analyse.
+        <p style={{ fontSize: "13px", color: "var(--text-2)" }}>
+          Umsatztrend, Statusverteilung und Überfälligkeits-Analyse der letzten 12 Monate.
         </p>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: "12px",
-        }}
-      >
-        <Kpi title="Bezahlt (12 Monate)" value={formatCurrency(kpis.paidTotal)} />
-        <Kpi title="Überfällig (Betrag)" value={formatCurrency(kpis.overdueTotal)} />
-        <Kpi title="Überfällige Rechnungen" value={String(kpis.overdueCount)} />
-        <Kpi title="Gesendete Erinnerungen" value={String(reminderCount)} />
+      {/* KPI Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
+        <KpiCard
+          title="Umsatz (12 Monate)"
+          value={formatCurrency(kpis.paidTotal)}
+          sub={kpis.peakMonth.paid > 0 ? `Bestes Monat: ${kpis.peakMonth.month}` : undefined}
+          icon={TrendingUp} color="#00A060" bg="rgba(0,160,96,0.08)" delay={0}
+        />
+        <KpiCard
+          title="Überfällig (Betrag)"
+          value={formatCurrency(kpis.overdueTotal)}
+          sub={`${kpis.overdueCount} Rechnung${kpis.overdueCount !== 1 ? "en" : ""} überfällig`}
+          icon={AlertTriangle} color="#CC2020" bg="rgba(204,32,32,0.08)" delay={80}
+        />
+        <KpiCard
+          title="Ø Zahlungsdauer"
+          value={avgPayDays !== null ? `${avgPayDays} Tage` : "–"}
+          sub={avgPayDays !== null ? (avgPayDays <= 14 ? "Sehr gut" : avgPayDays <= 30 ? "Gut" : "Langsam") : "Noch keine Daten"}
+          icon={Clock} color="#CC7000" bg="rgba(204,112,0,0.08)" delay={160}
+        />
+        <KpiCard
+          title="Erinnerungen gesendet"
+          value={String(reminderCount)}
+          sub="Gesamt alle Rechnungen"
+          icon={Send} color="#0040CC" bg="rgba(0,64,204,0.08)" delay={240}
+        />
       </div>
 
-      <div
-        style={{
-          background: "var(--card)",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius)",
-          padding: "16px",
-          height: "340px",
-        }}
-      >
-        <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)", marginBottom: "10px" }}>
-          Umsatz pro Monat (bezahlt)
-        </p>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={monthly}>
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip formatter={(value: number) => formatCurrency(value)} />
-            <Line type="monotone" dataKey="paid" stroke="#1B3A6B" strokeWidth={3} dot={{ r: 3 }} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          gap: "16px",
-        }}
-      >
-        <div
-          style={{
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius)",
-            padding: "16px",
-            height: "320px",
-          }}
-        >
-          <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)", marginBottom: "10px" }}>
-            Statusverteilung
-          </p>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie data={statusData} dataKey="value" nameKey="name" outerRadius={95}>
-                {statusData.map((entry) => (
-                  <Cell key={entry.name} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+      {/* Revenue Line Chart */}
+      <div className="card-elevated" style={{ padding: "24px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+          <div>
+            <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-1)" }}>Umsatz pro Monat</p>
+            <p style={{ fontSize: "12px", color: "var(--text-3)", marginTop: "2px" }}>Bezahlte Rechnungen, letzte 12 Monate</p>
+          </div>
+          <BarChart3 size={16} color="var(--text-3)" />
+        </div>
+        {monthly.every((m) => m.paid === 0) ? (
+          <div style={{ height: "200px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+            <BarChart3 size={28} color="var(--text-3)" />
+            <p style={{ fontSize: "13px", color: "var(--text-3)" }}>Noch keine Umsatzdaten vorhanden</p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={240}>
+            <LineChart data={monthly} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+              <CartesianGrid vertical={false} stroke="rgba(0,0,0,0.04)" />
+              <XAxis
+                dataKey="month"
+                tick={{ fill: "#9898AA", fontSize: 11 }}
+                axisLine={{ stroke: "rgba(0,0,0,0.06)" }}
+                tickLine={false}
+              />
+              <YAxis
+                tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+                tick={{ fill: "#9898AA", fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                width={40}
+              />
+              <Tooltip
+                {...tooltipStyle}
+                formatter={(v: number) => [formatCurrency(v), "Bezahlt"]}
+              />
+              <Line
+                type="monotone"
+                dataKey="paid"
+                stroke="#0040CC"
+                strokeWidth={2.5}
+                dot={{ r: 3, fill: "#0040CC", strokeWidth: 0 }}
+                activeDot={{ r: 5, fill: "#0040CC", strokeWidth: 0 }}
+              />
+            </LineChart>
           </ResponsiveContainer>
+        )}
+      </div>
+
+      {/* Bottom row: Pie + Aging */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px" }}>
+
+        {/* Status Pie */}
+        <div className="card-elevated" style={{ padding: "24px" }}>
+          <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-1)", marginBottom: "4px" }}>Statusverteilung</p>
+          <p style={{ fontSize: "12px", color: "var(--text-3)", marginBottom: "20px" }}>Anzahl Rechnungen je Status</p>
+          {statusData.length === 0 ? (
+            <div style={{ height: "200px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <p style={{ fontSize: "13px", color: "var(--text-3)" }}>Keine Daten</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={statusData}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={80}
+                  innerRadius={40}
+                  paddingAngle={2}
+                >
+                  {statusData.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={tooltipStyle.contentStyle}
+                  itemStyle={tooltipStyle.itemStyle}
+                />
+                <Legend
+                  iconType="square"
+                  iconSize={8}
+                  formatter={(value) => <span style={{ fontSize: 12, color: "#5c5c6e" }}>{value}</span>}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
-        <div
-          style={{
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius)",
-            padding: "16px",
-            height: "320px",
-          }}
-        >
-          <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)", marginBottom: "10px" }}>
-            Überfälligkeits-Alterung
-          </p>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={aging}>
-              <XAxis dataKey="bucket" />
-              <YAxis />
-              <Tooltip formatter={(value: number) => formatCurrency(value)} />
-              <Bar dataKey="total" fill="#DC2626" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        {/* Overdue Aging Bar */}
+        <div className="card-elevated" style={{ padding: "24px" }}>
+          <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-1)", marginBottom: "4px" }}>Überfälligkeits-Analyse</p>
+          <p style={{ fontSize: "12px", color: "var(--text-3)", marginBottom: "20px" }}>Ausstehende Beträge nach Alter</p>
+          {aging.every((a) => a.total === 0) ? (
+            <div style={{ height: "200px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+              <p style={{ fontSize: "24px" }}>✓</p>
+              <p style={{ fontSize: "13px", color: "var(--text-3)" }}>Keine überfälligen Rechnungen</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={aging} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
+                <CartesianGrid vertical={false} stroke="rgba(0,0,0,0.04)" />
+                <XAxis
+                  dataKey="bucket"
+                  tick={{ fill: "#9898AA", fontSize: 10 }}
+                  axisLine={{ stroke: "rgba(0,0,0,0.06)" }}
+                  tickLine={false}
+                />
+                <YAxis
+                  tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+                  tick={{ fill: "#9898AA", fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={36}
+                />
+                <Tooltip
+                  {...tooltipStyle}
+                  formatter={(v: number) => [formatCurrency(v), "Ausstehend"]}
+                />
+                <Bar dataKey="total" fill="#CC2020" maxBarSize={48} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 
-      <div
-        style={{
-          background: "var(--card)",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius)",
-          padding: "14px 16px",
-          fontSize: "13px",
-          color: "var(--muted-foreground)",
-        }}
-      >
-        Höchster Monatsumsatz:{" "}
-        <span style={{ color: "var(--foreground)", fontWeight: 600 }}>
-          {kpis.peakMonth.month} ({formatCurrency(kpis.peakMonth.paid)})
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function Kpi({ title, value }: { title: string; value: string }) {
-  return (
-    <div
-      style={{
-        background: "var(--card)",
-        border: "1px solid var(--border)",
-        borderRadius: "var(--radius)",
-        padding: "14px 16px",
-      }}
-    >
-      <p className="label-caps">{title}</p>
-      <p
-        className="amount"
-        style={{
-          marginTop: "8px",
-          fontSize: "20px",
-          fontWeight: 700,
-          color: "var(--foreground)",
-        }}
-      >
-        {value}
-      </p>
+      {/* Peak month insight */}
+      {kpis.peakMonth.paid > 0 && (
+        <div
+          style={{
+            background: "var(--accent-soft)",
+            padding: "14px 20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+          }}
+        >
+          <TrendingUp size={14} color="var(--accent)" style={{ flexShrink: 0 }} />
+          <p style={{ fontSize: "13px", color: "var(--accent)" }}>
+            Dein umsatzstärkster Monat:{" "}
+            <strong>{kpis.peakMonth.month}</strong> mit{" "}
+            <strong>{formatCurrency(kpis.peakMonth.paid)}</strong>
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -6,8 +6,10 @@ import { createClient } from "@/lib/supabase";
 import { generateInvoiceNumber, formatCurrency } from "@/lib/utils";
 import { Customer, InvoiceItem } from "@/types";
 import { toast } from "sonner";
-import { Plus, Trash2, Loader2, ChevronLeft, Sparkles } from "lucide-react";
+import { Plus, Trash2, Loader2, ChevronLeft, Sparkles, ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { usePlan } from "@/hooks/usePlan";
+import LockedFeature from "@/components/LockedFeature";
 
 const emptyItem = (): InvoiceItem => ({
   id: crypto.randomUUID(),
@@ -42,6 +44,12 @@ export default function NewInvoicePage() {
   const [invoiceNumber, setInvoiceNumber] = useState("RE-2025-0001");
   const [aiDescription, setAiDescription] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+  const [accordionOpen, setAccordionOpen] = useState(false);
+  const [recurring, setRecurring] = useState("");
+  const [emailCc, setEmailCc] = useState("");
+  const [emailBcc, setEmailBcc] = useState("");
+  const accordionRef = useRef<HTMLDivElement>(null);
+  const { can, loading: planLoading } = usePlan();
 
   useEffect(() => {
     async function load() {
@@ -67,6 +75,12 @@ export default function NewInvoicePage() {
     }
     load();
   }, []);
+
+  useEffect(() => {
+    const el = accordionRef.current;
+    if (!el) return;
+    el.style.height = accordionOpen ? `${el.scrollHeight}px` : "0px";
+  }, [accordionOpen]);
 
   function updateItem(
     id: string,
@@ -219,14 +233,7 @@ export default function NewInvoicePage() {
     marginBottom: "5px",
   };
 
-  const card = {
-    background: "var(--card)",
-    border: "1px solid var(--border)",
-    borderRadius: "var(--radius)",
-    boxShadow: "var(--shadow-xs)",
-    overflow: "hidden",
-    marginBottom: "16px",
-  };
+  const cardStyle = { overflow: "hidden", marginBottom: "16px" };
 
   const cardHeader = {
     padding: "14px 20px",
@@ -254,7 +261,7 @@ export default function NewInvoicePage() {
         Zurück
       </Link>
 
-      <div style={card}>
+      <div className="card-elevated" style={cardStyle}>
         <div style={cardHeader}>KI-Rechnungserstellung</div>
         <div style={{ padding: "20px", display: "grid", gap: "10px" }}>
           <textarea
@@ -274,19 +281,7 @@ export default function NewInvoicePage() {
             <button
               onClick={applyAiDraft}
               disabled={aiLoading}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "7px 12px",
-                fontSize: "12px",
-                fontWeight: 600,
-                background: "var(--primary-light)",
-                color: "var(--primary)",
-                border: "1px solid var(--border)",
-                borderRadius: "var(--radius)",
-                cursor: aiLoading ? "not-allowed" : "pointer",
-              }}
+              className="btn btn-secondary"
             >
               {aiLoading ? (
                 <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
@@ -300,7 +295,7 @@ export default function NewInvoicePage() {
       </div>
 
       {/* Kopfdaten */}
-      <div style={card}>
+      <div className="card-elevated" style={cardStyle}>
         <div style={cardHeader}>Rechnungsdetails</div>
         <div
           style={{
@@ -337,7 +332,7 @@ export default function NewInvoicePage() {
                 href="/customers/new"
                 style={{
                   fontSize: "11px",
-                  color: "var(--primary)",
+                  color: "var(--accent)",
                   marginTop: "4px",
                   display: "block",
                 }}
@@ -368,7 +363,7 @@ export default function NewInvoicePage() {
       </div>
 
       {/* Positionen */}
-      <div style={card}>
+      <div className="card-elevated" style={cardStyle}>
         <div style={cardHeader}>Positionen</div>
         <div style={{ padding: "20px" }}>
           {/* Table Header */}
@@ -476,22 +471,10 @@ export default function NewInvoicePage() {
 
           <button
             onClick={() => setItems((prev) => [...prev, emptyItem()])}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "5px",
-              marginTop: "8px",
-              padding: "6px 12px",
-              fontSize: "12px",
-              fontWeight: 500,
-              background: "transparent",
-              color: "var(--primary)",
-              border: "1px solid var(--border)",
-              borderRadius: "var(--radius)",
-              cursor: "pointer",
-            }}
+            className="btn btn-ghost"
+            style={{ marginTop: "8px" }}
           >
-            <Plus style={{ width: 13, height: 13 }} />
+            <Plus size={13} />
             Position hinzufügen
           </button>
 
@@ -581,15 +564,14 @@ export default function NewInvoicePage() {
                     justifyContent: "space-between",
                     padding: "10px 14px",
                     marginTop: "8px",
-                    background: "var(--primary)",
-                    borderRadius: "var(--radius)",
+                    background: "var(--accent)",
                   }}
                 >
                   <span
                     style={{
                       fontSize: "13px",
                       fontWeight: 700,
-                      color: "white",
+                      color: "#fff",
                     }}
                   >
                     Gesamt
@@ -599,7 +581,7 @@ export default function NewInvoicePage() {
                     style={{
                       fontSize: "14px",
                       fontWeight: 700,
-                      color: "white",
+                      color: "#fff",
                     }}
                   >
                     {formatCurrency(total)}
@@ -612,7 +594,7 @@ export default function NewInvoicePage() {
       </div>
 
       {/* Notizen */}
-      <div style={card}>
+      <div className="card-elevated" style={cardStyle}>
         <div style={cardHeader}>Anmerkungen (optional)</div>
         <div style={{ padding: "20px" }}>
           <textarea
@@ -631,6 +613,106 @@ export default function NewInvoicePage() {
         </div>
       </div>
 
+      {/* Weitere Einstellungen – nur ab Starter sichtbar */}
+      {!planLoading && can("starter") && (
+        <div className="card-elevated" style={{ overflow: "hidden", marginBottom: "16px" }}>
+          <button
+            className="accordion-trigger"
+            aria-expanded={accordionOpen}
+            onClick={() => setAccordionOpen((o) => !o)}
+            style={{ borderTop: "none" }}
+          >
+            <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>
+              Weitere Einstellungen
+            </span>
+            <ChevronDown size={14} className="accordion-chevron" />
+          </button>
+
+          <div ref={accordionRef} className="accordion-content">
+            <div
+              style={{
+                padding: "20px",
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "16px",
+              }}
+            >
+              {/* Wiederkehrende Rechnung – ab Starter */}
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={labelStyle}>Wiederkehrende Rechnung</label>
+                <select
+                  style={inputStyle}
+                  value={recurring}
+                  onChange={(e) => setRecurring(e.target.value)}
+                >
+                  <option value="">Keine Wiederholung</option>
+                  <option value="monthly">Monatlich</option>
+                  <option value="quarterly">Vierteljährlich</option>
+                  <option value="yearly">Jährlich</option>
+                </select>
+              </div>
+
+              {/* E-Mail CC – ab Professional */}
+              <div>
+                <label style={labelStyle}>E-Mail CC</label>
+                <LockedFeature
+                  locked={!can("professional")}
+                  featureName="E-Mail CC/BCC"
+                  requiredPlan="professional"
+                >
+                  <input
+                    style={inputStyle}
+                    placeholder="cc@example.com"
+                    value={emailCc}
+                    onChange={(e) => setEmailCc(e.target.value)}
+                  />
+                </LockedFeature>
+              </div>
+
+              {/* E-Mail BCC – ab Professional */}
+              <div>
+                <label style={labelStyle}>E-Mail BCC</label>
+                <LockedFeature
+                  locked={!can("professional")}
+                  featureName="E-Mail CC/BCC"
+                  requiredPlan="professional"
+                >
+                  <input
+                    style={inputStyle}
+                    placeholder="bcc@example.com"
+                    value={emailBcc}
+                    onChange={(e) => setEmailBcc(e.target.value)}
+                  />
+                </LockedFeature>
+              </div>
+
+              {/* Anhang – ab Professional */}
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={labelStyle}>Anhang</label>
+                <LockedFeature
+                  locked={!can("professional")}
+                  featureName="Anhänge"
+                  requiredPlan="professional"
+                >
+                  <div
+                    style={{
+                      border: "1px dashed var(--border)",
+                      padding: "24px",
+                      textAlign: "center",
+                      fontSize: "13px",
+                      color: "var(--text-3)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Datei hierher ziehen oder klicken zum Hochladen
+                  </div>
+                </LockedFeature>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Actions */}
       <div
         style={{
@@ -643,44 +725,17 @@ export default function NewInvoicePage() {
         <button
           onClick={() => handleSave("draft")}
           disabled={saving}
-          style={{
-            padding: "8px 18px",
-            fontSize: "13px",
-            fontWeight: 500,
-            background: "var(--card)",
-            color: "var(--foreground)",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius)",
-            cursor: "pointer",
-          }}
+          className="btn btn-secondary"
         >
           Als Entwurf speichern
         </button>
         <button
           onClick={() => handleSave("sent")}
           disabled={saving}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "6px",
-            padding: "8px 20px",
-            fontSize: "13px",
-            fontWeight: 600,
-            background: "var(--primary)",
-            color: "white",
-            border: "none",
-            borderRadius: "var(--radius)",
-            cursor: "pointer",
-          }}
+          className="btn btn-primary"
         >
           {saving && (
-            <Loader2
-              style={{
-                width: 14,
-                height: 14,
-                animation: "spin 1s linear infinite",
-              }}
-            />
+            <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
           )}
           Rechnung erstellen
         </button>

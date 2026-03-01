@@ -12,7 +12,7 @@ interface DraftResponse {
   notes?: string;
   suggested_due_days?: number;
   customer_hint?: string;
-  source: "openai" | "heuristic";
+  source: "groq" | "heuristic";
 }
 
 function heuristicDraft(description: string): DraftResponse {
@@ -55,73 +55,69 @@ function heuristicDraft(description: string): DraftResponse {
   };
 }
 
-async function openAiDraft(description: string): Promise<DraftResponse | null> {
-  const apiKey = process.env.OPENAI_API_KEY;
+async function groqDraft(description: string): Promise<DraftResponse | null> {
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return null;
 
-  const response = await fetch("https://api.openai.com/v1/responses", {
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "gpt-4.1-mini",
-      input: [
+      model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+      messages: [
         {
           role: "system",
           content:
-            "Du bist ein Assistent fuer deutsche Rechnungen. Antworte nur als JSON ohne Markdown.",
+            "Du bist ein Assistent fuer deutsche Rechnungen. Antworte ausschliesslich mit validem JSON ohne Markdown.",
         },
         {
           role: "user",
-          content: `Erzeuge aus dieser Projektbeschreibung eine Rechnungsstruktur: ${description}`,
+          content: `Erzeuge aus dieser Projektbeschreibung eine Rechnungsstruktur. Gib exakt dieses JSON-Format aus: {"customer_hint":string(optional),"suggested_due_days":number(optional),"notes":string(optional),"items":[{"description":string,"quantity":number,"unit_price":number}]}. Projektbeschreibung: ${description}`,
         },
       ],
-      text: {
-        format: {
-          type: "json_schema",
-          name: "invoice_draft",
-          schema: {
-            type: "object",
-            additionalProperties: false,
-            properties: {
-              customer_hint: { type: "string" },
-              suggested_due_days: { type: "number" },
-              notes: { type: "string" },
-              items: {
-                type: "array",
-                minItems: 1,
-                items: {
-                  type: "object",
-                  additionalProperties: false,
-                  properties: {
-                    description: { type: "string" },
-                    quantity: { type: "number" },
-                    unit_price: { type: "number" },
-                  },
-                  required: ["description", "quantity", "unit_price"],
-                },
-              },
-            },
-            required: ["items"],
-          },
-          strict: true,
-        },
-      },
+      temperature: 0.2,
+      response_format: { type: "json_object" },
     }),
   });
 
   if (!response.ok) return null;
   const data = (await response.json()) as {
-    output_text?: string;
+    choices?: Array<{
+      message?: {
+        content?: string;
+      };
+    }>;
   };
-  if (!data.output_text) return null;
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) return null;
 
   try {
-    const parsed = JSON.parse(data.output_text) as Omit<DraftResponse, "source">;
+    const parsed = JSON.parse(content) as Omit<DraftResponse, "source">;
     if (!Array.isArray(parsed.items) || parsed.items.length === 0) return null;
-    return { ...parsed, source: "openai" };
+    const items = parsed.items
+      .map((item) => ({
+        description: String(item.description ?? "").trim(),
+        quantity: Number(item.quantity),
+        unit_price: Number(item.unit_price),
+      }))
+      .filter(
+        (item) =>
+          item.description.length > 0 &&
+          Number.isFinite(item.quantity) &&
+          item.quantity > 0 &&
+          Number.isFinite(item.unit_price) &&
+          item.unit_price >= 0,
+      );
+    if (items.length === 0) return null;
+
+    return {
+      ...parsed,
+      items,
+      source: "groq",
+    };
   } catch {
     return null;
   }
@@ -144,9 +140,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const openAi = await openAiDraft(description.trim());
-  if (openAi) {
-    return NextResponse.json(openAi);
+  const groq = await groqDraft(description.trim());
+  if (groq) {
+    return NextResponse.json(groq);
   }
 
   return NextResponse.json(heuristicDraft(description));
