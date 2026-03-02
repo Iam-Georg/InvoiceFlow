@@ -298,6 +298,13 @@ textarea::placeholder {
   color: var(--text-3);
 }
 
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ── Enhanced Input Focus ── */
 .input-field {
   position: relative;
