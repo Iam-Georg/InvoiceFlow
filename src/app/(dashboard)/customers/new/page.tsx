@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, ChevronLeft } from "lucide-react";
@@ -116,18 +115,12 @@ export default function NewCustomerPage() {
           <span style={{ color: "var(--destructive)", marginLeft: "2px" }}>*</span>
         )}
       </Label>
-      <Input
+      <input
         type={type}
         placeholder={placeholder}
         value={form[key]}
         onChange={(e) => set(key, e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleSave()}
-        style={{
-          borderColor: "var(--border)",
-          background: "var(--background)",
-          fontSize: "13px",
-          height: "36px",
-        }}
       />
     </div>
   );
