@@ -281,7 +281,7 @@ export default function NewInvoicePage() {
             <button
               onClick={applyAiDraft}
               disabled={aiLoading}
-              className="btn btn-secondary"
+              className="btn btn-ai-gradient"
             >
               {aiLoading ? (
                 <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
@@ -393,6 +393,7 @@ export default function NewInvoicePage() {
           {items.map((item) => (
             <div
               key={item.id}
+              className="line-item-enter"
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 80px 100px 100px 32px",
@@ -508,7 +509,7 @@ export default function NewInvoicePage() {
                     >
                       {label}
                     </span>
-                    <span className="amount" style={{ fontSize: "13px" }}>
+                    <span className="amount" style={{ fontSize: "13px", transition: "all 200ms ease" }}>
                       {value}
                     </span>
                   </div>
@@ -554,7 +555,7 @@ export default function NewInvoicePage() {
                       <option value={19}>19%</option>
                     </select>
                   </div>
-                  <span className="amount" style={{ fontSize: "13px" }}>
+                  <span className="amount" style={{ fontSize: "13px", transition: "all 200ms ease" }}>
                     {formatCurrency(taxAmount)}
                   </span>
                 </div>
@@ -582,6 +583,7 @@ export default function NewInvoicePage() {
                       fontSize: "14px",
                       fontWeight: 700,
                       color: "#fff",
+                      transition: "all 200ms ease",
                     }}
                   >
                     {formatCurrency(total)}

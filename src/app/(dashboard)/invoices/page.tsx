@@ -159,6 +159,7 @@ export default function InvoicesPage() {
                 alignItems: "center",
                 justifyContent: "center",
                 marginBottom: "4px",
+                animation: "floatY 3s ease-in-out infinite",
               }}
             >
               <FileText
@@ -188,7 +189,7 @@ export default function InvoicesPage() {
             </Link>
           </div>
         ) : (
-          <>
+          <div className="reveal-stagger">
             <div
               style={{
                 display: "grid",
@@ -313,7 +314,7 @@ export default function InvoicesPage() {
                 </div>
               </Link>
             ))}
-          </>
+          </div>
         )}
       </div>
     </div>

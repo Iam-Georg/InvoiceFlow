@@ -17,6 +17,21 @@ export default function Home() {
   }
 
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+    );
+    document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     async function checkAuth() {
       const sb = getSupabase();
       const {
@@ -35,7 +50,7 @@ export default function Home() {
       <main style={{ paddingTop: "58px" }}>
 
         {/* ── HERO: Split ──────────────────────────────────────── */}
-        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "80px 40px 72px" }}>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "80px 40px 72px", background: "radial-gradient(ellipse at 60% 40%, var(--accent-soft) 0%, transparent 60%)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "72px", alignItems: "center" }}>
 
             {/* Left – Text */}
@@ -69,7 +84,7 @@ export default function Home() {
                 ) : (
                   <>
                     <Link href="/register" style={{ textDecoration: "none" }}>
-                      <button className="btn btn-primary" style={{ height: "44px", padding: "0 28px", fontSize: "14px" }}>
+                      <button className="btn btn-primary btn-breathe" style={{ height: "44px", padding: "0 28px", fontSize: "14px" }}>
                         Kostenlos starten
                       </button>
                     </Link>
@@ -94,7 +109,7 @@ export default function Home() {
             </div>
 
             {/* Right – Rechnungs-Mockup */}
-            <div style={{ position: "relative" }}>
+            <div style={{ position: "relative", animation: "floatY 4s ease-in-out infinite" }}>
 
               {/* Floating status chip oben rechts */}
               <div style={{
@@ -164,7 +179,7 @@ export default function Home() {
         </div>
 
         {/* ── WIE ES FUNKTIONIERT ──────────────────────────────── */}
-        <div style={{ background: "var(--surface)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+        <div className="scroll-reveal" style={{ background: "var(--surface)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
           <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "64px 40px" }}>
             <p className="label-caps" style={{ textAlign: "center", marginBottom: "48px" }}>So einfach geht&apos;s</p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)" }}>
@@ -190,7 +205,7 @@ export default function Home() {
         </div>
 
         {/* ── SECTION A: Kein Excel. Kein Chaos. ───────────────── */}
-        <div style={{ background: "#0B1628", padding: "80px 40px" }}>
+        <div className="scroll-reveal" style={{ background: "#0B1628", padding: "80px 40px" }}>
           <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
             <p className="label-caps" style={{ color: "rgba(255,255,255,0.35)", marginBottom: "16px" }}>
               Das kennen wir alle
@@ -259,7 +274,7 @@ export default function Home() {
         </div>
 
         {/* ── SECTION B: Testimonials ───────────────────────────── */}
-        <div style={{ background: "var(--bg)" }}>
+        <div className="scroll-reveal" style={{ background: "var(--bg)" }}>
           <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "72px 40px" }}>
             <p className="label-caps" style={{ marginBottom: "40px" }}>Was andere sagen</p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
@@ -313,7 +328,7 @@ export default function Home() {
         </div>
 
         {/* ── SECTION C: Bold CTA ───────────────────────────────── */}
-        <div style={{ background: "var(--accent)", padding: "80px 40px" }}>
+        <div className="scroll-reveal" style={{ background: "var(--accent)", padding: "80px 40px" }}>
           <div style={{ maxWidth: "700px", margin: "0 auto", textAlign: "center" }}>
             <h2 style={{
               fontSize: "40px", fontWeight: 700, letterSpacing: "-0.03em",

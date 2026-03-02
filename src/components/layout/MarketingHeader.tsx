@@ -96,6 +96,7 @@ export default function MarketingHeader() {
         alignItems: "center",
         padding: "0 40px",
         gap: "32px",
+        animation: "topNavSlideDown 300ms var(--ease-spring) forwards",
       }}
     >
       {/* Logo */}
@@ -162,6 +163,7 @@ export default function MarketingHeader() {
             width: indicator.width,
             height: "2px",
             background: "var(--accent)",
+            boxShadow: "0 1px 8px var(--accent-soft)",
             opacity: indicator.opacity,
             pointerEvents: "none",
             transition: `left var(--duration-normal) var(--ease-spring), width var(--duration-normal) var(--ease-spring), opacity var(--duration-fast) var(--ease-smooth)`,

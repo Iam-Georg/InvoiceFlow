@@ -27,6 +27,7 @@ const PLANS = [
     buttonDisabled: false,
     buttonClass: "btn-secondary",
     accentBorder: false,
+    highlighted: false,
   },
   {
     name: "Starter",
@@ -46,6 +47,7 @@ const PLANS = [
     buttonDisabled: true,
     buttonClass: "btn-primary",
     accentBorder: true,
+    highlighted: true,
   },
   {
     name: "Professional",
@@ -64,6 +66,7 @@ const PLANS = [
     buttonDisabled: true,
     buttonClass: "btn-primary",
     accentBorder: false,
+    highlighted: false,
   },
   {
     name: "Business",
@@ -82,6 +85,7 @@ const PLANS = [
     buttonDisabled: true,
     buttonClass: "btn-primary",
     accentBorder: false,
+    highlighted: false,
   },
 ];
 
@@ -126,7 +130,7 @@ export default function PreisePage() {
         </div>
 
         {/* ── PLANS GRID ───────────────────────────────────────── */}
-        <div style={{
+        <div className="scroll-reveal" style={{
           maxWidth: "1000px", margin: "0 auto",
           padding: "0 40px 80px",
           display: "grid",
@@ -137,11 +141,16 @@ export default function PreisePage() {
           {PLANS.map((plan) => (
             <div
               key={plan.name}
+              className="card-hover"
               style={{
                 background: "var(--surface)",
-                boxShadow: "var(--shadow-md)",
+                boxShadow: plan.highlighted ? "var(--shadow-lg)" : "var(--shadow-md)",
                 overflow: "hidden",
                 borderLeft: plan.accentBorder ? "3px solid var(--accent)" : undefined,
+                ...(plan.highlighted ? {
+                  transform: "translateY(-8px)",
+                  borderTop: "3px solid var(--accent)",
+                } : {}),
               }}
             >
               {/* Plan header */}
@@ -207,7 +216,7 @@ export default function PreisePage() {
         </div>
 
         {/* ── FAQ ──────────────────────────────────────────────── */}
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "48px 40px 80px" }}>
+        <div className="scroll-reveal" style={{ maxWidth: "800px", margin: "0 auto", padding: "48px 40px 80px" }}>
           <p className="label-caps" style={{ marginBottom: "32px" }}>Häufige Fragen</p>
           <div>
             {FAQ.map(({ q, a }) => (

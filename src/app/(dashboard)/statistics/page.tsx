@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -44,6 +44,26 @@ const tooltipStyle = {
   itemStyle: { color: "#0c0c14", fontWeight: 600 },
   cursor: { fill: "rgba(0,64,204,0.04)" },
 };
+
+/* ── useCountUp hook ─────────────────────────────── */
+function useCountUp(target: number, duration = 400) {
+  const [value, setValue] = useState(0);
+  const ref = useRef<number>();
+  useEffect(() => {
+    if (!target) return;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(eased * target));
+      if (progress < 1) ref.current = requestAnimationFrame(tick);
+    };
+    ref.current = requestAnimationFrame(tick);
+    return () => { if (ref.current) cancelAnimationFrame(ref.current); };
+  }, [target, duration]);
+  return value;
+}
 
 /* ── KPI Card ────────────────────────────────────── */
 function KpiCard({
@@ -181,6 +201,12 @@ export default function StatisticsPage() {
     return { paidTotal, overdueTotal, overdueCount, peakMonth };
   }, [monthly, aging]);
 
+  /* ── Animated KPI values ──────────────────────────── */
+  const animPaidTotal    = useCountUp(kpis.paidTotal);
+  const animOverdueTotal = useCountUp(kpis.overdueTotal);
+  const animAvgPayDays   = useCountUp(avgPayDays ?? 0);
+  const animReminderCount = useCountUp(reminderCount);
+
   /* ── Render ──────────────────────────────────────── */
   if (loading) {
     return (
@@ -212,35 +238,35 @@ export default function StatisticsPage() {
       </div>
 
       {/* KPI Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
+      <div className="reveal-stagger" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
         <KpiCard
           title="Umsatz (12 Monate)"
-          value={formatCurrency(kpis.paidTotal)}
+          value={formatCurrency(animPaidTotal)}
           sub={kpis.peakMonth.paid > 0 ? `Bestes Monat: ${kpis.peakMonth.month}` : undefined}
           icon={TrendingUp} color="#00A060" bg="rgba(0,160,96,0.08)" delay={0}
         />
         <KpiCard
           title="Überfällig (Betrag)"
-          value={formatCurrency(kpis.overdueTotal)}
+          value={formatCurrency(animOverdueTotal)}
           sub={`${kpis.overdueCount} Rechnung${kpis.overdueCount !== 1 ? "en" : ""} überfällig`}
           icon={AlertTriangle} color="#CC2020" bg="rgba(204,32,32,0.08)" delay={80}
         />
         <KpiCard
           title="Ø Zahlungsdauer"
-          value={avgPayDays !== null ? `${avgPayDays} Tage` : "–"}
+          value={avgPayDays !== null ? `${animAvgPayDays} Tage` : "–"}
           sub={avgPayDays !== null ? (avgPayDays <= 14 ? "Sehr gut" : avgPayDays <= 30 ? "Gut" : "Langsam") : "Noch keine Daten"}
           icon={Clock} color="#CC7000" bg="rgba(204,112,0,0.08)" delay={160}
         />
         <KpiCard
           title="Erinnerungen gesendet"
-          value={String(reminderCount)}
+          value={String(animReminderCount)}
           sub="Gesamt alle Rechnungen"
           icon={Send} color="#0040CC" bg="rgba(0,64,204,0.08)" delay={240}
         />
       </div>
 
       {/* Revenue Line Chart */}
-      <div className="card-elevated" style={{ padding: "24px" }}>
+      <div className="card-elevated anim-fade-in-up" style={{ padding: "24px", animationDelay: "200ms" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
           <div>
             <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-1)" }}>Umsatz pro Monat</p>
@@ -291,7 +317,7 @@ export default function StatisticsPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "16px" }}>
 
         {/* Status Pie */}
-        <div className="card-elevated" style={{ padding: "24px" }}>
+        <div className="card-elevated anim-fade-in-up" style={{ padding: "24px", animationDelay: "350ms" }}>
           <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-1)", marginBottom: "4px" }}>Statusverteilung</p>
           <p style={{ fontSize: "12px", color: "var(--text-3)", marginBottom: "20px" }}>Anzahl Rechnungen je Status</p>
           {statusData.length === 0 ? (
@@ -328,7 +354,7 @@ export default function StatisticsPage() {
         </div>
 
         {/* Overdue Aging Bar */}
-        <div className="card-elevated" style={{ padding: "24px" }}>
+        <div className="card-elevated anim-fade-in-up" style={{ padding: "24px", animationDelay: "500ms" }}>
           <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-1)", marginBottom: "4px" }}>Überfälligkeits-Analyse</p>
           <p style={{ fontSize: "12px", color: "var(--text-3)", marginBottom: "20px" }}>Ausstehende Beträge nach Alter</p>
           {aging.every((a) => a.total === 0) ? (
