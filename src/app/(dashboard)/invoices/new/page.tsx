@@ -210,19 +210,6 @@ export default function NewInvoicePage() {
     }
   }
 
-  const inputStyle = {
-    border: "1px solid var(--border)",
-    background: "var(--background)",
-    borderRadius: "var(--radius)",
-    padding: "7px 10px",
-    fontSize: "13px",
-    color: "var(--foreground)",
-    width: "100%",
-    outline: "none",
-    fontFamily: "inherit",
-    height: "36px",
-  };
-
   const labelStyle = {
     fontSize: "11px",
     fontWeight: 600 as const,
@@ -270,10 +257,8 @@ export default function NewInvoicePage() {
             onChange={(e) => setAiDescription(e.target.value)}
             rows={4}
             style={{
-              ...inputStyle,
               height: "auto",
               resize: "vertical",
-              padding: "10px 12px",
               lineHeight: 1.5,
             }}
           />
@@ -308,7 +293,6 @@ export default function NewInvoicePage() {
           <div>
             <label style={labelStyle}>Rechnungsnummer</label>
             <input
-              style={inputStyle}
               value={invoiceNumber}
               onChange={(e) => setInvoiceNumber(e.target.value)}
             />
@@ -318,7 +302,6 @@ export default function NewInvoicePage() {
             <select
               value={customerId}
               onChange={(e) => setCustomerId(e.target.value)}
-              style={{ ...inputStyle }}
             >
               <option value="">Kunde auswählen...</option>
               {customers.map((c) => (
@@ -345,7 +328,6 @@ export default function NewInvoicePage() {
             <label style={labelStyle}>Rechnungsdatum</label>
             <input
               type="date"
-              style={inputStyle}
               value={issueDate}
               onChange={(e) => setIssueDate(e.target.value)}
             />
@@ -354,7 +336,6 @@ export default function NewInvoicePage() {
             <label style={labelStyle}>Fälligkeitsdatum</label>
             <input
               type="date"
-              style={inputStyle}
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
             />
@@ -403,7 +384,6 @@ export default function NewInvoicePage() {
               }}
             >
               <input
-                style={inputStyle}
                 placeholder="z.B. Webdesign, Beratung..."
                 value={item.description}
                 onChange={(e) =>
@@ -413,7 +393,7 @@ export default function NewInvoicePage() {
               <input
                 type="number"
                 min="1"
-                style={{ ...inputStyle, textAlign: "right" }}
+                style={{ textAlign: "right" }}
                 value={item.quantity}
                 onChange={(e) =>
                   updateItem(
@@ -427,7 +407,7 @@ export default function NewInvoicePage() {
                 type="number"
                 min="0"
                 step="0.01"
-                style={{ ...inputStyle, textAlign: "right" }}
+                style={{ textAlign: "right" }}
                 placeholder="0,00"
                 value={item.unit_price || ""}
                 onChange={(e) =>
@@ -542,12 +522,10 @@ export default function NewInvoicePage() {
                       value={taxRate}
                       onChange={(e) => setTaxRate(Number(e.target.value))}
                       style={{
+                        width: "auto",
+                        height: "auto",
                         fontSize: "12px",
-                        border: "1px solid var(--border)",
-                        // borderRadius: "3px",
                         padding: "1px 4px",
-                        background: "var(--background)",
-                        color: "var(--foreground)",
                       }}
                     >
                       <option value={0}>0%</option>
@@ -605,10 +583,8 @@ export default function NewInvoicePage() {
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
             style={{
-              ...inputStyle,
               height: "auto",
               resize: "vertical",
-              padding: "10px 12px",
               lineHeight: "1.5",
             }}
           />
@@ -643,7 +619,6 @@ export default function NewInvoicePage() {
               <div style={{ gridColumn: "1 / -1" }}>
                 <label style={labelStyle}>Wiederkehrende Rechnung</label>
                 <select
-                  style={inputStyle}
                   value={recurring}
                   onChange={(e) => setRecurring(e.target.value)}
                 >
@@ -663,7 +638,6 @@ export default function NewInvoicePage() {
                   requiredPlan="professional"
                 >
                   <input
-                    style={inputStyle}
                     placeholder="cc@example.com"
                     value={emailCc}
                     onChange={(e) => setEmailCc(e.target.value)}
@@ -680,7 +654,6 @@ export default function NewInvoicePage() {
                   requiredPlan="professional"
                 >
                   <input
-                    style={inputStyle}
                     placeholder="bcc@example.com"
                     value={emailBcc}
                     onChange={(e) => setEmailBcc(e.target.value)}

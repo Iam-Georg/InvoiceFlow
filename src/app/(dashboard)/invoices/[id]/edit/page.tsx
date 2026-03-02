@@ -174,19 +174,6 @@ export default function EditInvoicePage() {
     );
   }
 
-  const inputStyle: React.CSSProperties = {
-    border: "1px solid var(--border)",
-    background: "var(--background)",
-    borderRadius: "var(--radius)",
-    padding: "7px 10px",
-    fontSize: "13px",
-    color: "var(--foreground)",
-    width: "100%",
-    outline: "none",
-    fontFamily: "inherit",
-    height: "36px",
-  };
-
   return (
     <div style={{ maxWidth: "860px", margin: "0 auto", display: "grid", gap: "16px" }}>
       <Link href={`/invoices/${invoice.id}`} style={{ color: "var(--muted-foreground)", fontSize: "13px", textDecoration: "none" }}>
@@ -196,23 +183,23 @@ export default function EditInvoicePage() {
       <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "16px" }}>
         <p style={{ fontSize: "14px", fontWeight: 600, marginBottom: "10px" }}>Rechnung bearbeiten</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-          <input style={inputStyle} value={invoice.invoice_number} onChange={(e) => setInvoice({ ...invoice, invoice_number: e.target.value })} />
-          <select style={inputStyle} value={invoice.customer_id} onChange={(e) => setInvoice({ ...invoice, customer_id: e.target.value })}>
+          <input value={invoice.invoice_number} onChange={(e) => setInvoice({ ...invoice, invoice_number: e.target.value })} />
+          <select value={invoice.customer_id} onChange={(e) => setInvoice({ ...invoice, customer_id: e.target.value })}>
             <option value="">Kunde auswählen...</option>
             {customers.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
-          <input style={inputStyle} type="date" value={invoice.issue_date} onChange={(e) => setInvoice({ ...invoice, issue_date: e.target.value })} />
-          <input style={inputStyle} type="date" value={invoice.due_date} onChange={(e) => setInvoice({ ...invoice, due_date: e.target.value })} />
-          <select style={inputStyle} value={invoice.status} onChange={(e) => setInvoice({ ...invoice, status: e.target.value as InvoiceStatus })}>
+          <input type="date" value={invoice.issue_date} onChange={(e) => setInvoice({ ...invoice, issue_date: e.target.value })} />
+          <input type="date" value={invoice.due_date} onChange={(e) => setInvoice({ ...invoice, due_date: e.target.value })} />
+          <select value={invoice.status} onChange={(e) => setInvoice({ ...invoice, status: e.target.value as InvoiceStatus })}>
             <option value="draft">Entwurf</option>
             <option value="sent">Gesendet</option>
             <option value="open">Offen</option>
             <option value="overdue">Überfällig</option>
             <option value="paid">Bezahlt</option>
           </select>
-          <select style={inputStyle} value={invoice.tax_rate} onChange={(e) => setInvoice({ ...invoice, tax_rate: Number(e.target.value) })}>
+          <select value={invoice.tax_rate} onChange={(e) => setInvoice({ ...invoice, tax_rate: Number(e.target.value) })}>
             <option value={0}>MwSt. 0%</option>
             <option value={7}>MwSt. 7%</option>
             <option value={19}>MwSt. 19%</option>
@@ -224,9 +211,9 @@ export default function EditInvoicePage() {
         <p style={{ fontSize: "14px", fontWeight: 600, marginBottom: "10px" }}>Positionen</p>
         {invoice.items.map((item) => (
           <div key={item.id} style={{ display: "grid", gridTemplateColumns: "1fr 90px 120px 120px 34px", gap: "8px", marginBottom: "8px", alignItems: "center" }}>
-            <input style={inputStyle} value={item.description} onChange={(e) => updateItem(item.id, "description", e.target.value)} />
-            <input style={{ ...inputStyle, textAlign: "right" }} type="number" min={1} value={item.quantity} onChange={(e) => updateItem(item.id, "quantity", Number(e.target.value) || 0)} />
-            <input style={{ ...inputStyle, textAlign: "right" }} type="number" min={0} step="0.01" value={item.unit_price} onChange={(e) => updateItem(item.id, "unit_price", Number(e.target.value) || 0)} />
+            <input value={item.description} onChange={(e) => updateItem(item.id, "description", e.target.value)} />
+            <input style={{ textAlign: "right" }} type="number" min={1} value={item.quantity} onChange={(e) => updateItem(item.id, "quantity", Number(e.target.value) || 0)} />
+            <input style={{ textAlign: "right" }} type="number" min={0} step="0.01" value={item.unit_price} onChange={(e) => updateItem(item.id, "unit_price", Number(e.target.value) || 0)} />
             <span className="amount" style={{ textAlign: "right", fontSize: "13px", fontWeight: 600 }}>{formatCurrency(item.total)}</span>
             <button
               onClick={() => invoice.items.length > 1 && setInvoice({ ...invoice, items: invoice.items.filter((row) => row.id !== item.id) })}
@@ -251,7 +238,7 @@ export default function EditInvoicePage() {
           value={invoice.notes ?? ""}
           onChange={(e) => setInvoice({ ...invoice, notes: e.target.value })}
           rows={3}
-          style={{ ...inputStyle, height: "auto", resize: "vertical", padding: "10px" }}
+          style={{ height: "auto", resize: "vertical" }}
         />
       </div>
 
