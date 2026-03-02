@@ -142,25 +142,6 @@ export default function SettingsPage() {
     }
   }
 
-  const inputStyle: React.CSSProperties = {
-    height: "36px",
-    padding: "0 10px",
-    fontSize: "13px",
-    border: "1px solid var(--border)",
-    background: "var(--background)",
-    color: "var(--foreground)",
-    outline: "none",
-    fontFamily: "inherit",
-    width: "100%",
-  };
-
-  const disabledStyle: React.CSSProperties = {
-    ...inputStyle,
-    background: "var(--muted)",
-    color: "var(--muted-foreground)",
-    cursor: "not-allowed",
-  };
-
   const labelStyle: React.CSSProperties = {
     fontSize: "11px",
     fontWeight: 600,
@@ -202,7 +183,6 @@ export default function SettingsPage() {
           value={form[k]}
           disabled={disabled}
           onChange={(e) => set(k, e.target.value)}
-          style={disabled ? disabledStyle : inputStyle}
         />
       </div>
     );
@@ -385,18 +365,7 @@ export default function SettingsPage() {
               onChange={(e) => set("default_notes", e.target.value)}
               placeholder="z.B. Zahlbar innerhalb von 14 Tagen ohne Abzug."
               rows={3}
-              style={{
-                padding: "8px 10px",
-                fontSize: "13px",
-                border: "1px solid var(--border)",
-                background: "var(--background)",
-                color: "var(--foreground)",
-                outline: "none",
-                fontFamily: "inherit",
-                width: "100%",
-                resize: "vertical",
-                lineHeight: 1.5,
-              }}
+              style={{ resize: "vertical" }}
             />
           </div>
         </Section>
@@ -442,7 +411,7 @@ export default function SettingsPage() {
               onChange={(e) => setExportYear(e.target.value)}
               min={2000}
               max={new Date().getFullYear() + 1}
-              style={{ ...inputStyle, width: "100px" }}
+              style={{ width: "100px" }}
             />
             <button
               onClick={exportTaxCsv}
