@@ -48,7 +48,7 @@ const tooltipStyle = {
 /* ── useCountUp hook ─────────────────────────────── */
 function useCountUp(target: number, duration = 400) {
   const [value, setValue] = useState(0);
-  const ref = useRef<number>();
+  const ref = useRef<number>(0);
   useEffect(() => {
     if (!target) return;
     const start = performance.now();
