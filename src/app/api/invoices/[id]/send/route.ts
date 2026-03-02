@@ -11,8 +11,6 @@ import {
   textToHtml,
 } from "@/lib/email-templates";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
@@ -67,6 +65,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     );
   }
 
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const senderName =
     profile?.company_name || profile?.full_name || "Ihr Dienstleister";
   const dueDate = new Intl.DateTimeFormat("de-DE").format(

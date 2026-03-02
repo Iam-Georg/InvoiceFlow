@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createRouteSupabaseClient } from "@/lib/supabase-server";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
 export async function POST(_req: NextRequest, context: RouteContext) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const { id } = await context.params;
   const supabase = await createRouteSupabaseClient();
 
