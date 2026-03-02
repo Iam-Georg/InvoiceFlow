@@ -158,16 +158,6 @@ export default function ResetPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="max@firma.de"
-                style={{
-                  height: "38px",
-                  padding: "0 12px",
-                  fontSize: "13px",
-                  border: "1px solid var(--border)",
-                  // borderRadius: "var(--radius)",
-                  background: "var(--background)",
-                  color: "var(--foreground)",
-                  outline: "none",
-                }}
               />
               <button
                 onClick={requestReset}
@@ -206,32 +196,12 @@ export default function ResetPasswordPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Neues Passwort"
-                style={{
-                  height: "38px",
-                  padding: "0 12px",
-                  fontSize: "13px",
-                  border: "1px solid var(--border)",
-                  // borderRadius: "var(--radius)",
-                  background: "var(--background)",
-                  color: "var(--foreground)",
-                  outline: "none",
-                }}
               />
               <input
                 type="password"
                 value={password2}
                 onChange={(e) => setPassword2(e.target.value)}
                 placeholder="Passwort wiederholen"
-                style={{
-                  height: "38px",
-                  padding: "0 12px",
-                  fontSize: "13px",
-                  border: "1px solid var(--border)",
-                  // borderRadius: "var(--radius)",
-                  background: "var(--background)",
-                  color: "var(--foreground)",
-                  outline: "none",
-                }}
               />
               <button
                 onClick={updatePassword}

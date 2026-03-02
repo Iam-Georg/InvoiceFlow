@@ -67,18 +67,6 @@ export default function LoginPage() {
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-        style={{
-          height: "38px",
-          padding: "0 12px",
-          fontSize: "13px",
-          border: "1px solid var(--border)",
-          // borderRadius: "var(--radius)",
-          background: "var(--background)",
-          color: "var(--foreground)",
-          outline: "none",
-          fontFamily: "inherit",
-          width: "100%",
-        }}
       />
     </div>
   );
