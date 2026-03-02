@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
-import { Plus, LogOut, Settings, FileText, ChevronDown, Moon, Sun } from "lucide-react";
+import { Plus, LogOut, Settings, FileText, ChevronDown, Moon, Sun, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export default function TopNav() {
@@ -122,6 +122,21 @@ export default function TopNav() {
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Neuer Kunde – Secondary */}
+          <Link href="/customers/new" style={{ textDecoration: "none" }}>
+            <button
+              className="btn btn-secondary"
+              style={{
+                height: "36px",
+                padding: "0 12px",
+                fontSize: "13px",
+              }}
+            >
+              <Users size={14} />
+              <span className="topnav-new-label">Neuer Kunde</span>
+            </button>
+          </Link>
+
           <Link href="/invoices/new" style={{ textDecoration: "none" }}>
             <button
               className="topnav-new-btn btn-breathe"

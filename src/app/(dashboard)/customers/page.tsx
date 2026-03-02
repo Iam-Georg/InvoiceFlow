@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 import type { Customer } from "@/types";
-import { Plus, Users, ChevronRight, Loader2, Mail } from "lucide-react";
+import { Users, ChevronRight, Loader2, Mail } from "lucide-react";
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -56,12 +56,6 @@ export default function CustomersPage() {
               : `${customers.length} ${customers.length === 1 ? "Kunde" : "Kunden"}`}
           </p>
         </div>
-        <Link href="/customers/new">
-          <button className="btn btn-primary">
-            <Plus size={15} />
-            Neuer Kunde
-          </button>
-        </Link>
       </div>
 
       <div className="card-elevated" style={{ overflow: "hidden" }}>
