@@ -190,7 +190,7 @@ export default function Sidebar() {
         {/* Shortcut hint */}
         <div style={{ padding: "0 14px 8px", flexShrink: 0 }}>
           <p style={{ fontSize: "10px", color: "var(--text-3)", letterSpacing: "0.04em" }}>
-            Drücke <kbd style={{ fontFamily: "monospace", fontWeight: 700, color: "var(--text-2)" }}>?</kbd> für Tastenkürzel
+            Drücke <kbd style={{ fontFamily: "monospace", fontWeight: 700, color: "var(--text-2)" }}>Shift</kbd> + <kbd style={{ fontFamily: "monospace", fontWeight: 700, color: "var(--text-2)" }}>ß</kbd> für Tastenkürzel
           </p>
         </div>
 

@@ -120,9 +120,15 @@ export default function KeyboardShortcuts() {
           ))}
           <div style={{ padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "13px", color: "var(--text-2)" }}>Diese Hilfe öffnen / schließen</span>
-            <kbd style={{ background: "var(--surface-2)", border: "1px solid var(--border)", padding: "2px 8px", fontSize: "11px", fontWeight: 700, color: "var(--text-1)", fontFamily: "monospace" }}>
-              ?
-            </kbd>
+            <span style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+              <kbd style={{ background: "var(--surface-2)", border: "1px solid var(--border)", padding: "2px 8px", fontSize: "11px", fontWeight: 700, color: "var(--text-1)", fontFamily: "monospace", minWidth: "22px", textAlign: "center" as const }}>
+                Shift
+              </kbd>
+              <span style={{ fontSize: "10px", color: "var(--text-3)" }}>+</span>
+              <kbd style={{ background: "var(--surface-2)", border: "1px solid var(--border)", padding: "2px 8px", fontSize: "11px", fontWeight: 700, color: "var(--text-1)", fontFamily: "monospace", minWidth: "22px", textAlign: "center" as const }}>
+                ß
+              </kbd>
+            </span>
           </div>
         </div>
 
