@@ -83,7 +83,7 @@ export default function TopNav() {
   }
 
   return (
-    <header className="topnav-frame">
+    <header className="topnav-frame" style={{ animation: 'topNavSlideDown 300ms var(--ease-spring) forwards' }}>
       <div className="topnav-shell">
         <Link
           href="/dashboard"
@@ -124,7 +124,7 @@ export default function TopNav() {
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <Link href="/invoices/new" style={{ textDecoration: "none" }}>
             <button
-              className="topnav-new-btn"
+              className="topnav-new-btn btn-breathe"
               style={{
                 height: "36px",
                 padding: "0 12px",

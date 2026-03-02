@@ -38,18 +38,19 @@ export default function Sidebar() {
   const [userName, setUserName] = useState("");
   const [userInitial, setUserInitial] = useState("?");
 
-  // Sliding active pill: each nav item is 40px, nav has paddingTop 6px
-  function calcPill(path: string) {
-    const idx = navItems.findIndex(
+  // Active index based on current path
+  function getActiveIndex(path: string): number {
+    return navItems.findIndex(
       (item) => path === item.href || path.startsWith(item.href + "/"),
     );
-    return idx >= 0 ? 6 + idx * 40 : null;
   }
-  const [pillY, setPillY] = useState<number | null>(() => calcPill(pathname));
+  const activeIndex = getActiveIndex(pathname);
 
-  useEffect(() => {
-    setPillY(calcPill(pathname));
-  }, [pathname]);
+  // Magnetic hover tracking
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+
+  // The indicator follows hover, falls back to active
+  const indicatorIndex = hoverIndex ?? activeIndex;
 
   useEffect(() => {
     async function loadUser() {
@@ -119,38 +120,68 @@ export default function Sidebar() {
         </Link>
 
         {/* Nav */}
-        <nav style={{ position: "relative", display: "flex", flexDirection: "column", paddingTop: "6px" }}>
-          {/* Sliding active pill */}
-          {pillY !== null && (
+        <nav
+          style={{ position: "relative", display: "flex", flexDirection: "column", paddingTop: "6px" }}
+          onMouseLeave={() => setHoverIndex(null)}
+        >
+          {/* Magnetic left-edge accent bar */}
+          {indicatorIndex >= 0 && (
             <div
               aria-hidden="true"
               style={{
                 position: "absolute",
                 left: 0,
-                right: 0,
-                top: pillY,
+                top: 6 + indicatorIndex * 40,
+                width: "3px",
                 height: 40,
-                background: "var(--sidebar-active-bg)",
-                borderLeft: "2px solid var(--accent)",
-                transition: "top var(--duration-normal) var(--ease-spring)",
+                background: "var(--accent)",
+                borderRadius: "0 3px 3px 0",
+                transition: "top var(--duration-normal) var(--ease-spring), height var(--duration-normal) var(--ease-spring)",
                 pointerEvents: "none",
-                zIndex: 0,
+                zIndex: 2,
               }}
             />
           )}
-          {navItems.map((item) => {
+          {navItems.map((item, i) => {
             const active =
               pathname === item.href || pathname.startsWith(item.href + "/");
+            const isHovered = hoverIndex === i;
             const Icon = item.icon;
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={"sidebar-nav-item" + (active ? " active" : "")}
-                style={{ position: "relative", zIndex: 1 }}
+                style={{
+                  position: "relative",
+                  zIndex: 1,
+                  ...(active
+                    ? {
+                        color: "var(--text-1)",
+                        background: "var(--accent-soft)",
+                        boxShadow: "inset 0 0 20px var(--accent-soft)",
+                      }
+                    : isHovered
+                      ? { color: "var(--text-1)" }
+                      : {}),
+                }}
+                onMouseEnter={() => setHoverIndex(i)}
               >
-                <Icon size={15} />
-                <span>{item.label}</span>
+                <Icon
+                  size={15}
+                  style={{
+                    color: active || isHovered ? "var(--accent)" : undefined,
+                    transition: "color var(--duration-fast) var(--ease-smooth)",
+                  }}
+                />
+                <span
+                  style={{
+                    color: active || isHovered ? "var(--text-1)" : undefined,
+                    transition: "color var(--duration-fast) var(--ease-smooth)",
+                  }}
+                >
+                  {item.label}
+                </span>
               </Link>
             );
           })}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -30,6 +30,25 @@ type DashboardInvoice = Invoice & {
   paid_at?: string | null;
 };
 
+function useCountUp(target: number, duration = 400) {
+  const [value, setValue] = useState(0);
+  const ref = useRef<number>();
+  useEffect(() => {
+    if (!target) return;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      setValue(Math.round(eased * target));
+      if (progress < 1) ref.current = requestAnimationFrame(tick);
+    };
+    ref.current = requestAnimationFrame(tick);
+    return () => { if (ref.current) cancelAnimationFrame(ref.current); };
+  }, [target, duration]);
+  return value;
+}
+
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>({
     openCount: 0,
@@ -45,6 +64,11 @@ export default function DashboardPage() {
   const [recentInvoices, setRecentInvoices] = useState<DashboardInvoice[]>([]);
   const [monthly, setMonthly] = useState<MonthlyRevenue[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const animOpenCount = useCountUp(stats.openCount);
+  const animOverdueCount = useCountUp(stats.overdueCount);
+  const animPaidMonth = useCountUp(stats.paidMonth);
+  const animAvgDays = useCountUp(stats.avgPaymentDays ?? 0);
 
   useEffect(() => {
     async function load() {
@@ -143,7 +167,7 @@ export default function DashboardPage() {
   const statCards = [
     {
       title: "OFFEN",
-      value: loading ? "-" : String(stats.openCount),
+      value: loading ? "-" : String(animOpenCount),
       sub: loading ? "..." : `${formatCurrency(stats.openTotal)} ausstehend`,
       icon: FileText,
       iconColor: "var(--accent)",
@@ -151,7 +175,7 @@ export default function DashboardPage() {
     },
     {
       title: "UEBERFAELLIG",
-      value: loading ? "-" : String(stats.overdueCount),
+      value: loading ? "-" : String(animOverdueCount),
       sub: loading ? "..." : `${formatCurrency(stats.overdueTotal)} offen`,
       icon: AlertTriangle,
       iconColor: "var(--danger)",
@@ -159,7 +183,7 @@ export default function DashboardPage() {
     },
     {
       title: "BEZAHLT (MONAT)",
-      value: loading ? "-" : formatCurrency(stats.paidMonth),
+      value: loading ? "-" : formatCurrency(animPaidMonth),
       sub: "Aktueller Monat",
       icon: TrendingUp,
       iconColor: "var(--success)",
@@ -167,7 +191,7 @@ export default function DashboardPage() {
     },
     {
       title: "ZAHLUNGSDAUER",
-      value: loading ? "-" : stats.avgPaymentDays ? `${stats.avgPaymentDays} Tage` : "-",
+      value: loading ? "-" : stats.avgPaymentDays ? `${animAvgDays} Tage` : "-",
       sub: stats.avgPaymentDays ? "Durchschnitt" : "Noch keine Daten",
       icon: Clock3,
       iconColor: "var(--warning)",
@@ -177,7 +201,7 @@ export default function DashboardPage() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "20px" }}>
+      <div className="reveal-stagger" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "20px" }}>
         {statCards.map((s, i) => (
           <article
             key={s.title}
@@ -234,7 +258,7 @@ export default function DashboardPage() {
                   style={{
                     width: `${s}%`,
                     height: "100%",
-                    background: color,
+                    background: 'linear-gradient(90deg, var(--danger) 0%, var(--warning) 50%, var(--success) 100%)',
                     transition: `width 1s var(--ease-smooth)`,
                   }}
                 />
@@ -302,7 +326,7 @@ export default function DashboardPage() {
         )}
       </section>
 
-      <section className="card-elevated" style={{ overflow: "hidden" }}>
+      <section className="card-elevated reveal-stagger" style={{ overflow: "hidden" }}>
         <div style={{ padding: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid var(--border)" }}>
           <h2 style={{ fontSize: "18px", fontWeight: 600, color: "var(--text-1)" }}>Letzte Rechnungen</h2>
           <Link href="/invoices" style={{ fontSize: "14px", color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}>
