@@ -8,11 +8,28 @@ import { useEffect, useRef, useState } from "react";
 
 export default function TopNav() {
   const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
   const [userInitial, setUserInitial] = useState("?");
   const [userName, setUserName] = useState("");
   const [isDark, setIsDark] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  function openMenu() {
+    setMenuVisible(true);
+    setMenuClosing(false);
+  }
+  function closeMenu() {
+    setMenuClosing(true);
+    setTimeout(() => {
+      setMenuVisible(false);
+      setMenuClosing(false);
+    }, 150);
+  }
+  function toggleMenu() {
+    if (menuVisible && !menuClosing) closeMenu();
+    else openMenu();
+  }
 
   useEffect(() => {
     async function loadUser() {
@@ -63,7 +80,7 @@ export default function TopNav() {
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
+        closeMenu();
       }
     }
 
@@ -72,7 +89,7 @@ export default function TopNav() {
   }, []);
 
   async function handleLogout() {
-    setMenuOpen(false);
+    closeMenu();
     try {
       const sb = createClient();
       await sb.auth.signOut();
@@ -122,14 +139,22 @@ export default function TopNav() {
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {/* Neuer Kunde – Secondary */}
+          {/* Neuer Kunde – accent styled */}
           <Link href="/customers/new" style={{ textDecoration: "none" }}>
             <button
-              className="btn btn-secondary"
+              className="topnav-new-btn"
               style={{
                 height: "36px",
                 padding: "0 12px",
+                border: "none",
+                background: "var(--accent-theme)",
+                color: "#fff",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
                 fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
               }}
             >
               <Users size={14} />
@@ -161,7 +186,7 @@ export default function TopNav() {
 
           <div ref={menuRef} style={{ position: "relative" }}>
             <button
-              onClick={() => setMenuOpen((open) => !open)}
+              onClick={toggleMenu}
               style={{
                 height: "36px",
                 padding: "0 10px",
@@ -199,15 +224,15 @@ export default function TopNav() {
                   width: 12,
                   height: 12,
                   color: "var(--text-2)",
-                  transform: menuOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  transform: menuVisible && !menuClosing ? "rotate(180deg)" : "rotate(0deg)",
                   transition: `transform var(--duration-normal) var(--ease-spring)`,
                 }}
               />
             </button>
 
-            {menuOpen && (
+            {menuVisible && (
               <div
-                className="dropdown-enter"
+                className={menuClosing ? "dropdown-exit" : "dropdown-enter"}
                 style={{
                   position: "absolute",
                   top: "calc(100% + 8px)",
@@ -239,7 +264,7 @@ export default function TopNav() {
 
                 <Link
                   href="/settings"
-                  onClick={() => setMenuOpen(false)}
+                  onClick={closeMenu}
                   className="dropdown-item"
                 >
                   <Settings size={14} color="var(--text-2)" />

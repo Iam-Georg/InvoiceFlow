@@ -66,7 +66,7 @@
   --shadow-topbar: 0 1px 0 rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
 
   /* Layout */
-  --sidebar-width: 220px;
+  --sidebar-width: 260px;
   --topbar-height: 56px;
   --gap: 16px;
   --card-padding: 24px;
@@ -401,15 +401,12 @@ textarea:disabled {
 
 .card-hover {
   transition:
-    transform var(--duration-normal) var(--ease-spring),
-    box-shadow var(--duration-normal) var(--ease-smooth),
-    border-color var(--duration-normal) var(--ease-smooth);
-  border-top: 2px solid transparent;
+    transform var(--duration-fast) var(--ease-spring),
+    box-shadow var(--duration-fast) var(--ease-smooth);
 }
 .card-hover:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-hover);
-  border-top-color: var(--accent);
 }
 
 /* ── Gradient Divider ── */
@@ -433,6 +430,9 @@ textarea:disabled {
 
 /* ═══════════════════════════════════════
    BUTTONS
+   Hover = background-color shift (like sidebar nav items).
+   Horizontal wipe from left (editorial curtain fill).
+   Active = scale down. Icons scale up on hover.
 ═══════════════════════════════════════ */
 .btn {
   display: inline-flex;
@@ -447,76 +447,91 @@ textarea:disabled {
   border: none;
   cursor: pointer;
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
   transition:
-    background-color var(--duration-fast) var(--ease-smooth),
+    color            var(--duration-normal) var(--ease-smooth),
     box-shadow       var(--duration-fast) var(--ease-smooth),
     transform        var(--duration-fast) var(--ease-spring),
-    color            var(--duration-fast) var(--ease-smooth),
     opacity          var(--duration-fast) var(--ease-smooth);
 }
 
-.btn:hover:not(:disabled) {
-  transform: translateY(-1px);
+/* ── Wipe layer – slides in from left on hover ── */
+.btn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateX(-101%);
+  transition: transform var(--duration-normal) var(--ease-smooth);
+  z-index: -1;
+  pointer-events: none;
+}
+.btn:hover:not(:disabled)::after {
+  transform: translateX(0);
+}
+
+/* Icons scale on hover */
+.btn:hover:not(:disabled) svg {
+  transform: scale(1.1);
+}
+.btn svg {
+  transition: transform var(--duration-fast) var(--ease-spring);
 }
 
 .btn:active:not(:disabled) {
-  transform: translateY(0) scale(0.97);
+  transform: scale(0.96);
+  transition-duration: 60ms;
 }
 
+/* ── Primary – brightens from left ── */
 .btn-primary {
   background: var(--accent);
   color: #fff;
 }
-.btn-primary:hover:not(:disabled) {
-  background: var(--accent-hover);
-  box-shadow: 0 4px 16px rgba(0, 64, 204, 0.25);
+.btn-primary::after {
+  background: rgba(255, 255, 255, 0.18);
 }
 
+/* ── Secondary – accent-soft wipes over surface ── */
 .btn-secondary {
   background: var(--surface);
   color: var(--text-1);
   box-shadow: var(--shadow-sm);
 }
+.btn-secondary::after {
+  background: var(--accent-soft);
+}
 .btn-secondary:hover:not(:disabled) {
-  box-shadow: var(--shadow-md);
+  color: var(--accent);
 }
 
+/* ── Ghost – solid accent wipes in, text inverts ── */
 .btn-ghost {
   background: transparent;
   color: var(--accent);
   border: 1.5px solid var(--accent);
 }
+.btn-ghost::after {
+  background: var(--accent);
+}
 .btn-ghost:hover:not(:disabled) {
-  background: var(--accent-soft);
+  color: #fff;
 }
 
+/* ── Danger – solid danger wipes in ── */
 .btn-danger {
   background: var(--danger-bg);
   color: var(--danger);
 }
+.btn-danger::after {
+  background: var(--danger);
+}
 .btn-danger:hover:not(:disabled) {
-  filter: brightness(0.95);
-}
-
-/* ── Button Ripple Effect ── */
-.btn {
-  position: relative;
-  overflow: hidden;
-}
-.btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), var(--accent-soft) 0%, transparent 70%);
-  opacity: 0;
-  transform: scale(0);
-  transition: opacity var(--duration-fast), transform var(--duration-normal) var(--ease-decel);
-  pointer-events: none;
-}
-.btn:active::after {
-  opacity: 1;
-  transform: scale(2.5);
-  transition: opacity 0ms, transform var(--duration-normal) var(--ease-decel);
+  color: #fff;
 }
 
 /* ── Button Loading State ── */
@@ -548,6 +563,10 @@ textarea:disabled {
   transform: none !important;
   box-shadow: none !important;
 }
+.btn:disabled::after,
+.btn[aria-disabled="true"]::after {
+  display: none;
+}
 
 /* ── Breathing Glow (for primary CTA) ── */
 .btn-breathe {
@@ -555,7 +574,6 @@ textarea:disabled {
 }
 .btn-breathe:hover {
   animation: none;
-  box-shadow: 0 0 20px 6px var(--accent-soft);
 }
 
 /* ═══════════════════════════════════════
@@ -711,13 +729,13 @@ textarea:disabled {
    SIDEBAR NAV ITEMS
 ═══════════════════════════════════════ */
 .sidebar-nav-item {
-  height: 40px;
+  height: 44px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 12px;
+  padding: 0 16px;
   text-decoration: none;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--sidebar-text);
   background: transparent;
@@ -978,29 +996,49 @@ textarea:disabled {
   border: none;
   cursor: pointer;
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
   transition:
-    background-color var(--duration-fast) var(--ease-smooth),
+    color            var(--duration-normal) var(--ease-smooth),
     box-shadow       var(--duration-fast) var(--ease-smooth),
     transform        var(--duration-fast) var(--ease-spring),
     opacity          var(--duration-fast) var(--ease-smooth);
 }
+.ios-btn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateX(-101%);
+  transition: transform var(--duration-normal) var(--ease-smooth);
+  z-index: -1;
+  pointer-events: none;
+}
+.ios-btn:hover:not(:disabled)::after {
+  transform: translateX(0);
+}
 
-.ios-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
+.ios-btn:hover:not(:disabled) svg {
+  transform: scale(1.1);
+}
+.ios-btn svg {
+  transition: transform var(--duration-fast) var(--ease-spring);
 }
 
 .ios-btn:active:not(:disabled) {
-  transform: translateY(0) scale(0.97);
+  transform: scale(0.96);
+  transition-duration: 60ms;
 }
 
 .ios-btn-primary {
   background: var(--accent);
   color: #fff;
 }
-
-.ios-btn-primary:hover:not(:disabled) {
-  background: var(--accent-hover);
-  box-shadow: 0 4px 16px rgba(0, 64, 204, 0.25);
+.ios-btn-primary::after {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .ios-btn-secondary {
@@ -1009,9 +1047,11 @@ textarea:disabled {
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
 }
-
+.ios-btn-secondary::after {
+  background: var(--accent-soft);
+}
 .ios-btn-secondary:hover:not(:disabled) {
-  box-shadow: var(--shadow-md);
+  color: var(--accent);
 }
 
 .ios-stat-value {
@@ -1056,7 +1096,7 @@ textarea:disabled {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  align-items: start;
+  align-items: stretch;
 }
 @media (max-width: 1100px) {
   .billing-grid {
@@ -1067,6 +1107,20 @@ textarea:disabled {
   .billing-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.billing-card {
+  transition:
+    transform var(--duration-normal) var(--ease-spring),
+    box-shadow var(--duration-normal) var(--ease-smooth);
+}
+.billing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.billing-card-recommended {
+  border-top: 4px solid var(--accent) !important;
 }
 
 /* ═══════════════════════════════════════
@@ -1115,6 +1169,11 @@ textarea:disabled {
   transform-origin: top right;
 }
 
+.dropdown-exit {
+  animation: dropdownExit var(--duration-fast) var(--ease-smooth) both;
+  transform-origin: top right;
+}
+
 .dropdown-enter > * {
   opacity: 0;
   animation: revealUp var(--duration-fast) var(--ease-smooth) forwards;
@@ -1129,20 +1188,32 @@ textarea:disabled {
    TOPBAR BUTTONS
 ═══════════════════════════════════════ */
 .topnav-new-btn {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
   transition:
-    background-color var(--duration-fast) var(--ease-smooth),
-    box-shadow       var(--duration-fast) var(--ease-smooth),
-    transform        var(--duration-fast) var(--ease-spring);
+    transform var(--duration-fast) var(--ease-spring);
 }
-
-.topnav-new-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 64, 204, 0.25);
+.topnav-new-btn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateX(-101%);
+  transition: transform var(--duration-normal) var(--ease-smooth);
+  z-index: -1;
+  pointer-events: none;
+}
+.topnav-new-btn:hover::after {
+  transform: translateX(0);
 }
 
 .topnav-new-btn:active {
-  transform: translateY(0) scale(0.97);
-  box-shadow: none;
+  transform: scale(0.96);
+  transition-duration: 60ms;
 }
 
 /* Sidebar User-Bereich hover */
@@ -1233,7 +1304,8 @@ body {
 .card-base {
   transition:
     background-color var(--duration-slow) var(--ease-smooth),
-    box-shadow       var(--duration-slow) var(--ease-smooth);
+    box-shadow       var(--duration-slow) var(--ease-smooth),
+    transform        var(--duration-normal) var(--ease-spring);
 }
 
 /* ═══════════════════════════════════════
@@ -1336,21 +1408,7 @@ body {
 }
 
 /* ═══════════════════════════════════════
-   REDUCED MOTION – Barrierefreiheit
+   REDUCED MOTION – DISABLED
+   All animations are forced regardless of OS setting.
+   The app's identity relies on physical motion.
 ═══════════════════════════════════════ */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-  .scroll-reveal {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-  .reveal-stagger > * {
-    opacity: 1 !important;
-    animation: none !important;
-  }
-}

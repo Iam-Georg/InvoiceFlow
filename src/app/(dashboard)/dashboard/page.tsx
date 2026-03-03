@@ -300,14 +300,14 @@ export default function DashboardPage() {
         </div>
 
         {monthly.every((m) => m.total === 0) ? (
-          <div style={{ minHeight: "180px", display: "grid", placeItems: "center" }}>
+          <div className="anim-fade-in" style={{ minHeight: "180px", display: "grid", placeItems: "center" }}>
             <div style={{ textAlign: "center" }}>
               <BarChart3 size={32} color="var(--text-3)" style={{ margin: "0 auto 10px" }} />
               <p style={{ fontSize: "14px", color: "var(--text-2)" }}>Noch keine Umsatzdaten vorhanden.</p>
             </div>
           </div>
         ) : (
-          <div style={{ display: "flex", alignItems: "flex-end", gap: "12px", minHeight: "180px" }}>
+          <div className="anim-fade-in" style={{ display: "flex", alignItems: "flex-end", gap: "12px", minHeight: "180px" }}>
             {monthly.map((m) => (
               <div key={m.month} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
                 <span style={{ fontSize: "11px", color: "var(--text-3)" }}>{m.total > 0 ? formatCurrency(m.total) : ""}</span>
@@ -335,7 +335,7 @@ export default function DashboardPage() {
         </div>
 
         {recentInvoices.length === 0 ? (
-          <div style={{ minHeight: "180px", display: "grid", placeItems: "center", padding: "24px" }}>
+          <div className="anim-fade-in" style={{ minHeight: "180px", display: "grid", placeItems: "center", padding: "24px" }}>
             <div style={{ textAlign: "center" }}>
               <FileText size={28} color="var(--text-3)" style={{ margin: "0 auto 8px" }} />
               <p style={{ fontSize: "14px", color: "var(--text-2)" }}>Noch keine Rechnungen vorhanden.</p>

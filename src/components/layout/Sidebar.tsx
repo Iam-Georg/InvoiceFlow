@@ -87,7 +87,7 @@ export default function Sidebar() {
             display: "flex",
             alignItems: "center",
             gap: "10px",
-            padding: "0 14px",
+            padding: "0 16px",
             height: "52px",
             borderBottom: "1px solid var(--border)",
             flexShrink: 0,
@@ -131,9 +131,9 @@ export default function Sidebar() {
               style={{
                 position: "absolute",
                 left: 0,
-                top: 6 + indicatorIndex * 40,
+                top: 6 + indicatorIndex * 44,
                 width: "3px",
-                height: 40,
+                height: 44,
                 background: "var(--accent)",
                 borderRadius: "0 3px 3px 0",
                 transition: "top var(--duration-normal) var(--ease-spring), height var(--duration-normal) var(--ease-spring)",
@@ -168,7 +168,7 @@ export default function Sidebar() {
                 onMouseEnter={() => setHoverIndex(i)}
               >
                 <Icon
-                  size={15}
+                  size={17}
                   style={{
                     color: active || isHovered ? "var(--accent)" : undefined,
                     transition: "color var(--duration-fast) var(--ease-smooth)",

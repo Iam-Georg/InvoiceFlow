@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { ensureProfile } from "@/lib/profile";
 import type { Profile, SubscriptionPlan } from "@/types";
-import { Check, CreditCard, Loader2 } from "lucide-react";
+import { Check, CreditCard, Loader2, Minus } from "lucide-react";
 
 const PLANS: {
   id: SubscriptionPlan;
@@ -19,39 +19,39 @@ const PLANS: {
   {
     id: "free",
     label: "Free",
-    price: "0 \u20ac",
+    price: "0 €",
     priceValue: 0,
-    description: "Kostenlos starten, keine Kreditkarte n\u00f6tig.",
+    description: "Kostenlos starten, keine Kreditkarte nötig.",
     features: [
       { text: "Bis zu 3 Rechnungen/Monat", included: true },
       { text: "PDF Export", included: true },
       { text: "1 Kunde", included: true },
       { text: "E-Mail Versand", included: false },
       { text: "Automatische Erinnerungen", included: false },
-      { text: "Priorit\u00e4t-Support", included: false },
+      { text: "Priorität-Support", included: false },
     ],
   },
   {
     id: "starter",
     label: "Starter",
-    price: "9 \u20ac",
+    price: "9 €",
     priceValue: 9,
-    description: "F\u00fcr Einzelunternehmer mit geringem Volumen.",
+    description: "Für Einzelunternehmer mit geringem Volumen.",
     features: [
       { text: "Bis zu 10 Rechnungen/Monat", included: true },
       { text: "PDF Export", included: true },
       { text: "Unbegrenzte Kunden", included: true },
       { text: "E-Mail Versand", included: true },
       { text: "Automatische Erinnerungen", included: false },
-      { text: "Priorit\u00e4t-Support", included: false },
+      { text: "Priorität-Support", included: false },
     ],
   },
   {
     id: "professional",
     label: "Professional",
-    price: "19 \u20ac",
+    price: "19 €",
     priceValue: 19,
-    description: "F\u00fcr wachsende Freelancer mit Automatisierung.",
+    description: "Für wachsende Freelancer mit Automatisierung.",
     recommended: true,
     features: [
       { text: "Unbegrenzte Rechnungen", included: true },
@@ -59,15 +59,15 @@ const PLANS: {
       { text: "Unbegrenzte Kunden", included: true },
       { text: "E-Mail Versand", included: true },
       { text: "Automatische Erinnerungen", included: true },
-      { text: "Priorit\u00e4t-Support", included: true },
+      { text: "Priorität-Support", included: true },
     ],
   },
   {
     id: "business",
     label: "Business",
-    price: "39 \u20ac",
+    price: "39 €",
     priceValue: 39,
-    description: "F\u00fcr Teams mit h\u00f6herem Volumen und Priorit\u00e4t.",
+    description: "Für Teams mit höherem Volumen und Priorität.",
     features: [
       { text: "Alle Professional-Features", included: true },
       { text: "Steuerexport CSV", included: true },
@@ -127,33 +127,53 @@ export default function BillingPage() {
 
   return (
     <div>
-      {/* Header */}
-      <div style={{ marginBottom: "24px" }}>
+      {/* Hero Header */}
+      <div
+        className="anim-fade-in-up"
+        style={{
+          marginBottom: "32px",
+          textAlign: "center",
+          padding: "8px 0 0",
+        }}
+      >
         <h1
           style={{
-            fontSize: "18px",
+            fontSize: "26px",
             fontWeight: 700,
             color: "var(--text-1)",
-            letterSpacing: "-0.01em",
+            letterSpacing: "-0.03em",
+            marginBottom: "8px",
           }}
         >
-          Billing
+          Wähle deinen Plan
         </h1>
         <p
           style={{
-            fontSize: "13px",
+            fontSize: "14px",
             color: "var(--text-2)",
-            marginTop: "4px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
           }}
         >
-          Aktueller Plan:{" "}
-          <strong style={{ color: "var(--text-1)" }}>
+          Aktueller Plan:
+          <span
+            style={{
+              padding: "3px 10px",
+              fontSize: "11px",
+              fontWeight: 700,
+              background: "var(--accent)",
+              color: "#fff",
+              letterSpacing: "0.05em",
+              textTransform: "uppercase",
+            }}
+          >
             {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
-          </strong>
+          </span>
         </p>
       </div>
 
-      {/* Plan Cards – 4-column grid */}
+      {/* Plan Cards */}
       <div className="billing-grid reveal-stagger">
         {PLANS.map((plan) => {
           const isCurrent = currentPlan === plan.id;
@@ -161,65 +181,50 @@ export default function BillingPage() {
           return (
             <div
               key={plan.id}
-              className="card-hover"
+              className={`billing-card${plan.recommended ? " billing-card-recommended" : ""}`}
               style={{
                 background: "var(--surface)",
-                border: plan.recommended
-                  ? "2px solid var(--accent)"
-                  : isCurrent
-                    ? "1px solid var(--accent)"
-                    : "1px solid var(--border)",
-                boxShadow: plan.recommended
-                  ? "var(--shadow-lg)"
-                  : "var(--shadow-md)",
+                border: isCurrent
+                  ? "1px solid var(--accent)"
+                  : "1px solid var(--border)",
+                boxShadow: "var(--shadow-md)",
                 overflow: "hidden",
-                transform: plan.recommended ? "translateY(-8px)" : "none",
+                display: "flex",
+                flexDirection: "column",
               }}
             >
-              {/* Empfohlen Banner */}
-              {plan.recommended && (
-                <div
-                  style={{
-                    background: "var(--accent)",
-                    color: "#fff",
-                    fontSize: "10px",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                    padding: "6px 0",
-                    textAlign: "center",
-                  }}
-                >
-                  Empfohlen
-                </div>
-              )}
-
-              {/* Plan Header */}
-              <div
-                style={{
-                  padding: "16px 20px",
-                  borderBottom: "1px solid var(--border)",
-                  background: isCurrent ? "var(--accent-soft)" : "transparent",
-                }}
-              >
+              {/* Card Body */}
+              <div style={{ padding: "24px 20px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
+                {/* Plan name + badge row */}
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    marginBottom: "4px",
+                    marginBottom: "12px",
                   }}
                 >
                   <p
                     style={{
-                      fontSize: "14px",
+                      fontSize: plan.recommended ? "16px" : "14px",
                       fontWeight: 700,
                       color: "var(--text-1)",
                     }}
                   >
                     {plan.label}
                   </p>
-                  {isCurrent && (
+                  {plan.recommended && (
+                    <span
+                      className="label-caps"
+                      style={{
+                        color: "var(--accent)",
+                        fontSize: "9px",
+                      }}
+                    >
+                      Beliebteste Wahl
+                    </span>
+                  )}
+                  {isCurrent && !plan.recommended && (
                     <span
                       style={{
                         padding: "2px 8px",
@@ -235,13 +240,16 @@ export default function BillingPage() {
                     </span>
                   )}
                 </div>
-                <div style={{ marginBottom: "4px" }}>
+
+                {/* Price */}
+                <div style={{ marginBottom: "16px" }}>
                   <span
                     style={{
-                      fontSize: "28px",
+                      fontSize: plan.recommended ? "32px" : "28px",
                       fontWeight: 700,
                       color: "var(--text-1)",
                       letterSpacing: "-0.02em",
+                      fontVariantNumeric: "tabular-nums",
                     }}
                   >
                     {plan.price}
@@ -258,20 +266,16 @@ export default function BillingPage() {
                     </span>
                   )}
                 </div>
-                <p style={{ fontSize: "12px", color: "var(--text-2)" }}>
-                  {plan.description}
-                </p>
-              </div>
 
-              {/* Features + Button */}
-              <div style={{ padding: "16px 20px" }}>
+                {/* Features */}
                 <ul
                   style={{
                     listStyle: "none",
                     display: "flex",
                     flexDirection: "column",
-                    gap: "8px",
+                    gap: "10px",
                     marginBottom: "16px",
+                    flex: 1,
                   }}
                 >
                   {plan.features.map((f) => (
@@ -281,26 +285,33 @@ export default function BillingPage() {
                         display: "flex",
                         alignItems: "center",
                         gap: "8px",
-                        opacity: f.included ? 1 : 0.4,
                       }}
                     >
-                      <Check
-                        style={{
-                          width: 13,
-                          height: 13,
-                          color: f.included
-                            ? "var(--success)"
-                            : "var(--text-3)",
-                          flexShrink: 0,
-                        }}
-                      />
+                      {f.included ? (
+                        <Check
+                          style={{
+                            width: 14,
+                            height: 14,
+                            color: "var(--success)",
+                            flexShrink: 0,
+                          }}
+                        />
+                      ) : (
+                        <Minus
+                          style={{
+                            width: 14,
+                            height: 14,
+                            color: "var(--text-3)",
+                            flexShrink: 0,
+                          }}
+                        />
+                      )}
                       <span
                         style={{
                           fontSize: "12px",
                           color: f.included
                             ? "var(--text-1)"
                             : "var(--text-3)",
-                          textDecoration: f.included ? "none" : "line-through",
                         }}
                       >
                         {f.text}
@@ -308,9 +319,31 @@ export default function BillingPage() {
                     </li>
                   ))}
                 </ul>
+
+                {/* Description */}
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "var(--text-3)",
+                    marginBottom: "16px",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {plan.description}
+                </p>
+
+                {/* CTA */}
                 <button
                   disabled={isCurrent || isFree}
-                  className={`btn ${isCurrent || isFree ? "btn-secondary" : "btn-primary"} ${plan.recommended && !isCurrent ? "btn-breathe" : ""}`}
+                  className={
+                    isCurrent
+                      ? "btn btn-secondary"
+                      : plan.recommended
+                        ? "btn btn-primary btn-breathe"
+                        : isFree
+                          ? "btn btn-secondary"
+                          : "btn btn-ghost"
+                  }
                   style={{ width: "100%" }}
                 >
                   <CreditCard style={{ width: 13, height: 13 }} />
@@ -318,7 +351,7 @@ export default function BillingPage() {
                     ? "Aktueller Plan"
                     : isFree
                       ? "Kostenlos"
-                      : "Upgrade \u2013 demn\u00e4chst"}
+                      : "Upgrade – demnächst"}
                 </button>
               </div>
             </div>
@@ -326,15 +359,17 @@ export default function BillingPage() {
         })}
       </div>
 
+      {/* Trust Footer */}
       <p
         style={{
-          marginTop: "20px",
+          marginTop: "28px",
           fontSize: "12px",
-          color: "var(--text-2)",
+          color: "var(--text-3)",
           textAlign: "center",
+          letterSpacing: "0.01em",
         }}
       >
-        Bezahlung via Lemon Squeezy \u2013 demn\u00e4chst verf\u00fcgbar.
+        Jederzeit kündbar · Keine versteckten Kosten · Lemon Squeezy Zahlungsabwicklung
       </p>
     </div>
   );

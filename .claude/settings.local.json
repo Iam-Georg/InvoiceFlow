@@ -4,7 +4,11 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(npx tsc:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(npm run:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(npx next:*)"
     ]
   }
 }

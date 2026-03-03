@@ -418,6 +418,7 @@ export default function InvoiceDetailPage() {
 
       {showSendComposer && (
         <div
+          className="anim-fade-in-up"
           style={{
             marginBottom: "20px",
             ...glassCardStyle,
