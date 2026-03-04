@@ -19,9 +19,9 @@ import { createClient } from "@/lib/supabase";
 const navItems = [
   { href: "/dashboard",           label: "Übersicht",     icon: LayoutGrid },
   { href: "/invoices",            label: "Rechnungen",    icon: FileText },
-  { href: "/invoices/templates",  label: "Vorlagen",      icon: Palette },
   { href: "/customers",           label: "Kunden",        icon: Users },
   { href: "/statistics",          label: "Statistiken",   icon: BarChart3 },
+  { href: "/invoices/templates",  label: "Vorlagen",      icon: Palette },
   { href: "/settings",            label: "Einstellungen", icon: Settings },
   { href: "/billing",             label: "Billing",       icon: CreditCard },
   { href: "/support",             label: "Support",       icon: HelpCircle },
@@ -154,8 +154,7 @@ export default function Sidebar() {
             />
           )}
           {navItems.map((item, i) => {
-            const active =
-              pathname === item.href || pathname.startsWith(item.href + "/");
+            const active = i === activeIndex;
             const isHovered = hoverIndex === i;
             const Icon = item.icon;
             return (

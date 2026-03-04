@@ -30,12 +30,15 @@ export default function TemplatesPage() {
       } = await sb.auth.getUser();
       if (!user) return;
 
-      const { data } = await sb
+      const { data, error } = await sb
         .from("invoice_templates")
         .select("*")
         .eq("user_id", user.id)
         .order("is_default", { ascending: false });
 
+      if (error) {
+        console.error("Template load error:", error);
+      }
       setTemplates((data as InvoiceTemplate[]) ?? []);
       setLoading(false);
     }
@@ -66,7 +69,8 @@ export default function TemplatesPage() {
 
     setActionLoading(null);
     if (error) {
-      toast.error("Fehler beim Erstellen");
+      toast.error(`Fehler: ${error.message}`);
+      console.error("Template create error:", error);
       return;
     }
     router.push(`/invoices/templates/${data.id}`);
