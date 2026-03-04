@@ -99,12 +99,24 @@ export async function POST(req: NextRequest, context: RouteContext) {
     </div>
   `;
 
+  // Load invoice template config if set
+  let templateConfig = undefined;
+  if (invoice.template_id) {
+    const { data: tpl } = await supabase
+      .from("invoice_templates")
+      .select("config")
+      .eq("id", invoice.template_id)
+      .single();
+    if (tpl) templateConfig = tpl.config;
+  }
+
   const pdfDocument = React.createElement(InvoicePDF, {
     invoice: invoice as Parameters<typeof InvoicePDF>[0]["invoice"],
     profile: {
       ...(profile ?? {}),
       email: profile?.email || user.email || "",
     },
+    templateConfig,
   }) as unknown as React.ReactElement<DocumentProps>;
   const pdfBuffer = await renderToBuffer(pdfDocument);
 

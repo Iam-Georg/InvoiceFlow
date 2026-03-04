@@ -16,6 +16,9 @@ import {
   ShieldCheck,
   CreditCard,
   Zap,
+  Palette,
+  Repeat,
+  Database,
 } from "lucide-react";
 import MarketingHeader from "@/components/layout/MarketingHeader";
 import MarketingFooter from "@/components/layout/MarketingFooter";
@@ -74,6 +77,24 @@ const FEATURES = [
     title: "Schnell & fokussiert",
     description:
       "Keine überladene Software. Keine steile Lernkurve. In 10 Minuten eingerichtet und direkt produktiv.",
+  },
+  {
+    Icon: Palette,
+    title: "Rechnungsvorlagen",
+    description:
+      "Gestalten Sie eigene Rechnungsvorlagen mit individuellen Farben, Logo und Schriftarten. Live-Vorschau beim Bearbeiten.",
+  },
+  {
+    Icon: Repeat,
+    title: "Wiederkehrende Rechnungen",
+    description:
+      "Automatische Rechnungserstellung für Retainer und Abonnements. Monatlich, vierteljährlich oder jährlich.",
+  },
+  {
+    Icon: Database,
+    title: "DATEV-Export",
+    description:
+      "Exportieren Sie Ihre Rechnungsdaten im DATEV-Buchungsstapel-Format für Ihren Steuerberater.",
   },
 ];
 

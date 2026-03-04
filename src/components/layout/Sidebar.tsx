@@ -10,19 +10,21 @@ import {
   HelpCircle,
   LayoutGrid,
   LogOut,
+  Palette,
   Settings,
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 
 const navItems = [
-  { href: "/dashboard",  label: "Übersicht",     icon: LayoutGrid },
-  { href: "/invoices",   label: "Rechnungen",    icon: FileText },
-  { href: "/customers",  label: "Kunden",        icon: Users },
-  { href: "/statistics", label: "Statistiken",   icon: BarChart3 },
-  { href: "/settings",   label: "Einstellungen", icon: Settings },
-  { href: "/billing",    label: "Billing",       icon: CreditCard },
-  { href: "/support",    label: "Support",       icon: HelpCircle },
+  { href: "/dashboard",           label: "Übersicht",     icon: LayoutGrid },
+  { href: "/invoices",            label: "Rechnungen",    icon: FileText },
+  { href: "/invoices/templates",  label: "Vorlagen",      icon: Palette },
+  { href: "/customers",           label: "Kunden",        icon: Users },
+  { href: "/statistics",          label: "Statistiken",   icon: BarChart3 },
+  { href: "/settings",            label: "Einstellungen", icon: Settings },
+  { href: "/billing",             label: "Billing",       icon: CreditCard },
+  { href: "/support",             label: "Support",       icon: HelpCircle },
 ];
 
 export default function Sidebar() {
@@ -38,11 +40,20 @@ export default function Sidebar() {
   const [userName, setUserName] = useState("");
   const [userInitial, setUserInitial] = useState("?");
 
-  // Active index based on current path
+  // Active index based on current path (longest prefix match)
   function getActiveIndex(path: string): number {
-    return navItems.findIndex(
-      (item) => path === item.href || path.startsWith(item.href + "/"),
-    );
+    let bestIndex = -1;
+    let bestLength = 0;
+    navItems.forEach((item, i) => {
+      if (
+        (path === item.href || path.startsWith(item.href + "/")) &&
+        item.href.length > bestLength
+      ) {
+        bestIndex = i;
+        bestLength = item.href.length;
+      }
+    });
+    return bestIndex;
   }
   const activeIndex = getActiveIndex(pathname);
 

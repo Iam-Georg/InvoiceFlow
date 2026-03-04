@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { generateInvoiceNumber, formatCurrency } from "@/lib/utils";
-import { Customer, InvoiceItem } from "@/types";
+import { Customer, InvoiceItem, InvoiceTemplate } from "@/types";
 import { toast } from "sonner";
 import { Plus, Trash2, Loader2, ChevronLeft, Sparkles, ChevronDown } from "lucide-react";
 import Link from "next/link";
@@ -48,6 +48,8 @@ export default function NewInvoicePage() {
   const [recurring, setRecurring] = useState("");
   const [emailCc, setEmailCc] = useState("");
   const [emailBcc, setEmailBcc] = useState("");
+  const [templates, setTemplates] = useState<InvoiceTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
   const accordionRef = useRef<HTMLDivElement>(null);
   const { can, loading: planLoading } = usePlan();
 
@@ -66,12 +68,16 @@ export default function NewInvoicePage() {
         .single();
       if (profile)
         setInvoiceNumber(generateInvoiceNumber(profile.invoice_counter));
-      const { data: custs } = await supabase
-        .from("customers")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("name");
+      const [{ data: custs }, { data: tplData }] = await Promise.all([
+        supabase.from("customers").select("*").eq("user_id", user.id).order("name"),
+        supabase.from("invoice_templates").select("*").eq("user_id", user.id).order("is_default", { ascending: false }),
+      ]);
       setCustomers(custs ?? []);
+      if (tplData) {
+        setTemplates(tplData as InvoiceTemplate[]);
+        const def = (tplData as InvoiceTemplate[]).find((t) => t.is_default);
+        if (def) setSelectedTemplateId(def.id);
+      }
     }
     load();
   }, []);
@@ -122,7 +128,7 @@ export default function NewInvoicePage() {
         return;
       }
 
-      const { error } = await supabase.from("invoices").insert({
+      const { data: invoiceData, error } = await supabase.from("invoices").insert({
         user_id: user.id,
         customer_id: customerId,
         invoice_number: invoiceNumber,
@@ -136,11 +142,30 @@ export default function NewInvoicePage() {
         total,
         notes,
         sent_at: status === "sent" ? new Date().toISOString() : null,
-      });
+        template_id: selectedTemplateId || null,
+      }).select("id").single();
 
       if (error) {
         toast.error(`Fehler: ${error.message}`);
         return;
+      }
+
+      // Create recurring schedule if selected
+      if (recurring && invoiceData?.id) {
+        const nextDate = new Date();
+        switch (recurring) {
+          case "monthly": nextDate.setMonth(nextDate.getMonth() + 1); break;
+          case "quarterly": nextDate.setMonth(nextDate.getMonth() + 3); break;
+          case "yearly": nextDate.setFullYear(nextDate.getFullYear() + 1); break;
+        }
+        await supabase.from("recurring_schedules").insert({
+          user_id: user.id,
+          customer_id: customerId,
+          template_invoice_id: invoiceData.id,
+          interval: recurring,
+          next_run_date: nextDate.toISOString().split("T")[0],
+          active: true,
+        });
       }
 
       await getSupabase().rpc("increment_invoice_counter", { user_id_input: user.id });
@@ -340,6 +365,22 @@ export default function NewInvoicePage() {
               onChange={(e) => setDueDate(e.target.value)}
             />
           </div>
+          {templates.length > 0 && (
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={labelStyle}>Vorlage</label>
+              <select
+                value={selectedTemplateId}
+                onChange={(e) => setSelectedTemplateId(e.target.value)}
+              >
+                <option value="">Standard</option>
+                {templates.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}{t.is_default ? " (Standard)" : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 

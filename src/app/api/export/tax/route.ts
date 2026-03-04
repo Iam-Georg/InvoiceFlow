@@ -56,6 +56,75 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  const format = req.nextUrl.searchParams.get("format") || "standard";
+
+  // ── DATEV Buchungsstapel format ──
+  if (format === "datev") {
+    const datevHeader = [
+      '"EXTF"',
+      "700",
+      "21",
+      '"Buchungsstapel"',
+      "12",
+      `"${new Date().toISOString().replace(/[-:T]/g, "").slice(0, 14)}"`,
+      '""',
+      '"SK"',
+      '""',
+      '""',
+      `${year}0101`,
+      "4",
+      `${year}0101`,
+      `${year}1231`,
+      '""',
+      '""',
+      '""',
+    ].join(";");
+
+    const datevColumns = [
+      "Umsatz (ohne Soll/Haben-Kz)",
+      "Soll/Haben-Kennzeichen",
+      "WKZ Umsatz",
+      "Konto",
+      "Gegenkonto (ohne BU-Schluessel)",
+      "Belegdatum",
+      "Buchungstext",
+      "Belegfeld 1",
+    ].join(";");
+
+    const datevRows = (invoices ?? []).map((inv) => {
+      const issueDate = new Date(inv.issue_date);
+      const belegdatum = `${String(issueDate.getDate()).padStart(2, "0")}${String(issueDate.getMonth() + 1).padStart(2, "0")}`;
+      const erloskonto =
+        Number(inv.tax_rate) === 19
+          ? "8400"
+          : Number(inv.tax_rate) === 7
+            ? "8300"
+            : "8000";
+      return [
+        Number(inv.total ?? 0).toFixed(2).replace(".", ","),
+        "S",
+        "EUR",
+        "10000",
+        erloskonto,
+        belegdatum,
+        `"${String(inv.invoice_number ?? "").replace(/"/g, '""')}"`,
+        `"${String(inv.invoice_number ?? "").replace(/"/g, '""')}"`,
+      ].join(";");
+    });
+
+    const csv = [datevHeader, datevColumns, ...datevRows].join("\r\n");
+
+    return new NextResponse(csv, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="EXTF_Buchungsstapel_${year}.csv"`,
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
+  // ── Standard CSV format ──
   const header = [
     "Rechnungsnummer",
     "Rechnungsdatum",

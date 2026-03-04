@@ -3,6 +3,7 @@ export type PlanId = "free" | "starter" | "professional" | "business";
 export interface PlanFeatures {
   maxInvoices: number;
   maxCustomers: number;
+  maxTemplates: number;
   import: boolean;
   recurringInvoices: boolean;
   customEmail: boolean;
@@ -16,12 +17,14 @@ export interface PlanFeatures {
   creditLimit: boolean;
   multipleContacts: boolean;
   taxExemption: boolean;
+  datevExport: boolean;
 }
 
 export const PLAN_FEATURES: Record<PlanId, PlanFeatures> = {
   free: {
     maxInvoices: 5,
     maxCustomers: 3,
+    maxTemplates: 1,
     import: false,
     recurringInvoices: false,
     customEmail: false,
@@ -35,10 +38,12 @@ export const PLAN_FEATURES: Record<PlanId, PlanFeatures> = {
     creditLimit: false,
     multipleContacts: false,
     taxExemption: false,
+    datevExport: false,
   },
   starter: {
     maxInvoices: Infinity,
     maxCustomers: Infinity,
+    maxTemplates: 3,
     import: true,
     recurringInvoices: true,
     customEmail: true,
@@ -52,10 +57,12 @@ export const PLAN_FEATURES: Record<PlanId, PlanFeatures> = {
     creditLimit: false,
     multipleContacts: false,
     taxExemption: false,
+    datevExport: false,
   },
   professional: {
     maxInvoices: Infinity,
     maxCustomers: Infinity,
+    maxTemplates: Infinity,
     import: true,
     recurringInvoices: true,
     customEmail: true,
@@ -69,10 +76,12 @@ export const PLAN_FEATURES: Record<PlanId, PlanFeatures> = {
     creditLimit: true,
     multipleContacts: true,
     taxExemption: true,
+    datevExport: true,
   },
   business: {
     maxInvoices: Infinity,
     maxCustomers: Infinity,
+    maxTemplates: Infinity,
     import: true,
     recurringInvoices: true,
     customEmail: true,
@@ -86,6 +95,7 @@ export const PLAN_FEATURES: Record<PlanId, PlanFeatures> = {
     creditLimit: true,
     multipleContacts: true,
     taxExemption: true,
+    datevExport: true,
   },
 };
 

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
-import type { Customer, Invoice, Profile } from "@/types";
+import type { Customer, Invoice, Profile, TemplateConfig } from "@/types";
 import { calculatePressure } from "@/lib/pressure";
 import { getDefaultInvoiceEmailTemplate } from "@/lib/email-templates";
 import PressureBadge from "@/components/invoices/PressureBadge";
@@ -84,6 +84,7 @@ export default function InvoiceDetailPage() {
     }
   });
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
+  const [invoiceTemplateConfig, setInvoiceTemplateConfig] = useState<TemplateConfig | undefined>(undefined);
 
   const TEMPLATE_STORAGE_KEY = "faktura:email-templates:v1";
 
@@ -132,6 +133,16 @@ export default function InvoiceDetailPage() {
         setPressure(
           calculatePressure(inv as Invoice, reminders?.length ?? 0, lateRatio),
         );
+      }
+
+      // Load invoice template config if set
+      if (inv?.template_id) {
+        const { data: tpl } = await sb
+          .from("invoice_templates")
+          .select("config")
+          .eq("id", inv.template_id)
+          .single();
+        if (tpl) setInvoiceTemplateConfig(tpl.config as TemplateConfig);
       }
 
       setInvoice((inv as InvoiceWithRelations | null) ?? null);
@@ -335,7 +346,7 @@ export default function InvoiceDetailPage() {
           {/* PDF Download */}
           {pdfReady && invoice && profile && (
             <PDFDownloadLink
-              document={<InvoicePDF invoice={invoice} profile={profile} />}
+              document={<InvoicePDF invoice={invoice} profile={profile} templateConfig={invoiceTemplateConfig} />}
               fileName={`${invoice.invoice_number}.pdf`}
               style={{ textDecoration: "none" }}
             >

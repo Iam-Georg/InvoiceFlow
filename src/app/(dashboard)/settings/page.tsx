@@ -27,6 +27,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
   const [exportYear, setExportYear] = useState(String(new Date().getFullYear()));
+  const [exportFormat, setExportFormat] = useState("standard");
   const [userId, setUserId] = useState("");
   const [form, setForm] = useState<SettingsForm>({
     full_name: "",
@@ -115,7 +116,7 @@ export default function SettingsPage() {
     setExportLoading(true);
     try {
       const response = await fetch(
-        `/api/export/tax?year=${encodeURIComponent(exportYear)}`,
+        `/api/export/tax?year=${encodeURIComponent(exportYear)}&format=${exportFormat}`,
       );
       if (!response.ok) {
         const payload = (await response.json().catch(() => ({}))) as {
@@ -127,7 +128,9 @@ export default function SettingsPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `steuerexport-${exportYear}.csv`;
+      a.download = exportFormat === "datev"
+        ? `EXTF_Buchungsstapel_${exportYear}.csv`
+        : `steuerexport-${exportYear}.csv`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -394,30 +397,34 @@ export default function SettingsPage() {
                 marginTop: "2px",
               }}
             >
-              CSV Export für Steuerberater.
+              CSV oder DATEV Export für Steuerberater.
             </p>
           </div>
-          <div
-            style={{
-              padding: "20px",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <input
-              type="number"
-              value={exportYear}
-              onChange={(e) => setExportYear(e.target.value)}
-              min={2000}
-              max={new Date().getFullYear() + 1}
-              style={{ width: "100px" }}
-            />
-            <button
-              onClick={exportTaxCsv}
-              disabled={exportLoading}
-              className="btn btn-secondary"
-            >
+          <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ display: "flex", gap: "12px", fontSize: "13px" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", color: "var(--foreground)" }}>
+                <input type="radio" name="exportFormat" value="standard" checked={exportFormat === "standard"} onChange={() => setExportFormat("standard")} />
+                Standard CSV
+              </label>
+              <label style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", color: "var(--foreground)" }}>
+                <input type="radio" name="exportFormat" value="datev" checked={exportFormat === "datev"} onChange={() => setExportFormat("datev")} />
+                DATEV-Format
+              </label>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <input
+                type="number"
+                value={exportYear}
+                onChange={(e) => setExportYear(e.target.value)}
+                min={2000}
+                max={new Date().getFullYear() + 1}
+                style={{ width: "100px" }}
+              />
+              <button
+                onClick={exportTaxCsv}
+                disabled={exportLoading}
+                className="btn btn-secondary"
+              >
               {exportLoading ? (
                 <Loader2
                   style={{
@@ -429,8 +436,9 @@ export default function SettingsPage() {
               ) : (
                 <Download style={{ width: 14, height: 14 }} />
               )}
-              CSV herunterladen
-            </button>
+              {exportFormat === "datev" ? "DATEV" : "CSV"} herunterladen
+              </button>
+            </div>
           </div>
         </div>
       </div>
