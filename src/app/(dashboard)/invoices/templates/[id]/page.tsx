@@ -207,23 +207,20 @@ export default function TemplateEditorPage({
     }
 
     setLogoUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("/api/templates/upload-logo", {
-      method: "POST",
-      body: formData,
-    });
-
-    setLogoUploading(false);
-    if (!res.ok) {
-      toast.error("Upload fehlgeschlagen");
-      return;
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error("Fehler beim Lesen"));
+        reader.readAsDataURL(file);
+      });
+      updateConfig({ logoUrl: dataUrl });
+      toast.success("Logo hinzugefügt");
+    } catch {
+      toast.error("Fehler beim Lesen der Datei");
+    } finally {
+      setLogoUploading(false);
     }
-
-    const { url } = await res.json();
-    updateConfig({ logoUrl: url });
-    toast.success("Logo hochgeladen");
   }
 
   if (loading) {
@@ -256,10 +253,9 @@ export default function TemplateEditorPage({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <Link href="/invoices/templates">
-            <button className="btn btn-ghost" style={{ padding: "6px" }}>
-              <ArrowLeft size={16} />
-            </button>
+          <Link href="/invoices/templates" className="btn-back">
+            <ArrowLeft size={14} />
+            Zurück
           </Link>
           <div>
             <h1
@@ -333,7 +329,6 @@ export default function TemplateEditorPage({
               Name
             </label>
             <input
-              className="input-field"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Meine Vorlage"
@@ -401,7 +396,6 @@ export default function TemplateEditorPage({
               Schriftart
             </label>
             <select
-              className="input-field"
               value={config.font}
               onChange={(e) =>
                 updateConfig({ font: e.target.value as TemplateConfig["font"] })
@@ -495,7 +489,7 @@ export default function TemplateEditorPage({
                   }}
                 />
                 <button
-                  className="btn btn-ghost"
+                  className="btn-icon-danger"
                   onClick={() => updateConfig({ logoUrl: null })}
                   style={{ color: "var(--danger)", padding: "6px" }}
                 >
@@ -557,7 +551,6 @@ export default function TemplateEditorPage({
               Fußzeile
             </label>
             <textarea
-              className="input-field"
               rows={2}
               value={config.footerText}
               onChange={(e) => updateConfig({ footerText: e.target.value })}

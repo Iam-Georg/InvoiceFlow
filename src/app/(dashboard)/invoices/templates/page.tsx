@@ -45,7 +45,11 @@ export default function TemplatesPage() {
     load();
   }, []);
 
-  const maxTemplates = !can("starter") ? 1 : !can("professional") ? 3 : Infinity;
+  const maxTemplates = !can("starter")
+    ? 1
+    : !can("professional")
+      ? 3
+      : Infinity;
   const canCreate = templates.length < maxTemplates;
 
   async function handleCreate() {
@@ -88,7 +92,10 @@ export default function TemplatesPage() {
   async function handleSetDefault(id: string) {
     const sb = getSupabase();
     setActionLoading(id);
-    await sb.from("invoice_templates").update({ is_default: true }).eq("id", id);
+    await sb
+      .from("invoice_templates")
+      .update({ is_default: true })
+      .eq("id", id);
     setTemplates((prev) =>
       prev.map((t) => ({ ...t, is_default: t.id === id })),
     );
@@ -137,7 +144,10 @@ export default function TemplatesPage() {
           style={{ gap: "6px" }}
         >
           {actionLoading === "create" ? (
-            <Loader2 size={13} style={{ animation: "spin 1s linear infinite" }} />
+            <Loader2
+              size={13}
+              style={{ animation: "spin 1s linear infinite" }}
+            />
           ) : (
             <Plus size={13} />
           )}
@@ -159,8 +169,12 @@ export default function TemplatesPage() {
           }}
         >
           <Palette size={14} />
-          Du hast das Maximum von {maxTemplates} Vorlage{maxTemplates > 1 ? "n" : ""} erreicht.{" "}
-          <Link href="/billing" style={{ color: "var(--accent)", fontWeight: 600 }}>
+          Du hast das Maximum von {maxTemplates} Vorlage
+          {maxTemplates > 1 ? "n" : ""} erreicht.{" "}
+          <Link
+            href="/billing"
+            style={{ color: "var(--accent)", fontWeight: 600 }}
+          >
             Upgrade
           </Link>
         </div>
@@ -206,7 +220,9 @@ export default function TemplatesPage() {
                 animation: "floatY 3s ease-in-out infinite",
               }}
             >
-              <Palette style={{ width: 20, height: 20, color: "var(--accent)" }} />
+              <Palette
+                style={{ width: 20, height: 20, color: "var(--accent)" }}
+              />
             </div>
             <p
               style={{
@@ -242,12 +258,21 @@ export default function TemplatesPage() {
             {templates.map((template) => (
               <div
                 key={template.id}
-                className="card-hover"
                 style={{
                   border: "1px solid var(--border)",
                   borderRadius: "var(--radius)",
                   overflow: "hidden",
                   position: "relative",
+                  transition:
+                    "box-shadow var(--duration-fast) var(--ease-smooth), border-color var(--duration-fast) var(--ease-smooth)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = "var(--shadow-hover)";
+                  e.currentTarget.style.borderColor = "var(--accent)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = "none";
+                  e.currentTarget.style.borderColor = "var(--border)";
                 }}
               >
                 {/* Color preview bar */}
@@ -271,7 +296,13 @@ export default function TemplatesPage() {
                   }}
                 >
                   {/* Mini preview mockup */}
-                  <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "8px",
+                      alignItems: "center",
+                    }}
+                  >
                     <div
                       style={{
                         width: "20px",
@@ -309,7 +340,8 @@ export default function TemplatesPage() {
                         key={n}
                         style={{
                           height: "4px",
-                          background: n === 1 ? "var(--border)" : "var(--background-2)",
+                          background:
+                            n === 1 ? "var(--border)" : "var(--background-2)",
                           borderRadius: "2px",
                           marginBottom: "3px",
                           width: n === 1 ? "100%" : `${90 - n * 10}%`,
@@ -331,7 +363,14 @@ export default function TemplatesPage() {
                 </div>
 
                 {/* Info + actions */}
-                <div style={{ padding: "14px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div
+                  style={{
+                    padding: "14px 16px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
                   <div>
                     <p
                       style={{
@@ -352,7 +391,13 @@ export default function TemplatesPage() {
                         />
                       )}
                     </p>
-                    <p style={{ fontSize: "11px", color: "var(--muted-foreground)", marginTop: "2px" }}>
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--muted-foreground)",
+                        marginTop: "2px",
+                      }}
+                    >
                       {template.config.layout === "classic"
                         ? "Klassisch"
                         : template.config.layout === "modern"
@@ -380,20 +425,23 @@ export default function TemplatesPage() {
                     <Link href={`/invoices/templates/${template.id}`}>
                       <button
                         className="btn btn-secondary"
-                        style={{ padding: "6px 10px", fontSize: "12px" }}
+                        style={{
+                          padding: "10px 10px",
+                          fontSize: "12px",
+                          height: "48px",
+                        }}
                       >
                         Bearbeiten
                       </button>
                     </Link>
                     <button
-                      className="btn btn-ghost"
+                      className="btn-icon-danger"
                       onClick={(e) => {
                         e.preventDefault();
                         handleDelete(template.id);
                       }}
                       disabled={actionLoading === template.id}
                       title="Löschen"
-                      style={{ padding: "6px", color: "var(--danger)" }}
                     >
                       <Trash2 size={13} />
                     </button>
