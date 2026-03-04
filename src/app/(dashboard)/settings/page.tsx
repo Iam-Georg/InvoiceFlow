@@ -400,43 +400,50 @@ export default function SettingsPage() {
               CSV oder DATEV Export für Steuerberater.
             </p>
           </div>
-          <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
-            <div style={{ display: "flex", gap: "12px", fontSize: "13px" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", color: "var(--foreground)" }}>
-                <input type="radio" name="exportFormat" value="standard" checked={exportFormat === "standard"} onChange={() => setExportFormat("standard")} />
-                Standard CSV
-              </label>
-              <label style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", color: "var(--foreground)" }}>
-                <input type="radio" name="exportFormat" value="datev" checked={exportFormat === "datev"} onChange={() => setExportFormat("datev")} />
-                DATEV-Format
-              </label>
+          <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
+            <div>
+              <p style={{ fontSize: "11px", fontWeight: 600, color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
+                Format
+              </p>
+              <div className="radio-pill-group">
+                <input type="radio" name="exportFormat" id="fmt-standard" value="standard" checked={exportFormat === "standard"} onChange={() => setExportFormat("standard")} />
+                <label htmlFor="fmt-standard">Standard CSV</label>
+                <input type="radio" name="exportFormat" id="fmt-datev" value="datev" checked={exportFormat === "datev"} onChange={() => setExportFormat("datev")} />
+                <label htmlFor="fmt-datev">DATEV</label>
+              </div>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <input
-                type="number"
-                value={exportYear}
-                onChange={(e) => setExportYear(e.target.value)}
-                min={2000}
-                max={new Date().getFullYear() + 1}
-                style={{ width: "100px" }}
-              />
+            <div style={{ display: "flex", alignItems: "flex-end", gap: "10px" }}>
+              <div style={{ flex: "0 0 100px" }}>
+                <p style={{ fontSize: "11px", fontWeight: 600, color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
+                  Jahr
+                </p>
+                <input
+                  type="number"
+                  value={exportYear}
+                  onChange={(e) => setExportYear(e.target.value)}
+                  min={2000}
+                  max={new Date().getFullYear() + 1}
+                  style={{ width: "100px" }}
+                />
+              </div>
               <button
                 onClick={exportTaxCsv}
                 disabled={exportLoading}
                 className="btn btn-secondary"
+                style={{ height: "44px" }}
               >
-              {exportLoading ? (
-                <Loader2
-                  style={{
-                    width: 14,
-                    height: 14,
-                    animation: "spin 1s linear infinite",
-                  }}
-                />
-              ) : (
-                <Download style={{ width: 14, height: 14 }} />
-              )}
-              {exportFormat === "datev" ? "DATEV" : "CSV"} herunterladen
+                {exportLoading ? (
+                  <Loader2
+                    style={{
+                      width: 14,
+                      height: 14,
+                      animation: "spin 1s linear infinite",
+                    }}
+                  />
+                ) : (
+                  <Download style={{ width: 14, height: 14 }} />
+                )}
+                {exportFormat === "datev" ? "DATEV" : "CSV"} herunterladen
               </button>
             </div>
           </div>

@@ -25,9 +25,27 @@ const PREVIEW_INVOICE = {
   issue_date: "2026-03-03",
   due_date: "2026-03-17",
   items: [
-    { id: "1", description: "Webdesign & Entwicklung", quantity: 40, unit_price: 95, total: 3800 },
-    { id: "2", description: "SEO Optimierung", quantity: 1, unit_price: 450, total: 450 },
-    { id: "3", description: "Hosting (12 Monate)", quantity: 12, unit_price: 9.99, total: 119.88 },
+    {
+      id: "1",
+      description: "Webdesign & Entwicklung",
+      quantity: 40,
+      unit_price: 95,
+      total: 3800,
+    },
+    {
+      id: "2",
+      description: "SEO Optimierung",
+      quantity: 1,
+      unit_price: 450,
+      total: 450,
+    },
+    {
+      id: "3",
+      description: "Hosting (12 Monate)",
+      quantity: 12,
+      unit_price: 9.99,
+      total: 119.88,
+    },
   ],
   subtotal: 4369.88,
   tax_rate: 19,
@@ -61,8 +79,16 @@ const PREVIEW_PROFILE = {
 
 /* ── Layout option cards ──────────────────────────── */
 
-const LAYOUTS: { value: TemplateConfig["layout"]; label: string; desc: string }[] = [
-  { value: "classic", label: "Klassisch", desc: "Logo links, Metadaten rechts" },
+const LAYOUTS: {
+  value: TemplateConfig["layout"];
+  label: string;
+  desc: string;
+}[] = [
+  {
+    value: "classic",
+    label: "Klassisch",
+    desc: "Logo links, Metadaten rechts",
+  },
   { value: "modern", label: "Modern", desc: "Zentriert mit großem Header" },
   { value: "minimal", label: "Minimal", desc: "Schlicht und kompakt" },
 ];
@@ -162,7 +188,10 @@ export default function TemplateEditorPage({
 
   async function handleSetDefault() {
     const sb = getSupabase();
-    await sb.from("invoice_templates").update({ is_default: true }).eq("id", id);
+    await sb
+      .from("invoice_templates")
+      .update({ is_default: true })
+      .eq("id", id);
     setIsDefault(true);
     toast.success("Als Standard gesetzt");
   }
@@ -199,8 +228,17 @@ export default function TemplateEditorPage({
 
   if (loading) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", padding: "64px" }}>
-        <Loader2 style={{ width: 18, height: 18, color: "var(--muted-foreground)", animation: "spin 1s linear infinite" }} />
+      <div
+        style={{ display: "flex", justifyContent: "center", padding: "64px" }}
+      >
+        <Loader2
+          style={{
+            width: 18,
+            height: 18,
+            color: "var(--muted-foreground)",
+            animation: "spin 1s linear infinite",
+          }}
+        />
       </div>
     );
   }
@@ -234,14 +272,24 @@ export default function TemplateEditorPage({
             >
               Vorlage bearbeiten
             </h1>
-            <p style={{ fontSize: "12px", color: "var(--muted-foreground)", marginTop: "2px" }}>
+            <p
+              style={{
+                fontSize: "12px",
+                color: "var(--muted-foreground)",
+                marginTop: "2px",
+              }}
+            >
               Änderungen werden in der Vorschau live angezeigt
             </p>
           </div>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
           {!isDefault && (
-            <button className="btn btn-secondary" onClick={handleSetDefault} style={{ gap: "6px" }}>
+            <button
+              className="btn btn-secondary"
+              onClick={handleSetDefault}
+              style={{ gap: "6px" }}
+            >
               <Star size={13} />
               Als Standard
             </button>
@@ -253,7 +301,10 @@ export default function TemplateEditorPage({
             style={{ gap: "6px" }}
           >
             {saving ? (
-              <Loader2 size={13} style={{ animation: "spin 1s linear infinite" }} />
+              <Loader2
+                size={13}
+                style={{ animation: "spin 1s linear infinite" }}
+              />
             ) : (
               <Save size={13} />
             )}
@@ -275,7 +326,10 @@ export default function TemplateEditorPage({
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {/* Name */}
           <div className="card-elevated" style={{ padding: "16px" }}>
-            <label className="label-caps" style={{ marginBottom: "6px", display: "block" }}>
+            <label
+              className="label-caps"
+              style={{ marginBottom: "6px", display: "block" }}
+            >
               Name
             </label>
             <input
@@ -288,15 +342,20 @@ export default function TemplateEditorPage({
 
           {/* Colors */}
           <div className="card-elevated" style={{ padding: "16px" }}>
-            <label className="label-caps" style={{ marginBottom: "12px", display: "block" }}>
+            <label
+              className="label-caps"
+              style={{ marginBottom: "12px", display: "block" }}
+            >
               Farben
             </label>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {([
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+            >
+              {[
                 ["Primärfarbe", "primary"] as const,
                 ["Sekundärfarbe", "secondary"] as const,
                 ["Akzentfarbe", "accent"] as const,
-              ]).map(([label, key]) => (
+              ].map(([label, key]) => (
                 <div
                   key={key}
                   style={{ display: "flex", alignItems: "center", gap: "10px" }}
@@ -316,8 +375,15 @@ export default function TemplateEditorPage({
                     }}
                   />
                   <div>
-                    <p style={{ fontSize: "13px", color: "var(--foreground)" }}>{label}</p>
-                    <p style={{ fontSize: "11px", color: "var(--muted-foreground)" }}>
+                    <p style={{ fontSize: "13px", color: "var(--foreground)" }}>
+                      {label}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: "var(--muted-foreground)",
+                      }}
+                    >
                       {config.colors[key]}
                     </p>
                   </div>
@@ -328,7 +394,10 @@ export default function TemplateEditorPage({
 
           {/* Font */}
           <div className="card-elevated" style={{ padding: "16px" }}>
-            <label className="label-caps" style={{ marginBottom: "6px", display: "block" }}>
+            <label
+              className="label-caps"
+              style={{ marginBottom: "6px", display: "block" }}
+            >
               Schriftart
             </label>
             <select
@@ -339,17 +408,24 @@ export default function TemplateEditorPage({
               }
             >
               {FONTS.map((f) => (
-                <option key={f.value} value={f.value}>{f.label}</option>
+                <option key={f.value} value={f.value}>
+                  {f.label}
+                </option>
               ))}
             </select>
           </div>
 
           {/* Layout */}
           <div className="card-elevated" style={{ padding: "16px" }}>
-            <label className="label-caps" style={{ marginBottom: "10px", display: "block" }}>
+            <label
+              className="label-caps"
+              style={{ marginBottom: "10px", display: "block" }}
+            >
               Layout
             </label>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
+            >
               {LAYOUTS.map((l) => (
                 <button
                   key={l.value}
@@ -361,7 +437,10 @@ export default function TemplateEditorPage({
                     padding: "10px 12px",
                     border: `1.5px solid ${config.layout === l.value ? "var(--accent)" : "var(--border)"}`,
                     borderRadius: "var(--radius)",
-                    background: config.layout === l.value ? "var(--accent-soft)" : "var(--background)",
+                    background:
+                      config.layout === l.value
+                        ? "var(--accent-soft)"
+                        : "var(--background)",
                     cursor: "pointer",
                     transition: "all 150ms ease",
                   }}
@@ -370,12 +449,20 @@ export default function TemplateEditorPage({
                     style={{
                       fontSize: "13px",
                       fontWeight: 600,
-                      color: config.layout === l.value ? "var(--accent)" : "var(--foreground)",
+                      color:
+                        config.layout === l.value
+                          ? "var(--accent)"
+                          : "var(--foreground)",
                     }}
                   >
                     {l.label}
                   </p>
-                  <p style={{ fontSize: "11px", color: "var(--muted-foreground)" }}>
+                  <p
+                    style={{
+                      fontSize: "11px",
+                      color: "var(--muted-foreground)",
+                    }}
+                  >
                     {l.desc}
                   </p>
                 </button>
@@ -385,11 +472,16 @@ export default function TemplateEditorPage({
 
           {/* Logo */}
           <div className="card-elevated" style={{ padding: "16px" }}>
-            <label className="label-caps" style={{ marginBottom: "10px", display: "block" }}>
+            <label
+              className="label-caps"
+              style={{ marginBottom: "10px", display: "block" }}
+            >
               Logo
             </label>
             {config.logoUrl ? (
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "12px" }}
+              >
                 <img
                   src={config.logoUrl}
                   alt="Logo"
@@ -434,11 +526,22 @@ export default function TemplateEditorPage({
                   }}
                 />
                 {logoUploading ? (
-                  <Loader2 size={18} style={{ color: "var(--muted-foreground)", animation: "spin 1s linear infinite" }} />
+                  <Loader2
+                    size={18}
+                    style={{
+                      color: "var(--muted-foreground)",
+                      animation: "spin 1s linear infinite",
+                    }}
+                  />
                 ) : (
-                  <Upload size={18} style={{ color: "var(--muted-foreground)" }} />
+                  <Upload
+                    size={18}
+                    style={{ color: "var(--muted-foreground)" }}
+                  />
                 )}
-                <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>
+                <p
+                  style={{ fontSize: "12px", color: "var(--muted-foreground)" }}
+                >
                   Logo hochladen (max. 2 MB)
                 </p>
               </label>
@@ -447,7 +550,10 @@ export default function TemplateEditorPage({
 
           {/* Footer text + options */}
           <div className="card-elevated" style={{ padding: "16px" }}>
-            <label className="label-caps" style={{ marginBottom: "6px", display: "block" }}>
+            <label
+              className="label-caps"
+              style={{ marginBottom: "6px", display: "block" }}
+            >
               Fußzeile
             </label>
             <textarea
@@ -458,40 +564,94 @@ export default function TemplateEditorPage({
               placeholder="Vielen Dank für Ihr Vertrauen!"
               style={{ resize: "vertical" }}
             />
-            <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div
+              style={{
+                marginTop: "14px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+              }}
+            >
               <label
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px",
-                  fontSize: "13px",
-                  color: "var(--foreground)",
+                  justifyContent: "space-between",
                   cursor: "pointer",
                 }}
               >
+                <div>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 500,
+                      color: "var(--foreground)",
+                    }}
+                  >
+                    Steuernummer anzeigen
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "11px",
+                      color: "var(--muted-foreground)",
+                      marginTop: "1px",
+                    }}
+                  >
+                    St.-Nr. im PDF-Header
+                  </p>
+                </div>
                 <input
                   type="checkbox"
+                  className="toggle-switch"
                   checked={config.showTaxId}
-                  onChange={(e) => updateConfig({ showTaxId: e.target.checked })}
+                  onChange={(e) =>
+                    updateConfig({ showTaxId: e.target.checked })
+                  }
                 />
-                Steuernummer anzeigen
               </label>
+              <div
+                style={{
+                  height: "1px",
+                  background: "var(--border)",
+                  opacity: 0.5,
+                }}
+              />
               <label
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px",
-                  fontSize: "13px",
-                  color: "var(--foreground)",
+                  justifyContent: "space-between",
                   cursor: "pointer",
                 }}
               >
+                <div>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 500,
+                      color: "var(--foreground)",
+                    }}
+                  >
+                    Zahlungsinformationen
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "11px",
+                      color: "var(--muted-foreground)",
+                      marginTop: "1px",
+                    }}
+                  >
+                    Bankdaten in der Fußzeile
+                  </p>
+                </div>
                 <input
                   type="checkbox"
+                  className="toggle-switch"
                   checked={config.showPaymentInfo}
-                  onChange={(e) => updateConfig({ showPaymentInfo: e.target.checked })}
+                  onChange={(e) =>
+                    updateConfig({ showPaymentInfo: e.target.checked })
+                  }
                 />
-                Zahlungsinformationen anzeigen
               </label>
             </div>
           </div>
@@ -499,36 +659,29 @@ export default function TemplateEditorPage({
 
         {/* ── Right: Live PDF Preview ── */}
         <div
-          className="card-elevated"
           style={{
             position: "sticky",
             top: "20px",
-            overflow: "hidden",
-            background: "var(--background-2)",
           }}
         >
+          {/* Color accent bar */}
           <div
             style={{
-              padding: "12px 16px",
-              borderBottom: "1px solid var(--border)",
+              height: "3px",
+              borderRadius: "2px 2px 0 0",
+              background: `linear-gradient(90deg, ${config.colors.primary}, ${config.colors.accent})`,
+            }}
+          />
+          {/* Paper container with shadow */}
+          <div
+            style={{
+              background: "#8b8b8b",
               display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
+              justifyContent: "center",
+              borderRadius: "0 0 var(--radius) var(--radius)",
+              // minHeight: "760px",
             }}
           >
-            <p style={{ fontSize: "12px", fontWeight: 600, color: "var(--foreground)" }}>
-              Vorschau
-            </p>
-            <div
-              style={{
-                height: "4px",
-                width: "60px",
-                borderRadius: "2px",
-                background: `linear-gradient(90deg, ${config.colors.primary}, ${config.colors.accent})`,
-              }}
-            />
-          </div>
-          <div style={{ padding: "16px", display: "flex", justifyContent: "center" }}>
             <BlobProvider
               key={pdfKey}
               document={
@@ -546,8 +699,9 @@ export default function TemplateEditorPage({
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      height: "700px",
                       width: "100%",
+                      background: "#fff",
+                      boxShadow: "0 4px 24px rgba(0,0,0,0.25)",
                     }}
                   >
                     <Loader2
@@ -561,12 +715,13 @@ export default function TemplateEditorPage({
                   </div>
                 ) : (
                   <iframe
-                    src={url}
+                    src={`${url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
                     style={{
                       width: "100%",
-                      height: "700px",
+                      height: "1120px",
                       border: "none",
-                      borderRadius: "var(--radius)",
+                      background: "#fff",
+                      boxShadow: "0 4px 24px rgba(0,0,0,0.25)",
                     }}
                     title="PDF Vorschau"
                   />
