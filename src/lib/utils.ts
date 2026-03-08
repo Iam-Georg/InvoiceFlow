@@ -29,6 +29,7 @@ export function getStatusLabel(status: string): string {
     open: 'Offen',
     overdue: 'Ueberfaellig',
     paid: 'Bezahlt',
+    cancelled: 'Storniert',
   }
   return labels[status] ?? status
 }
@@ -40,6 +41,7 @@ export function getStatusColors(status: string): { bg: string; text: string } {
     open: { bg: 'var(--badge-open-bg)', text: 'var(--badge-open-text)' },
     overdue: { bg: 'var(--badge-overdue-bg)', text: 'var(--badge-overdue-text)' },
     paid: { bg: 'var(--badge-paid-bg)', text: 'var(--badge-paid-text)' },
+    cancelled: { bg: 'var(--destructive-bg)', text: 'var(--destructive)' },
   }
 
   return colors[status] ?? { bg: 'var(--badge-draft-bg)', text: 'var(--badge-draft-text)' }

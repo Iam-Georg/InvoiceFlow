@@ -1,4 +1,4 @@
-export type InvoiceStatus = 'draft' | 'sent' | 'open' | 'overdue' | 'paid'
+export type InvoiceStatus = 'draft' | 'sent' | 'open' | 'overdue' | 'paid' | 'cancelled'
 
 export type SubscriptionPlan = 'free' | 'starter' | 'professional' | 'business'
 

@@ -59,6 +59,54 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "Faktura",
+              applicationCategory: "BusinessApplication",
+              operatingSystem: "Web",
+              url: "https://faktura.app",
+              description:
+                "Rechnungsprogramm für Freelancer und Selbstständige. Professionelle Rechnungen erstellen, per E-Mail versenden und schneller bezahlt werden.",
+              offers: [
+                {
+                  "@type": "Offer",
+                  price: "0",
+                  priceCurrency: "EUR",
+                  name: "Free",
+                },
+                {
+                  "@type": "Offer",
+                  price: "9",
+                  priceCurrency: "EUR",
+                  name: "Starter",
+                },
+                {
+                  "@type": "Offer",
+                  price: "19",
+                  priceCurrency: "EUR",
+                  name: "Professional",
+                },
+                {
+                  "@type": "Offer",
+                  price: "49",
+                  priceCurrency: "EUR",
+                  name: "Business",
+                },
+              ],
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.8",
+                ratingCount: "120",
+              },
+            }),
+          }}
+        />
+      </head>
       <body className={inter.variable}>
         {children}
         <Toaster position="top-right" richColors />

@@ -105,6 +105,3 @@ async function runCron(req: NextRequest) {
 export async function POST(req: NextRequest) {
   return runCron(req);
 }
-export async function GET(req: NextRequest) {
-  return runCron(req);
-}

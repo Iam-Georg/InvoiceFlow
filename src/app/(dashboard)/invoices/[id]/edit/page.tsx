@@ -62,6 +62,13 @@ export default function EditInvoicePage() {
       ]);
 
       if (inv) {
+        // GoBD: Gesendete/bezahlte Rechnungen sind unveränderlich
+        if (inv.status !== "draft") {
+          toast.error("Gesendete Rechnungen können nicht bearbeitet werden (GoBD)");
+          router.replace(`/invoices/${inv.id}`);
+          return;
+        }
+
         const parsedItems = Array.isArray(inv.items) ? (inv.items as InvoiceItem[]) : [EMPTY_ITEM()];
         setInvoice({
           id: inv.id,
@@ -123,6 +130,7 @@ export default function EditInvoicePage() {
     setSaving(true);
     try {
       const supabase = createClient();
+      // GoBD: Status wird nicht über Edit geändert, nur Inhalte von Entwürfen
       const { error } = await supabase
         .from("invoices")
         .update({
@@ -130,7 +138,6 @@ export default function EditInvoicePage() {
           invoice_number: invoice.invoice_number.trim(),
           issue_date: invoice.issue_date,
           due_date: invoice.due_date,
-          status: invoice.status,
           items: invoice.items,
           subtotal,
           tax_rate: invoice.tax_rate,
@@ -192,13 +199,10 @@ export default function EditInvoicePage() {
           </select>
           <input type="date" value={invoice.issue_date} onChange={(e) => setInvoice({ ...invoice, issue_date: e.target.value })} />
           <input type="date" value={invoice.due_date} onChange={(e) => setInvoice({ ...invoice, due_date: e.target.value })} />
-          <select value={invoice.status} onChange={(e) => setInvoice({ ...invoice, status: e.target.value as InvoiceStatus })}>
-            <option value="draft">Entwurf</option>
-            <option value="sent">Gesendet</option>
-            <option value="open">Offen</option>
-            <option value="overdue">Überfällig</option>
-            <option value="paid">Bezahlt</option>
-          </select>
+          {/* Status ist read-only — wird nur durch Aktionen geändert (GoBD) */}
+          <div style={{ padding: "8px 10px", background: "var(--bg-2)", fontSize: "13px", color: "var(--text-2)", border: "1px solid var(--border)" }}>
+            Status: Entwurf
+          </div>
           <select value={invoice.tax_rate} onChange={(e) => setInvoice({ ...invoice, tax_rate: Number(e.target.value) })}>
             <option value={0}>MwSt. 0%</option>
             <option value={7}>MwSt. 7%</option>

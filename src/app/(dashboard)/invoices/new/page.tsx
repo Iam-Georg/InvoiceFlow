@@ -10,6 +10,7 @@ import { Plus, Trash2, Loader2, ChevronLeft, Sparkles, ChevronDown } from "lucid
 import Link from "next/link";
 import { usePlan } from "@/hooks/usePlan";
 import LockedFeature from "@/components/LockedFeature";
+import { checkInvoiceLimit } from "@/lib/plan-guard";
 
 const emptyItem = (): InvoiceItem => ({
   id: crypto.randomUUID(),
@@ -125,6 +126,23 @@ export default function NewInvoicePage() {
       if (!user) {
         toast.error("Nicht eingeloggt");
         router.push("/login");
+        return;
+      }
+
+      // Plan-Limit prüfen
+      const limit = await checkInvoiceLimit(supabase, user.id);
+      if (!limit.allowed) {
+        toast.error(
+          `Rechnungslimit erreicht (${limit.current}/${limit.max}). Upgrade für unbegrenzte Rechnungen.`,
+          {
+            action: {
+              label: "Upgraden",
+              onClick: () => router.push("/billing"),
+            },
+            duration: 8000,
+          },
+        );
+        setSaving(false);
         return;
       }
 

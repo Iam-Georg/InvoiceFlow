@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2, ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { checkCustomerLimit } from "@/lib/plan-guard";
 
 interface CustomerForm {
   name: string;
@@ -59,6 +60,23 @@ export default function NewCustomerPage() {
       if (authError || !user) {
         toast.error("Nicht eingeloggt - bitte neu anmelden");
         router.push("/login");
+        return;
+      }
+
+      // Plan-Limit prüfen
+      const limit = await checkCustomerLimit(supabase, user.id);
+      if (!limit.allowed) {
+        toast.error(
+          `Kundenlimit erreicht (${limit.current}/${limit.max}). Upgrade für unbegrenzte Kunden.`,
+          {
+            action: {
+              label: "Upgraden",
+              onClick: () => router.push("/billing"),
+            },
+            duration: 8000,
+          },
+        );
+        setSaving(false);
         return;
       }
 

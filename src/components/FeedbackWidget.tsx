@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { MessageCircle, X, Bug, Lightbulb, Heart, Send, Check } from "lucide-react";
 import { createFeedback, type FeedbackType } from "@/lib/feedback";
@@ -16,12 +16,66 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode; desc: string }[] = 
 export default function FeedbackWidget() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [tab, setTab] = useState<Tab>("bug");
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sliding indicator for tabs
+  const tabNavRef = useRef<HTMLDivElement>(null);
+  const tabItemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [tabIndicator, setTabIndicator] = useState<{ left: number; width: number; opacity: number }>({ left: 0, width: 0, opacity: 0 });
+  const activeTabPos = useRef<{ left: number; width: number } | null>(null);
+
+  function measureTab(index: number) {
+    const el = tabItemRefs.current[index];
+    if (!el || !tabNavRef.current) return null;
+    const navRect = tabNavRef.current.getBoundingClientRect();
+    const itemRect = el.getBoundingClientRect();
+    return { left: itemRect.left - navRect.left, width: itemRect.width };
+  }
+
+  useEffect(() => {
+    if (!visible) return;
+    // small delay to let the modal render
+    const t = setTimeout(() => {
+      const activeIndex = TABS.findIndex((t) => t.id === tab);
+      if (activeIndex >= 0) {
+        const pos = measureTab(activeIndex);
+        if (pos) {
+          activeTabPos.current = pos;
+          setTabIndicator({ ...pos, opacity: 1 });
+        }
+      }
+    }, 50);
+    return () => clearTimeout(t);
+  }, [tab, visible]);
+
+  function handleTabHover(index: number) {
+    const pos = measureTab(index);
+    if (pos) setTabIndicator({ ...pos, opacity: 1 });
+  }
+
+  function handleTabLeave() {
+    if (activeTabPos.current) {
+      setTabIndicator({ ...activeTabPos.current, opacity: 1 });
+    }
+  }
+
+  // Manage open/close with exit animation
+  useEffect(() => {
+    if (open) {
+      setVisible(true);
+    } else if (visible) {
+      // Delay unmount for exit animation
+      closeTimer.current = setTimeout(() => setVisible(false), 200);
+      return () => { if (closeTimer.current) clearTimeout(closeTimer.current); };
+    }
+  }, [open]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -71,22 +125,29 @@ export default function FeedbackWidget() {
           alignItems: "center",
           justifyContent: "center",
           boxShadow: "var(--shadow-lg)",
-          transition: `transform var(--duration-fast) var(--ease-spring), box-shadow var(--duration-fast) var(--ease-smooth)`,
+          transition: `transform var(--duration-fast) var(--ease-spring), box-shadow var(--duration-fast) var(--ease-smooth), opacity var(--duration-fast) var(--ease-smooth)`,
+          opacity: open ? 0 : 1,
+          transform: open ? "scale(0.8) rotate(-90deg)" : "",
+          pointerEvents: open ? "none" : "auto",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.08)";
-          e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,64,204,0.35)";
+          if (!open) {
+            e.currentTarget.style.transform = "scale(1.08)";
+            e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,64,204,0.35)";
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "";
-          e.currentTarget.style.boxShadow = "var(--shadow-lg)";
+          if (!open) {
+            e.currentTarget.style.transform = "";
+            e.currentTarget.style.boxShadow = "var(--shadow-lg)";
+          }
         }}
       >
         <MessageCircle size={20} />
       </button>
 
       {/* Backdrop */}
-      {open && (
+      {visible && (
         <div
           onClick={handleClose}
           style={{
@@ -94,15 +155,15 @@ export default function FeedbackWidget() {
             inset: 0,
             zIndex: 300,
             background: "rgba(0,0,0,0.3)",
-            animation: "fadeIn var(--duration-fast) var(--ease-smooth) both",
+            opacity: open ? 1 : 0,
+            transition: "opacity 200ms ease",
           }}
         />
       )}
 
       {/* Modal */}
-      {open && (
+      {visible && (
         <div
-          className="dropdown-enter"
           style={{
             position: "fixed",
             bottom: "88px",
@@ -113,6 +174,11 @@ export default function FeedbackWidget() {
             boxShadow: "var(--shadow-lg)",
             overflow: "hidden",
             transformOrigin: "bottom right",
+            opacity: open ? 1 : 0,
+            transform: open
+              ? "scale(1) translateY(0)"
+              : "scale(0.92) translateY(8px)",
+            transition: `opacity 200ms cubic-bezier(0.34, 1.56, 0.64, 1), transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)`,
           }}
         >
           {/* Header */}
@@ -137,21 +203,43 @@ export default function FeedbackWidget() {
                 color: "var(--text-3)",
                 display: "flex",
                 padding: "2px",
-                transition: `color var(--duration-fast) var(--ease-smooth)`,
+                transition: `color var(--duration-fast) var(--ease-smooth), transform var(--duration-fast) var(--ease-spring)`,
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-1)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-3)"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text-1)"; e.currentTarget.style.transform = "rotate(90deg)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-3)"; e.currentTarget.style.transform = ""; }}
             >
               <X size={16} />
             </button>
           </div>
 
-          {/* Tabs */}
-          <div style={{ display: "flex", borderBottom: "1px solid var(--border)" }}>
-            {TABS.map((t) => (
+          {/* Tabs with sliding indicator */}
+          <div
+            ref={tabNavRef}
+            style={{ display: "flex", borderBottom: "1px solid var(--border)", position: "relative" }}
+            onMouseLeave={handleTabLeave}
+          >
+            {/* Sliding indicator */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: tabIndicator.left,
+                width: tabIndicator.width,
+                height: "2px",
+                background: "var(--accent)",
+                boxShadow: "0 1px 8px var(--accent-soft)",
+                opacity: tabIndicator.opacity,
+                pointerEvents: "none",
+                transition: `left var(--duration-normal) var(--ease-spring), width var(--duration-normal) var(--ease-spring), opacity var(--duration-fast) var(--ease-smooth)`,
+              }}
+            />
+
+            {TABS.map((t, i) => (
               <button
                 key={t.id}
+                ref={(el) => { tabItemRefs.current[i] = el; }}
                 onClick={() => setTab(t.id)}
+                onMouseEnter={() => handleTabHover(i)}
                 style={{
                   flex: 1,
                   height: "40px",
@@ -165,8 +253,7 @@ export default function FeedbackWidget() {
                   fontWeight: tab === t.id ? 700 : 500,
                   color: tab === t.id ? "var(--accent)" : "var(--text-2)",
                   cursor: "pointer",
-                  borderBottom: tab === t.id ? "2px solid var(--accent)" : "2px solid transparent",
-                  transition: `color var(--duration-fast) var(--ease-smooth), border-color var(--duration-normal) var(--ease-spring)`,
+                  transition: `color var(--duration-fast) var(--ease-smooth)`,
                 }}
               >
                 {t.icon}

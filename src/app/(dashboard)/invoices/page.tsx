@@ -267,6 +267,8 @@ export default function InvoicesPage() {
                           fontSize: "13px",
                           fontWeight: 600,
                           color: "var(--foreground)",
+                          textDecoration: invoice.status === "cancelled" ? "line-through" : "none",
+                          opacity: invoice.status === "cancelled" ? 0.6 : 1,
                         }}
                       >
                         {invoice.invoice_number}

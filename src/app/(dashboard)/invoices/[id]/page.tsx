@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import type { Customer, Invoice, Profile, TemplateConfig } from "@/types";
+import { canTransition, canDelete } from "@/lib/invoice-status";
 import { calculatePressure } from "@/lib/pressure";
 import { getDefaultInvoiceEmailTemplate } from "@/lib/email-templates";
 import PressureBadge from "@/components/invoices/PressureBadge";
@@ -29,6 +30,7 @@ import {
   Calendar,
   Hash,
   AlertCircle,
+  XCircle,
 } from "lucide-react";
 
 export default function InvoiceDetailPage() {
@@ -54,6 +56,7 @@ export default function InvoiceDetailPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [pdfReady, setPdfReady] = useState(false);
   const [pressure, setPressure] = useState<ReturnType<
     typeof calculatePressure
@@ -155,6 +158,10 @@ export default function InvoiceDetailPage() {
   }, [id, router]);
 
   async function markAsPaid() {
+    if (!invoice || !canTransition(invoice.status, "paid")) {
+      toast.error("Statuswechsel nicht erlaubt (GoBD)");
+      return;
+    }
     setActionLoading("paid");
     const sb = getSupabase();
     const { error } = await sb
@@ -188,6 +195,10 @@ export default function InvoiceDetailPage() {
   }
 
   async function sendInvoice() {
+    if (invoice?.status === "draft" && !canTransition("draft", "sent")) {
+      toast.error("Statuswechsel nicht erlaubt (GoBD)");
+      return;
+    }
     setActionLoading("send");
     const res = await fetch(`/api/invoices/${id}/send`, {
       method: "POST",
@@ -239,6 +250,10 @@ export default function InvoiceDetailPage() {
   }
 
   async function deleteInvoice() {
+    if (!invoice || !canDelete(invoice.status)) {
+      toast.error("Nur Entwürfe dürfen gelöscht werden (GoBD)");
+      return;
+    }
     setActionLoading("delete");
     const sb = getSupabase();
     const { error } = await sb.from("invoices").delete().eq("id", id);
@@ -249,6 +264,28 @@ export default function InvoiceDetailPage() {
     }
     toast.success("Rechnung gelöscht");
     router.push("/invoices");
+  }
+
+  async function cancelInvoice() {
+    if (!invoice || !canTransition(invoice.status, "cancelled")) {
+      toast.error("Stornierung nicht möglich (GoBD)");
+      return;
+    }
+    setActionLoading("cancel");
+    const sb = getSupabase();
+    const { error } = await sb
+      .from("invoices")
+      .update({ status: "cancelled" })
+      .eq("id", id);
+    if (error) {
+      toast.error("Fehler beim Stornieren");
+      setActionLoading(null);
+      return;
+    }
+    setInvoice((prev) => (prev ? { ...prev, status: "cancelled" } : prev));
+    toast.success("Rechnung storniert");
+    setShowCancelConfirm(false);
+    setActionLoading(null);
   }
 
   if (loading)
@@ -290,6 +327,8 @@ export default function InvoiceDetailPage() {
   const customer = invoice.customer;
   const { bg, text } = getStatusColors(invoice.status);
   const isPaid = invoice.status === "paid";
+  const isCancelled = invoice.status === "cancelled";
+  const isActionable = !isPaid && !isCancelled;
   const glassCardStyle = {
     background: "var(--surface)",
     border: "1px solid var(--border)",
@@ -336,12 +375,15 @@ export default function InvoiceDetailPage() {
             border: "1px solid var(--border)",
           }}
         >
-          <Link
-            href={`/invoices/${invoice.id}/edit`}
-            style={{ textDecoration: "none" }}
-          >
-            <button className="btn btn-secondary">Bearbeiten</button>
-          </Link>
+          {/* GoBD: Nur Entwürfe sind bearbeitbar */}
+          {invoice.status === "draft" && (
+            <Link
+              href={`/invoices/${invoice.id}/edit`}
+              style={{ textDecoration: "none" }}
+            >
+              <button className="btn btn-secondary">Bearbeiten</button>
+            </Link>
+          )}
 
           {/* PDF Download */}
           {pdfReady && invoice && profile && (
@@ -360,7 +402,7 @@ export default function InvoiceDetailPage() {
           )}
 
           {/* Reminder */}
-          {!isPaid && (
+          {isActionable && (
             <button
               onClick={sendReminder}
               disabled={actionLoading === "reminder"}
@@ -382,7 +424,7 @@ export default function InvoiceDetailPage() {
           )}
 
           {/* Send invoice */}
-          {!isPaid && (
+          {isActionable && (
             <button
               onClick={() => setShowSendComposer((prev) => !prev)}
               disabled={actionLoading === "send"}
@@ -404,7 +446,7 @@ export default function InvoiceDetailPage() {
           )}
 
           {/* Mark as Paid */}
-          {!isPaid && (
+          {isActionable && (
             <button
               onClick={markAsPaid}
               disabled={actionLoading === "paid"}
@@ -426,6 +468,26 @@ export default function InvoiceDetailPage() {
           )}
         </div>
       </div>
+
+      {/* GoBD: Stornierung-Banner */}
+      {isCancelled && (
+        <div
+          style={{
+            marginBottom: "20px",
+            padding: "14px 20px",
+            background: "var(--destructive-bg)",
+            border: "1px solid var(--destructive-border)",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <XCircle style={{ width: 16, height: 16, color: "var(--destructive)", flexShrink: 0 }} />
+          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--destructive)" }}>
+            Diese Rechnung wurde storniert und kann nicht mehr bearbeitet werden.
+          </span>
+        </div>
+      )}
 
       {showSendComposer && (
         <div
@@ -912,62 +974,123 @@ export default function InvoiceDetailPage() {
         </div>
       </div>
 
-      {/* Delete */}
-      <div
-        style={{
-          marginTop: "24px",
-          display: "flex",
-          justifyContent: "flex-end",
-        }}
-      >
-        {!showDeleteConfirm ? (
-          <button
-            onClick={() => setShowDeleteConfirm(true)}
-            className="btn btn-danger"
-          >
-            <Trash2 style={{ width: 14, height: 14 }} />
-            Rechnung löschen
-          </button>
-        ) : (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              padding: "10px 16px",
-              background: "var(--destructive-bg)",
-              border: "1px solid var(--destructive-border)",
-              borderRadius: "var(--radius)",
-            }}
-          >
-            <AlertCircle
-              style={{
-                width: 14,
-                height: 14,
-                color: "var(--destructive)",
-                flexShrink: 0,
-              }}
-            />
-            <span style={{ fontSize: "13px", color: "var(--destructive)" }}>
-              Wirklich löschen? Diese Aktion kann nicht rückgängig gemacht
-              werden.
-            </span>
+      {/* GoBD: Entwürfe löschen, sonst stornieren */}
+      {invoice.status === "draft" && (
+        <div
+          style={{
+            marginTop: "24px",
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          {!showDeleteConfirm ? (
             <button
-              onClick={() => setShowDeleteConfirm(false)}
-              className="btn btn-secondary"
-            >
-              Abbrechen
-            </button>
-            <button
-              onClick={deleteInvoice}
-              disabled={actionLoading === "delete"}
+              onClick={() => setShowDeleteConfirm(true)}
               className="btn btn-danger"
             >
-              {actionLoading === "delete" ? "Löschen..." : "Ja, löschen"}
+              <Trash2 style={{ width: 14, height: 14 }} />
+              Rechnung löschen
             </button>
-          </div>
-        )}
-      </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "10px 16px",
+                background: "var(--destructive-bg)",
+                border: "1px solid var(--destructive-border)",
+              }}
+            >
+              <AlertCircle
+                style={{
+                  width: 14,
+                  height: 14,
+                  color: "var(--destructive)",
+                  flexShrink: 0,
+                }}
+              />
+              <span style={{ fontSize: "13px", color: "var(--destructive)" }}>
+                Wirklich löschen? Diese Aktion kann nicht rückgängig gemacht
+                werden.
+              </span>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="btn btn-secondary"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={deleteInvoice}
+                disabled={actionLoading === "delete"}
+                className="btn btn-danger"
+              >
+                {actionLoading === "delete" ? "Löschen..." : "Ja, löschen"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* GoBD: Stornieren für nicht-Entwürfe */}
+      {!isCancelled && invoice.status !== "draft" && (
+        <div
+          style={{
+            marginTop: "24px",
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          {!showCancelConfirm ? (
+            <button
+              onClick={() => setShowCancelConfirm(true)}
+              className="btn btn-danger"
+            >
+              <XCircle style={{ width: 14, height: 14 }} />
+              Rechnung stornieren
+            </button>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "10px 16px",
+                background: "var(--destructive-bg)",
+                border: "1px solid var(--destructive-border)",
+              }}
+            >
+              <AlertCircle
+                style={{
+                  width: 14,
+                  height: 14,
+                  color: "var(--destructive)",
+                  flexShrink: 0,
+                }}
+              />
+              <span style={{ fontSize: "13px", color: "var(--destructive)" }}>
+                Rechnung stornieren? Der Status wird auf &quot;Storniert&quot;
+                gesetzt (GoBD-konform, keine Löschung).
+              </span>
+              <button
+                onClick={() => setShowCancelConfirm(false)}
+                className="btn btn-secondary"
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={cancelInvoice}
+                disabled={actionLoading === "cancel"}
+                className="btn btn-danger"
+              >
+                {actionLoading === "cancel"
+                  ? "Stornieren..."
+                  : "Ja, stornieren"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

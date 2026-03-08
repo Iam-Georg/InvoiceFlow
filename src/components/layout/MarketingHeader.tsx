@@ -9,6 +9,7 @@ import { ArrowRight, FileText } from "lucide-react";
 const NAV = [
   { href: "/", label: "Startseite" },
   { href: "/funktionen", label: "Funktionen" },
+  { href: "/fuer", label: "Für dich" },
   { href: "/preise", label: "Preise" },
   { href: "/ueber-uns", label: "Über uns" },
   { href: "/docs", label: "Dokumentation" },
@@ -96,7 +97,7 @@ export default function MarketingHeader() {
         alignItems: "center",
         padding: "0 40px",
         gap: "32px",
-        animation: "topNavSlideDown 300ms var(--ease-spring) forwards",
+        /* no entry animation — header stays persistent across pages */
       }}
     >
       {/* Logo */}
