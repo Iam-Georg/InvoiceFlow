@@ -7,6 +7,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import StatusBadge from "@/components/invoices/StatusBadge";
 import type { Invoice } from "@/types";
 import { FileText, Clock3, AlertTriangle, TrendingUp, BarChart3, ChevronRight } from "lucide-react";
+import OnboardingBanner from "@/components/OnboardingBanner";
 
 interface Stats {
   openCount: number;
@@ -201,6 +202,7 @@ export default function DashboardPage() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <OnboardingBanner />
       <div className="reveal-stagger" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "20px" }}>
         {statCards.map((s, i) => (
           <article

@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { ensureProfile } from "@/lib/profile";
 import type { Profile, SubscriptionPlan } from "@/types";
-import { Check, CreditCard, Loader2, Minus } from "lucide-react";
+import { Check, CreditCard, Loader2, Minus, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 
 const PLANS: {
   id: SubscriptionPlan;
@@ -89,7 +90,11 @@ export default function BillingPage() {
   }
 
   const [loading, setLoading] = useState(true);
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<SubscriptionPlan>("free");
+  const [hasStripeCustomer, setHasStripeCustomer] = useState(false);
+  const [paymentProvider, setPaymentProvider] = useState<"stripe" | "paypal">("stripe");
 
   useEffect(() => {
     async function load() {
@@ -103,10 +108,56 @@ export default function BillingPage() {
       }
       const profile = (await ensureProfile(sb, user)) as Profile | null;
       setCurrentPlan(profile?.plan ?? "free");
+      setHasStripeCustomer(!!profile?.stripe_customer_id);
       setLoading(false);
     }
     load();
   }, [router]);
+
+  async function handleCheckout(plan: SubscriptionPlan) {
+    setCheckoutLoading(plan);
+    try {
+      const endpoint = paymentProvider === "stripe"
+        ? "/api/billing/stripe/checkout"
+        : "/api/billing/paypal/checkout";
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Checkout fehlgeschlagen");
+      }
+
+      window.location.href = data.url;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Checkout fehlgeschlagen";
+      toast.error(message);
+      setCheckoutLoading(null);
+    }
+  }
+
+  async function handlePortal() {
+    setPortalLoading(true);
+    try {
+      const res = await fetch("/api/billing/stripe/portal", {
+        method: "POST",
+      });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || "Portal konnte nicht geöffnet werden");
+      }
+      window.location.href = data.url;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Portal fehlgeschlagen";
+      toast.error(message);
+    } finally {
+      setPortalLoading(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -334,7 +385,8 @@ export default function BillingPage() {
 
                 {/* CTA */}
                 <button
-                  disabled={isCurrent || isFree}
+                  disabled={isCurrent || isFree || checkoutLoading !== null}
+                  onClick={() => !isCurrent && !isFree && handleCheckout(plan.id)}
                   className={
                     isCurrent
                       ? "btn btn-secondary"
@@ -346,12 +398,18 @@ export default function BillingPage() {
                   }
                   style={{ width: "100%" }}
                 >
-                  <CreditCard style={{ width: 13, height: 13 }} />
+                  {checkoutLoading === plan.id ? (
+                    <Loader2 style={{ width: 13, height: 13, animation: "spin 1s linear infinite" }} />
+                  ) : (
+                    <CreditCard style={{ width: 13, height: 13 }} />
+                  )}
                   {isCurrent
                     ? "Aktueller Plan"
                     : isFree
                       ? "Kostenlos"
-                      : "Upgrade – demnächst"}
+                      : checkoutLoading === plan.id
+                        ? "Weiterleitung..."
+                        : "Jetzt upgraden"}
                 </button>
               </div>
             </div>
@@ -359,17 +417,55 @@ export default function BillingPage() {
         })}
       </div>
 
+      {/* Payment Provider Toggle */}
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "24px", gap: "8px" }}>
+        <button
+          onClick={() => setPaymentProvider("stripe")}
+          className={paymentProvider === "stripe" ? "btn btn-primary" : "btn btn-ghost"}
+          style={{ fontSize: "12px", padding: "6px 16px" }}
+        >
+          <CreditCard style={{ width: 12, height: 12 }} />
+          Kreditkarte (Stripe)
+        </button>
+        <button
+          onClick={() => setPaymentProvider("paypal")}
+          className={paymentProvider === "paypal" ? "btn btn-primary" : "btn btn-ghost"}
+          style={{ fontSize: "12px", padding: "6px 16px" }}
+        >
+          PayPal
+        </button>
+      </div>
+
+      {/* Manage Subscription (for existing Stripe customers) */}
+      {hasStripeCustomer && currentPlan !== "free" && (
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "16px" }}>
+          <button
+            onClick={handlePortal}
+            disabled={portalLoading}
+            className="btn btn-ghost"
+            style={{ fontSize: "12px" }}
+          >
+            {portalLoading ? (
+              <Loader2 style={{ width: 12, height: 12, animation: "spin 1s linear infinite" }} />
+            ) : (
+              <ExternalLink style={{ width: 12, height: 12 }} />
+            )}
+            Abonnement verwalten
+          </button>
+        </div>
+      )}
+
       {/* Trust Footer */}
       <p
         style={{
-          marginTop: "28px",
+          marginTop: "20px",
           fontSize: "12px",
           color: "var(--text-3)",
           textAlign: "center",
           letterSpacing: "0.01em",
         }}
       >
-        Jederzeit kündbar · Keine versteckten Kosten · Lemon Squeezy Zahlungsabwicklung
+        Jederzeit kündbar · Keine versteckten Kosten · Sichere Zahlungsabwicklung
       </p>
     </div>
   );

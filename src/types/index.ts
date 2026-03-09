@@ -69,6 +69,7 @@ export interface Profile {
   default_payment_terms?: number
   default_notes?: string
   invoice_counter?: number
+  role?: string
   created_at: string
 }
 

@@ -12,7 +12,8 @@
       "Bash(xargs grep:*)",
       "Bash(head:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

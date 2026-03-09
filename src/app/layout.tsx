@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
+import CookieBanner from '@/components/CookieBanner'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -108,8 +109,15 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.variable}>
+        <a
+          href="#main-content"
+          className="skip-to-content"
+        >
+          Zum Inhalt springen
+        </a>
         {children}
         <Toaster position="top-right" richColors />
+        <CookieBanner />
       </body>
     </html>
   )

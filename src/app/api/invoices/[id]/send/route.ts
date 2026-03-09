@@ -11,6 +11,25 @@ import {
   textToHtml,
 } from "@/lib/email-templates";
 
+// Simple in-memory rate limiter: max 10 emails per user per minute
+const rateLimitMap = new Map<string, number[]>();
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const timestamps = (rateLimitMap.get(userId) ?? []).filter(
+    (t) => now - t < RATE_LIMIT_WINDOW_MS,
+  );
+  if (timestamps.length >= RATE_LIMIT_MAX) {
+    rateLimitMap.set(userId, timestamps);
+    return false;
+  }
+  timestamps.push(now);
+  rateLimitMap.set(userId, timestamps);
+  return true;
+}
+
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
@@ -31,6 +50,13 @@ export async function POST(req: NextRequest, context: RouteContext) {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!checkRateLimit(user.id)) {
+    return NextResponse.json(
+      { error: "Zu viele E-Mails. Bitte warte eine Minute." },
+      { status: 429 },
+    );
   }
 
   const { data: invoice } = await supabase
@@ -121,7 +147,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
   const pdfBuffer = await renderToBuffer(pdfDocument);
 
   const { error } = await resend.emails.send({
-    from: `${senderName} <onboarding@resend.dev>`,
+    from: `${senderName} <${process.env.RESEND_FROM_EMAIL || "noreply@faktura.app"}>`,
     to: customer.email,
     subject,
     html,

@@ -73,7 +73,7 @@ export default function DashboardLayout({
     <div className="dashboard-shell">
       <TopNav />
       <Sidebar />
-      <main>
+      <main id="main-content" role="main">
         <div className="app-main-container dashboard-main-container page-enter">{children}</div>
       </main>
       <FeedbackWidget />

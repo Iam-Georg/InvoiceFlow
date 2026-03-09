@@ -1,9 +1,5 @@
 "use client";
 
-// ── ADMIN USER-ID ─────────────────────────────────────────────────────────────
-const ADMIN_USER_ID = "1f6663f2-b15c-48ad-bd30-60b434ecfba3";
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
@@ -282,17 +278,19 @@ export default function AdminPage() {
     return sbRef.current;
   }
 
-  // ── Auth check ───────────────────────────────────────────────────────────
+  // ── Auth check (server-side) ─────────────────────────────────────────────
   useEffect(() => {
     async function check() {
-      const {
-        data: { user },
-      } = await getSb().auth.getUser();
-      if (!user || user.id !== ADMIN_USER_ID) {
+      try {
+        const res = await fetch("/api/admin/verify");
+        if (!res.ok) {
+          router.replace("/dashboard");
+          return;
+        }
+        setAuthed(true);
+      } catch {
         router.replace("/dashboard");
-        return;
       }
-      setAuthed(true);
     }
     check();
   }, [router]);
@@ -1284,7 +1282,7 @@ export default function AdminPage() {
                             <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
                               {p.full_name || "–"}
                             </span>
-                            {p.id === ADMIN_USER_ID && (
+                            {p.role === "admin" && (
                               <Crown
                                 size={11}
                                 style={{

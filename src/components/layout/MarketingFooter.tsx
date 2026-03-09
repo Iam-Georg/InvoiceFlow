@@ -11,6 +11,7 @@ const PRODUKT_LINKS = [
 const UNTERNEHMEN_LINKS = [{ href: "/ueber-uns", label: "Über uns" }];
 
 const RECHTLICHES_LINKS = [
+  { href: "/agb", label: "AGB" },
   { href: "/datenschutz", label: "Datenschutz" },
   { href: "/impressum", label: "Impressum" },
 ];

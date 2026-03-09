@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createServiceSupabaseClient } from "@/lib/supabase-server";
+import { escapeHtml } from "@/lib/email-templates";
 
 type InvoiceCronRow = {
   id: string;
@@ -220,18 +221,18 @@ async function runCron(req: NextRequest) {
     const tone = reminderTone(riskScore);
 
     const sendResult = await resend.emails.send({
-      from: `${senderName} <onboarding@resend.dev>`,
+      from: `${senderName} <${process.env.RESEND_FROM_EMAIL || "noreply@faktura.app"}>`,
       to: customerEmail,
       subject: `${tone.subjectPrefix} - Rechnung ${invoice.invoice_number}`,
       html: `
         <div style="font-family: -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; color: #0A0F1E;">
-          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">${tone.subjectPrefix}</h2>
-          <p style="color: #6B7A90; font-size: 14px; margin-bottom: 24px;">Rechnung ${invoice.invoice_number}</p>
-          <p style="font-size: 14px; line-height: 1.6;">Sehr geehrte(r) ${invoice.customer?.name ?? "Kunde"},</p>
-          <p style="font-size: 14px; line-height: 1.6;">${tone.intro}</p>
-          <p style="font-size: 14px; line-height: 1.8;"><strong>Faellig am:</strong> ${dueDate}<br/><strong>Betrag:</strong> ${amount}</p>
+          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">${escapeHtml(tone.subjectPrefix)}</h2>
+          <p style="color: #6B7A90; font-size: 14px; margin-bottom: 24px;">Rechnung ${escapeHtml(String(invoice.invoice_number))}</p>
+          <p style="font-size: 14px; line-height: 1.6;">Sehr geehrte(r) ${escapeHtml(invoice.customer?.name ?? "Kunde")},</p>
+          <p style="font-size: 14px; line-height: 1.6;">${escapeHtml(tone.intro)}</p>
+          <p style="font-size: 14px; line-height: 1.8;"><strong>Faellig am:</strong> ${escapeHtml(dueDate)}<br/><strong>Betrag:</strong> ${escapeHtml(amount)}</p>
           <p style="font-size: 14px; line-height: 1.6;">Bitte ueberweisen Sie den offenen Betrag. Vielen Dank.</p>
-          <p style="font-size: 14px; line-height: 1.6; color: #6B7A90;">Mit freundlichen Gruessen,<br/><strong style="color:#0A0F1E;">${senderName}</strong></p>
+          <p style="font-size: 14px; line-height: 1.6; color: #6B7A90;">Mit freundlichen Gruessen,<br/><strong style="color:#0A0F1E;">${escapeHtml(senderName)}</strong></p>
         </div>
       `,
     });

@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { ensureProfile } from "@/lib/profile";
 import type { Profile } from "@/types";
 import { toast } from "sonner";
-import { Loader2, Save, Download } from "lucide-react";
+import { Loader2, Save, Download, Trash2, FileDown } from "lucide-react";
 
 interface SettingsForm {
   full_name: string;
@@ -22,10 +23,15 @@ interface SettingsForm {
 }
 
 export default function SettingsPage() {
+  const router = useRouter();
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
+  const [dataExportLoading, setDataExportLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [exportYear, setExportYear] = useState(String(new Date().getFullYear()));
   const [exportFormat, setExportFormat] = useState("standard");
   const [userId, setUserId] = useState("");
@@ -142,6 +148,47 @@ export default function SettingsPage() {
       toast.error(message);
     } finally {
       setExportLoading(false);
+    }
+  }
+
+  async function exportAllData() {
+    setDataExportLoading(true);
+    try {
+      const res = await fetch("/api/account/export");
+      if (!res.ok) throw new Error("Export fehlgeschlagen");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `faktura-export-${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Datenexport wurde heruntergeladen");
+    } catch {
+      toast.error("Datenexport fehlgeschlagen");
+    } finally {
+      setDataExportLoading(false);
+    }
+  }
+
+  async function handleDeleteAccount() {
+    if (deleteConfirmText !== "LÖSCHEN") return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch("/api/account/delete", { method: "POST" });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(data.error || "Löschung fehlgeschlagen");
+      }
+      await supabase.auth.signOut();
+      router.push("/login");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Löschung fehlgeschlagen";
+      toast.error(message);
+    } finally {
+      setDeleteLoading(false);
     }
   }
 
@@ -445,6 +492,111 @@ export default function SettingsPage() {
                 )}
                 {exportFormat === "datev" ? "DATEV" : "CSV"} herunterladen
               </button>
+            </div>
+          </div>
+        </div>
+        {/* Datenschutz */}
+        <div className="card-elevated" style={{ overflow: "hidden" }}>
+          <div
+            style={{
+              padding: "16px 20px",
+              borderBottom: "1px solid var(--border)",
+            }}
+          >
+            <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}>
+              Datenschutz
+            </p>
+            <p style={{ fontSize: "12px", color: "var(--muted-foreground)", marginTop: "2px" }}>
+              Datenexport und Account-Verwaltung (DSGVO Art. 17 & 20).
+            </p>
+          </div>
+          <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "16px" }}>
+            {/* Datenexport */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <p style={{ fontSize: "13px", fontWeight: 500, color: "var(--foreground)" }}>
+                  Alle Daten exportieren
+                </p>
+                <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>
+                  Lade alle deine Daten als JSON herunter.
+                </p>
+              </div>
+              <button
+                onClick={exportAllData}
+                disabled={dataExportLoading}
+                className="btn btn-secondary"
+              >
+                {dataExportLoading ? (
+                  <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
+                ) : (
+                  <FileDown style={{ width: 14, height: 14 }} />
+                )}
+                Exportieren
+              </button>
+            </div>
+
+            {/* Account löschen */}
+            <div style={{ borderTop: "1px solid var(--border)", paddingTop: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <p style={{ fontSize: "13px", fontWeight: 500, color: "var(--danger)" }}>
+                    Account löschen
+                  </p>
+                  <p style={{ fontSize: "12px", color: "var(--muted-foreground)" }}>
+                    Alle Daten werden unwiderruflich gelöscht. Gesendete Rechnungen werden gemäß GoBD 10 Jahre aufbewahrt (anonymisiert).
+                  </p>
+                </div>
+                {!showDeleteConfirm && (
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="btn"
+                    style={{ background: "var(--danger-bg)", color: "var(--danger)", border: "1px solid var(--danger)" }}
+                  >
+                    <Trash2 style={{ width: 14, height: 14 }} />
+                    Löschen
+                  </button>
+                )}
+              </div>
+
+              {showDeleteConfirm && (
+                <div style={{ marginTop: "12px", padding: "16px", background: "var(--danger-bg)", border: "1px solid var(--danger)" }}>
+                  <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--danger)", marginBottom: "8px" }}>
+                    Bist du sicher? Tippe &quot;LÖSCHEN&quot; um zu bestätigen.
+                  </p>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <input
+                      type="text"
+                      value={deleteConfirmText}
+                      onChange={(e) => setDeleteConfirmText(e.target.value)}
+                      placeholder='LÖSCHEN'
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={deleteConfirmText !== "LÖSCHEN" || deleteLoading}
+                      className="btn"
+                      style={{
+                        background: deleteConfirmText === "LÖSCHEN" ? "var(--danger)" : "var(--danger-bg)",
+                        color: deleteConfirmText === "LÖSCHEN" ? "#fff" : "var(--danger)",
+                        border: "1px solid var(--danger)",
+                      }}
+                    >
+                      {deleteLoading ? (
+                        <Loader2 style={{ width: 14, height: 14, animation: "spin 1s linear infinite" }} />
+                      ) : (
+                        <Trash2 style={{ width: 14, height: 14 }} />
+                      )}
+                      Endgültig löschen
+                    </button>
+                    <button
+                      onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(""); }}
+                      className="btn btn-secondary"
+                    >
+                      Abbrechen
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

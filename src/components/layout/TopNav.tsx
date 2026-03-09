@@ -100,7 +100,7 @@ export default function TopNav() {
   }
 
   return (
-    <header className="topnav-frame" style={{ animation: 'topNavSlideDown 300ms var(--ease-spring) forwards' }}>
+    <header className="topnav-frame" role="banner" style={{ animation: 'topNavSlideDown 300ms var(--ease-spring) forwards' }}>
       <div className="topnav-shell">
         <Link
           href="/dashboard"
@@ -187,6 +187,8 @@ export default function TopNav() {
           <div ref={menuRef} style={{ position: "relative" }}>
             <button
               onClick={toggleMenu}
+              aria-label="Benutzermenü"
+              aria-expanded={menuVisible && !menuClosing}
               style={{
                 height: "36px",
                 padding: "0 10px",
@@ -271,7 +273,7 @@ export default function TopNav() {
                   Einstellungen
                 </Link>
 
-                <button onClick={toggleTheme} className="dropdown-item">
+                <button onClick={toggleTheme} className="dropdown-item" aria-label={isDark ? "Helles Design aktivieren" : "Dunkles Design aktivieren"}>
                   {isDark
                     ? <Sun size={14} color="var(--text-2)" />
                     : <Moon size={14} color="var(--text-2)" />}

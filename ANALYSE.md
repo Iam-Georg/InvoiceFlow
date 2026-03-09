@@ -601,3 +601,125 @@
   │ Buchhaltung           │ ✅ Voll │ ✅ Voll   │ ❌ (bewusst nicht) │
   ├───────────────────────┼─────────┼───────────┼────────────────────┤
   │ Mobile App            │ ✅      │ ✅        │ ❌
+
+
+  ┌─────┬───────────────────────────┬────────────────────────────────┐
+  │  #  │           Task            │            Dateien             │
+  ├─────┼───────────────────────────┼────────────────────────────────┤
+  │ 1   │ Error Boundaries          │ 3 neue Dateien                 │
+  ├─────┼───────────────────────────┼────────────────────────────────┤
+  │ 2   │ AGB-Seite                 │ 1 neu + 2 Edits                │
+  ├─────┼───────────────────────────┼────────────────────────────────┤
+  │ 3   │ .env.example + Validation │ 2 neue Dateien                 │
+  ├─────┼───────────────────────────┼────────────────────────────────┤
+  │ 4   │ Plan-Limit SQL Triggers   │ 1 SQL Migration                │
+  ├─────┼───────────────────────────┼────────────────────────────────┤
+  │ 5   │ Feedback RLS              │ 1 SQL Migration                │
+  ├─────┼───────────────────────────┼────────────────────────────────┤
+  │ 6   │ Sentry Integration        │ npm install + 4 neue + 2 Edits │
+  ├─────┼───────────────────────────┼────────────────────────────────┤
+  │ 7   │ Cookie Banner             │ 1 neu + 1 Edit                 │
+  └─────┴───────────────────────────┴────────────────────────────────┘
+
+  ┌────────────────────────┬───────┬─────────────────────────────────────────────────────┐
+  │        Bereich         │ Score │                  Kritischste Lücke                  │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ Auth & Security        │ 6/10  │ Kein Rate-Limiting, Feedback-RLS fehlt              │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ Error Handling         │ 4/10  │ Kein Error Boundary — ein Crash killt die ganze App │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ Legal (Impressum etc.) │ 8/10  │ AGB fehlen komplett (Pflicht in DE)                 │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ E-Mail System          │ 7/10  │ Keine Welcome-Mail, hardcoded Absender              │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ Payment/Billing        │ 4/10  │ PayPal-Webhook unsigniert, Buttons deaktiviert      │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ Monitoring             │ 1/10  │ Kein Error-Tracking, kein Logging, keine Analytics  │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ Performance            │ 6/10  │ Kein Image-Opt, unbekannte Bundle-Größe             │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ Accessibility          │ 2/10  │ Keine ARIA-Labels, kein Alt-Text                    │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ Mobile                 │ 5/10  │ Kein mobiles Menü, ungetestet                       │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ Testing                │ 0/10  │ Null Tests im gesamten Projekt                      │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ Environment/Config     │ 3/10  │ Kein .env.example, kein CI/CD                       │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ SEO                    │ 7/10  │ Sitemap + robots.txt existieren jetzt               │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ Onboarding             │ 3/10  │ Kein Setup-Wizard nach Registrierung                │
+  ├────────────────────────┼───────┼─────────────────────────────────────────────────────┤
+  │ DSGVO/Data Export      │ 6/10  │ Kein "Account löschen", kein DSGVO-Export           │
+  └────────────────────────┴───────┴─────────────────────────────────────────────────────┘
+
+
+    Impressum — komplett neu, jetzt mit:
+  - § 5 TMG Pflichtangaben (Name, Anschrift, Vertretung, E-Mail, Telefon, Registergericht, HRB, USt-IdNr.)
+  - § 18 MStV Verantwortlicher für Inhalt
+  - EU-Streitschlichtung (OS-Plattform-Link + Erklärung)
+  - Haftung für Inhalte (§§ 7-10 TMG)
+  - Haftung für Links
+  - Urheberrecht
+
+  Datenschutzerklärung — von 5 Zeilen auf 16 vollständige Abschnitte:
+  1. Verantwortlicher (Name, Adresse, Kontakt)
+  2. Übersicht der Verarbeitungen (Datenkategorien, betroffene Personen)
+  3. Rechtsgrundlagen (Art. 6 lit. a/b/c/f einzeln aufgeführt)
+  4. Registrierung und Nutzung (welche Daten genau)
+  5. E-Mail-Versand (Resend als Auftragsverarbeiter, SCC)
+  6. Zahlungsabwicklung (Stripe PCI-DSS, PayPal, Links)
+  7. Hosting (Vercel, Supabase EU-Server Frankfurt)
+  8. KI-Funktionen (Groq API, Einwilligung)
+  9. Fehleranalyse (Sentry, berechtigtes Interesse)
+  10. Cookies und localStorage (TTDSG § 25 Abs. 2 Nr. 2, Cookie-Banner)
+  11. Speicherdauer (10 Jahre Rechnungen/GoBD, 30 Tage Logs, 2 Jahre Feedback)
+  12. Betroffenenrechte (Art. 15-21 DSGVO komplett)
+  13. Beschwerderecht (Berliner Datenschutzbeauftragte)
+  14. Datensicherheit (TOMs: TLS 1.3, bcrypt, RLS, Backups)
+  15. Auftragsverarbeitung (AVV Art. 28 mit allen Dienstleistern)
+  16. Änderungen
+
+
+  ┌────────────────────────┬──────┬──────┬─────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │        Bereich         │ Alt  │ Neu  │ Veränderung │                                                     Status                                                      │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Auth & Security        │ 6/10 │ 7/10 │ +1          │ Feedback-RLS, PayPal-Signatur, Plan-Limits via DB-Trigger hinzugefügt. Rate-Limiting + Admin-Härtung fehlt noch │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Error Handling         │ 4/10 │ 7/10 │ +3          │ Error Boundaries (3 Dateien) + Sentry vollständig integriert                                                    │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Legal (Impressum etc.) │ 8/10 │ 9/10 │ +1          │ AGB-Seite + Cookie-Banner existieren jetzt                                                                      │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ E-Mail System          │ 7/10 │ 7/10 │ =           │ Welcome-Mail fehlt, Sender noch onboarding@resend.dev in 3 Routes                                               │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Payment/Billing        │ 4/10 │ 5/10 │ +1          │ Webhooks gesichert, aber Checkout-Buttons immer noch DISABLED                                                   │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Monitoring             │ 1/10 │ 5/10 │ +4          │ Sentry (Client+Server+Edge) vollständig integriert                                                              │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Performance            │ 6/10 │ 6/10 │ =           │ React Compiler aktiv, aber kein Image-Opt, kein Bundle-Analyse                                                  │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Accessibility          │ 2/10 │ 3/10 │ +1          │ Keyboard Shortcuts + Focus-States, aber keine ARIA-Labels/Skip-Links                                            │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Mobile                 │ 5/10 │ 6/10 │ +1          │ MobileNav (Bottom-Nav) existiert jetzt                                                                          │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Testing                │ 0/10 │ 0/10 │ =           │ Null Tests, null Frameworks                                                                                     │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Environment/Config     │ 3/10 │ 6/10 │ +3          │ .env.example + Zod-Validierung existieren                                                                       │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ SEO                    │ 7/10 │ 8/10 │ +1          │ JSON-LD Structured Data + dynamische Metadaten                                                                  │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Onboarding             │ 3/10 │ 3/10 │ =           │ Kein Setup-Wizard, kein Welcome-Screen                                                                          │
+  ├────────────────────────┼──────┼──────┼─────────────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ DSGVO/Data Export      │ 6/10 │ 6/10 │ =           │ Cookie-Banner da, aber Account-Löschen + Datenexport fehlt                                                      │
+  └────────────────────────┴──────┴──────┴─────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+    Kritische Launch-Blocker (MUSS vor Launch):
+
+  1. Billing Checkout verbinden — Buttons funktionslos
+  2. Account-Löschung (DSGVO Art. 17) — Pflicht
+  3. Vollständiger Datenexport (DSGVO Art. 20) — In Datenschutz versprochen
+  4. Email-Absender von onboarding@resend.dev auf ENV-Variable umstellen
+  5. GoBD: DB-Trigger für Invoice-Immutabilität — Nur Client-seitig geschützt
+  6. XSS in Email-Templates — customer.name, invoice_number nicht escaped in remind/cron Routes
+  7. Admin-Panel serverseitig absichern — Aktuell nur Client-Side + hardcoded UID
+  8. Accessibility Basics — ARIA-Labels, Skip-Links, Alt-Text minimum

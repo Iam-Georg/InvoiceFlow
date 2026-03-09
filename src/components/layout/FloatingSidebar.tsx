@@ -36,6 +36,7 @@ export default function FloatingSidebar() {
         </div>
 
         <nav
+          aria-label="Hauptnavigation"
           style={{
             display: "flex",
             flexDirection: "column",

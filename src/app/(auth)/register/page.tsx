@@ -47,6 +47,8 @@ export default function RegisterPage() {
       if (data.session) {
         if (data.user) {
           await ensureProfile(sb, data.user);
+          // Fire-and-forget welcome email
+          fetch("/api/account/welcome", { method: "POST" }).catch(() => {});
         }
         toast.success("Account erstellt!");
         router.push("/dashboard");
@@ -197,6 +199,31 @@ export default function RegisterPage() {
               )}
               {loading ? "Erstelle Account..." : "Kostenlos registrieren"}
             </button>
+
+            <p
+              style={{
+                textAlign: "center",
+                fontSize: "11px",
+                color: "var(--muted-foreground)",
+                lineHeight: 1.5,
+              }}
+            >
+              Mit der Registrierung akzeptierst du unsere{" "}
+              <Link
+                href="/agb"
+                style={{ color: "var(--accent)", textDecoration: "none" }}
+              >
+                AGB
+              </Link>{" "}
+              und{" "}
+              <Link
+                href="/datenschutz"
+                style={{ color: "var(--accent)", textDecoration: "none" }}
+              >
+                Datenschutzerklärung
+              </Link>
+              .
+            </p>
 
             <p
               style={{
