@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase";
-import { ArrowRight, FileText } from "lucide-react";
+import { ArrowRight, FileText, Moon, Sun } from "lucide-react";
 
 const NAV = [
   { href: "/", label: "Startseite" },
@@ -21,6 +21,7 @@ export default function MarketingHeader() {
   const pathname = usePathname();
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [isDark, setIsDark] = useState(false);
 
   // Sliding indicator
   const navRef = useRef<HTMLElement>(null);
@@ -46,6 +47,31 @@ export default function MarketingHeader() {
     }
     check();
   }, []);
+
+  // Theme initialisation — respect saved preference or system default
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+
+    if (saved === "dark" || (!saved && prefersDark)) {
+      document.documentElement.classList.add("dark");
+      setIsDark(true);
+    }
+  }, []);
+
+  function toggleTheme() {
+    const next = !isDark;
+    if (next) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+    setIsDark(next);
+  }
 
   // Init indicator at active item on mount / pathname change
   useEffect(() => {
@@ -198,6 +224,30 @@ export default function MarketingHeader() {
           );
         })}
       </nav>
+
+      {/* Dark-mode toggle */}
+      <button
+        onClick={toggleTheme}
+        aria-label="Toggle dark mode"
+        style={{
+          width: "34px",
+          height: "34px",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          background: "none",
+          border: "1px solid var(--border)",
+          borderRadius: 0,
+          cursor: "pointer",
+          color: "var(--text-2)",
+          padding: 0,
+          transition:
+            "color var(--duration-fast) var(--ease-smooth), border-color var(--duration-fast) var(--ease-smooth)",
+        }}
+      >
+        {isDark ? <Sun size={16} /> : <Moon size={16} />}
+      </button>
 
       {/* Auth buttons */}
       <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>

@@ -1,6 +1,9 @@
 export interface Industry {
   slug: string;
   name: string;
+  category: "kreative" | "tech" | "beratung" | "handwerk";
+  benefit: string;
+  icon: string;
   heroTitle: string;
   heroSubtitle: string;
   painPoints: [string, string, string];
@@ -17,6 +20,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "fotografen",
     name: "Fotografen",
+    category: "kreative",
+    benefit: "Nutzungsrechte & Shootings in einer Rechnung",
+    icon: "Camera",
     heroTitle: "Rechnungen für Fotografen — in 60 Sekunden",
     heroSubtitle:
       "Du fotografierst Hochzeiten, Events und Produkte. Faktura kümmert sich um deine Rechnungen, damit du dich aufs Bild konzentrieren kannst.",
@@ -49,6 +55,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "webdesigner",
     name: "Webdesigner",
+    category: "kreative",
+    benefit: "Abschlagszahlungen für jede Projektphase",
+    icon: "Globe",
     heroTitle: "Rechnungen für Webdesigner — in 60 Sekunden",
     heroSubtitle:
       "Du baust Websites und Shops. Faktura baut deine Rechnungen — mit Abschlagszahlungen, Stundensätzen und allem, was Webprojekte brauchen.",
@@ -81,6 +90,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "it-berater",
     name: "IT-Berater",
+    category: "tech",
+    benefit: "Tagessätze + DATEV-Export für Konzern-Kunden",
+    icon: "Monitor",
     heroTitle: "Rechnungen für IT-Berater — in 60 Sekunden",
     heroSubtitle:
       "Dein Tagessatz steht, dein Projekt läuft. Faktura rechnet deine Stunden ab — GoBD-konform und mit einem Klick beim Steuerberater.",
@@ -113,6 +125,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "texter",
     name: "Texter & Copywriter",
+    category: "kreative",
+    benefit: "Blitz-Rechnungen für viele kleine Aufträge",
+    icon: "PenTool",
     heroTitle: "Rechnungen für Texter — in 60 Sekunden",
     heroSubtitle:
       "Du schreibst Texte, die verkaufen. Faktura schreibt Rechnungen, die schnell bezahlt werden — inklusive Wort-Preise und Pauschalbeträge.",
@@ -145,6 +160,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "grafikdesigner",
     name: "Grafikdesigner",
+    category: "kreative",
+    benefit: "Entwurf, Reinzeichnung & Nutzungsrechte abrechnen",
+    icon: "Palette",
     heroTitle: "Rechnungen für Grafikdesigner — in 60 Sekunden",
     heroSubtitle:
       "Du gestaltest Logos, Flyer und Brandings. Faktura gestaltet deine Rechnungen — mit dem gleichen Anspruch an Professionalität.",
@@ -177,6 +195,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "architekten",
     name: "Architekten",
+    category: "handwerk",
+    benefit: "HOAI-Phasen und Abschlagsrechnungen meistern",
+    icon: "Building2",
     heroTitle: "Rechnungen für Architekten — in 60 Sekunden",
     heroSubtitle:
       "HOAI-Phasen, Abschlagszahlungen und lange Projektlaufzeiten. Faktura bildet deine komplexe Abrechnungsstruktur einfach ab.",
@@ -209,6 +230,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "coaches",
     name: "Coaches & Trainer",
+    category: "beratung",
+    benefit: "Coaching-Pakete und Sessions automatisch abrechnen",
+    icon: "Heart",
     heroTitle: "Rechnungen für Coaches — in 60 Sekunden",
     heroSubtitle:
       "Du coachst Menschen zu besseren Ergebnissen. Faktura bringt deine Finanzen zu besseren Ergebnissen — mit automatischen Rechnungen nach jeder Session.",
@@ -241,6 +265,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "uebersetzer",
     name: "Übersetzer & Dolmetscher",
+    category: "beratung",
+    benefit: "Wortpreise, Zeilenpreise und Agentur-Mahnungen",
+    icon: "Languages",
     heroTitle: "Rechnungen für Übersetzer — in 60 Sekunden",
     heroSubtitle:
       "Du übersetzt Texte und dolmetschst auf Konferenzen. Faktura übersetzt deinen Aufwand in professionelle Rechnungen.",
@@ -273,6 +300,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "musiker",
     name: "Musiker & DJs",
+    category: "kreative",
+    benefit: "Gagen und Technikpauschalen nach jedem Gig",
+    icon: "Music",
     heroTitle: "Rechnungen für Musiker — in 60 Sekunden",
     heroSubtitle:
       "Du machst Musik, spielst Gigs und produzierst Beats. Faktura sorgt dafür, dass du dafür auch bezahlt wirst.",
@@ -305,6 +335,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "videografen",
     name: "Videografen & Filmemacher",
+    category: "kreative",
+    benefit: "Pre- bis Post-Production in einer Rechnung",
+    icon: "Video",
     heroTitle: "Rechnungen für Videografen — in 60 Sekunden",
     heroSubtitle:
       "Du produzierst Videos, Imagefilme und Social-Media-Content. Faktura produziert deine Rechnungen — mit einem Bruchteil des Aufwands.",
@@ -337,6 +370,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "programmierer",
     name: "Programmierer & Entwickler",
+    category: "tech",
+    benefit: "Sprint-Abrechnungen und Retainer automatisiert",
+    icon: "Code",
     heroTitle: "Rechnungen für Entwickler — in 60 Sekunden",
     heroSubtitle:
       "Du schreibst Code, der Probleme löst. Faktura schreibt Rechnungen, die schnell bezahlt werden — mit Stundensätzen und Sprint-Abrechnungen.",
@@ -369,6 +405,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "berater",
     name: "Unternehmensberater",
+    category: "beratung",
+    benefit: "Tagessätze und Reisekosten für Konzern-Kunden",
+    icon: "Briefcase",
     heroTitle: "Rechnungen für Berater — in 60 Sekunden",
     heroSubtitle:
       "Du berätst Unternehmen zu Strategie und Prozessen. Faktura optimiert deinen eigenen Prozess — die Rechnungsstellung.",
@@ -401,6 +440,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "handwerker",
     name: "Handwerker & Monteure",
+    category: "handwerk",
+    benefit: "Material und Arbeitsstunden getrennt ausweisen",
+    icon: "Wrench",
     heroTitle: "Rechnungen für Handwerker — in 60 Sekunden",
     heroSubtitle:
       "Du bist auf der Baustelle, nicht im Büro. Faktura erstellt deine Rechnungen schnell und einfach — auch vom Smartphone.",
@@ -433,6 +475,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "dozenten",
     name: "Dozenten & Trainer",
+    category: "beratung",
+    benefit: "Honorare an mehrere Institutionen gleichzeitig",
+    icon: "GraduationCap",
     heroTitle: "Rechnungen für Dozenten — in 60 Sekunden",
     heroSubtitle:
       "Du unterrichtest an Hochschulen, Akademien oder in Unternehmen. Faktura rechnet deine Honorare sauber und schnell ab.",
@@ -465,6 +510,9 @@ export const INDUSTRIES: Industry[] = [
   {
     slug: "virtuelle-assistenten",
     name: "Virtuelle Assistenten",
+    category: "beratung",
+    benefit: "Retainer-Rechnungen automatisch jeden Monat",
+    icon: "Headphones",
     heroTitle: "Rechnungen für Virtuelle Assistenten — in 60 Sekunden",
     heroSubtitle:
       "Du managst Kalender, E-Mails und Projekte für andere. Faktura managed deine Rechnungen — automatisch und professionell.",
@@ -502,4 +550,33 @@ export function getIndustryBySlug(slug: string): Industry | undefined {
 
 export function getAllIndustrySlugs(): string[] {
   return INDUSTRIES.map((i) => i.slug);
+}
+
+export const CATEGORY_CONFIG = {
+  kreative: {
+    label: "Kreative",
+    headline: "Kreative Köpfe verdienen kreative Rechnungen",
+    description: "Von Fotografie über Design bis Musik — Faktura versteht kreative Arbeit.",
+  },
+  tech: {
+    label: "Tech & Digital",
+    headline: "Stundensätze, Sprints und Retainer — automatisiert",
+    description: "Faktura spricht deine Sprache — ob Tagessatz oder Sprint-Pauschale.",
+  },
+  beratung: {
+    label: "Beratung & Coaching",
+    headline: "Mehr Zeit für deine Klienten, weniger für Papierkram",
+    description: "Sessions, Pakete und Honorare — alles in einem Tool.",
+  },
+  handwerk: {
+    label: "Handwerk & Spezialisten",
+    headline: "Rechnungen so solide wie deine Arbeit",
+    description: "Material, Arbeitsstunden und Abschläge — klar und professionell.",
+  },
+} as const;
+
+export type Category = keyof typeof CATEGORY_CONFIG;
+
+export function getIndustriesByCategory(category: Category): Industry[] {
+  return INDUSTRIES.filter((i) => i.category === category);
 }

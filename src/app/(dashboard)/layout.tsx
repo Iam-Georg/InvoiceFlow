@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase";
 import TopNav from "@/components/layout/TopNav";
 import Sidebar from "@/components/layout/Sidebar";
 import FeedbackWidget from "@/components/FeedbackWidget";
+import SkipToContent from "@/components/SkipToContent";
 import KeyboardShortcuts from "@/components/KeyboardShortcuts";
 import { Loader2 } from "lucide-react";
 
@@ -76,6 +77,7 @@ export default function DashboardLayout({
       <main id="main-content" role="main">
         <div className="app-main-container dashboard-main-container page-enter">{children}</div>
       </main>
+      <SkipToContent />
       <FeedbackWidget />
       <KeyboardShortcuts />
     </div>

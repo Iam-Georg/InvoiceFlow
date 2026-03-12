@@ -89,18 +89,29 @@ export default function TemplatesPage() {
     toast.success("Vorlage gelöscht");
   }
 
-  async function handleSetDefault(id: string) {
+  async function handleToggleDefault(id: string, currentlyDefault: boolean) {
     const sb = getSupabase();
     setActionLoading(id);
-    await sb
-      .from("invoice_templates")
-      .update({ is_default: true })
-      .eq("id", id);
-    setTemplates((prev) =>
-      prev.map((t) => ({ ...t, is_default: t.id === id })),
-    );
+    if (currentlyDefault) {
+      await sb
+        .from("invoice_templates")
+        .update({ is_default: false })
+        .eq("id", id);
+      setTemplates((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, is_default: false } : t)),
+      );
+      toast.success("Standard entfernt");
+    } else {
+      await sb
+        .from("invoice_templates")
+        .update({ is_default: true })
+        .eq("id", id);
+      setTemplates((prev) =>
+        prev.map((t) => ({ ...t, is_default: t.id === id })),
+      );
+      toast.success("Als Standard gesetzt");
+    }
     setActionLoading(null);
-    toast.success("Als Standard gesetzt");
   }
 
   return (
@@ -371,57 +382,69 @@ export default function TemplatesPage() {
                     alignItems: "center",
                   }}
                 >
-                  <div>
-                    <p
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleToggleDefault(template.id, template.is_default);
+                      }}
+                      disabled={actionLoading === template.id}
+                      title={template.is_default ? "Standard entfernen" : "Als Standard setzen"}
                       style={{
-                        fontSize: "13px",
-                        fontWeight: 600,
-                        color: "var(--foreground)",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "4px",
                         display: "flex",
                         alignItems: "center",
-                        gap: "6px",
+                        justifyContent: "center",
+                        transition: "transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+                        flexShrink: 0,
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "scale(1.2)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "scale(1)";
                       }}
                     >
-                      {template.name}
-                      {template.is_default && (
-                        <Star
-                          size={12}
-                          fill="var(--accent)"
-                          color="var(--accent)"
-                        />
-                      )}
-                    </p>
-                    <p
-                      style={{
-                        fontSize: "11px",
-                        color: "var(--muted-foreground)",
-                        marginTop: "2px",
-                      }}
-                    >
-                      {template.config.layout === "classic"
-                        ? "Klassisch"
-                        : template.config.layout === "modern"
-                          ? "Modern"
-                          : "Minimal"}{" "}
-                      · {template.config.font}
-                    </p>
+                      <Star
+                        size={16}
+                        fill={template.is_default ? "var(--accent)" : "none"}
+                        color={template.is_default ? "var(--accent)" : "var(--muted-foreground)"}
+                        style={{
+                          transition: "color 200ms ease, fill 200ms ease",
+                        }}
+                      />
+                    </button>
+                    <div>
+                      <p
+                        style={{
+                          fontSize: "13px",
+                          fontWeight: 600,
+                          color: "var(--foreground)",
+                        }}
+                      >
+                        {template.name}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: "11px",
+                          color: "var(--muted-foreground)",
+                          marginTop: "2px",
+                        }}
+                      >
+                        {template.config.layout === "classic"
+                          ? "Klassisch"
+                          : template.config.layout === "modern"
+                            ? "Modern"
+                            : "Minimal"}{" "}
+                        · {template.config.font}
+                      </p>
+                    </div>
                   </div>
 
                   <div style={{ display: "flex", gap: "4px" }}>
-                    {!template.is_default && (
-                      <button
-                        className="btn btn-ghost"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleSetDefault(template.id);
-                        }}
-                        disabled={actionLoading === template.id}
-                        title="Als Standard setzen"
-                        style={{ padding: "6px" }}
-                      >
-                        <Star size={13} />
-                      </button>
-                    )}
                     <Link href={`/invoices/templates/${template.id}`}>
                       <button
                         className="btn btn-secondary"

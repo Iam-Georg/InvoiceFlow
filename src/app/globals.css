@@ -1694,24 +1694,6 @@ body {
    ACCESSIBILITY
 ═══════════════════════════════════════ */
 
-/* Skip-to-content link */
-.skip-to-content {
-  position: absolute;
-  left: -9999px;
-  top: 0;
-  z-index: 9999;
-  padding: 8px 16px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-}
-.skip-to-content:focus {
-  left: 8px;
-  top: 8px;
-}
-
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *,

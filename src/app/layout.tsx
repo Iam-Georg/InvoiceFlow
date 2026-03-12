@@ -109,12 +109,6 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.variable}>
-        <a
-          href="#main-content"
-          className="skip-to-content"
-        >
-          Zum Inhalt springen
-        </a>
         {children}
         <Toaster position="top-right" richColors />
         <CookieBanner />
