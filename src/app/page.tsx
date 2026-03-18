@@ -70,7 +70,7 @@ export default function Home() {
               </h1>
 
               <p className="anim-fade-in-up anim-delay-2" style={{ fontSize: "16px", color: "var(--text-2)", lineHeight: 1.7, marginBottom: "36px", maxWidth: "400px" }}>
-                Professionelle Rechnungen in unter 3 Minuten. Zahlungen verfolgen, Mahnungen automatisieren, PDF exportieren.
+                Professionelle Rechnungen in wenigen Minuten. Zahlungen verfolgen, Mahnungen automatisieren, PDF exportieren.
               </p>
 
               {/* CTAs */}
@@ -185,7 +185,7 @@ export default function Home() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)" }}>
               {[
                 { num: "01", title: "Kunden anlegen", text: "Name, E-Mail, Adresse – einmal hinterlegt, immer abrufbar. Vollständige Rechnungshistorie pro Kunde." },
-                { num: "02", title: "Rechnung erstellen", text: "Positionen, MwSt., Zahlungsziel – alles in einem Formular. In unter 3 Minuten versandbereit." },
+                { num: "02", title: "Rechnung erstellen", text: "Positionen, MwSt., Zahlungsziel – alles in einem Formular. Schnell versandbereit." },
                 { num: "03", title: "Senden &amp; tracken", text: "Per E-Mail senden, PDF exportieren, Zahlungseingang verfolgen und automatisch mahnen." },
               ].map(({ num, title, text }, i) => (
                 <div
@@ -208,13 +208,13 @@ export default function Home() {
         <div className="scroll-reveal" style={{ background: "#0B1628", padding: "80px 40px" }}>
           <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
             <p className="label-caps" style={{ color: "rgba(255,255,255,0.35)", marginBottom: "16px" }}>
-              Das kennen wir alle
+              Rechnungen schreiben kann einfacher sein
             </p>
             <h2 style={{
               fontSize: "42px", fontWeight: 700, letterSpacing: "-0.03em",
               color: "#fff", marginBottom: "40px", lineHeight: 1.1,
             }}>
-              Schluss mit Excel-Chaos.
+              Dein Rechnungsprozess, vereinfacht.
             </h2>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
@@ -230,11 +230,11 @@ export default function Home() {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   {[
-                    "Word-Dokument als Rechnungsvorlage",
-                    "Mahnungen vergessen – Geld weg",
-                    "Keine Ahnung, wer noch schuldet",
-                    "Stundenlange Vorbereitung fürs Steuerbüro",
-                    "Jede Rechnung kostet 20 Minuten",
+                    "Rechnungen ohne Umwege erstellen",
+                    "Erinnerungen an ausstehende Zahlungen",
+                    "Offene Posten leicht im Blick behalten",
+                    "Daten fürs Steuerbüro schnell bereit",
+                    "Weniger Zeit für Papierkram",
                   ].map((item) => (
                     <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
                       <div style={{ width: "5px", height: "5px", background: "var(--danger)", flexShrink: 0, marginTop: "5px" }} />
@@ -256,7 +256,7 @@ export default function Home() {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   {[
-                    "Rechnung in 3 Minuten, professionell",
+                    "Rechnung schnell erstellt, professionell",
                     "Automatische Erinnerungen per E-Mail",
                     "Dashboard mit allen offenen Posten",
                     "CSV-Export für den Steuerberater",
@@ -273,57 +273,28 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── SECTION B: Testimonials ───────────────────────────── */}
+        {/* ── SECTION B: Ehrliche Feedback-Box ─────────────────── */}
         <div className="scroll-reveal" style={{ background: "var(--bg)" }}>
-          <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "72px 40px" }}>
-            <p className="label-caps" style={{ marginBottom: "40px" }}>Was andere sagen</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
-              {[
-                {
-                  quote: "Ich hab Faktura ausprobiert und meine Rechnungs-Excel-Tabelle sofort gelöscht. Keine Sekunde bereut.",
-                  initials: "MK",
-                  person: "M.K. · Webdesignerin, Berlin",
-                },
-                {
-                  quote: "Endlich sehe ich auf einen Blick, wer noch nicht bezahlt hat. Das Dashboard ist Gold wert.",
-                  initials: "TB",
-                  person: "T.B. · Fotograf, München",
-                },
-                {
-                  quote: "Dass man einfach kostenlos starten kann ohne Kreditkarte hat mich überzeugt. Genau so soll Software sein.",
-                  initials: "SR",
-                  person: "S.R. · Texterin, Hamburg",
-                },
-              ].map(({ quote, initials, person }, i) => (
-                <div
-                  key={person}
-                  className={`card-hover anim-fade-in-up anim-delay-${i + 1}`}
-                  style={{
-                    background: "var(--surface)",
-                    boxShadow: "var(--shadow-md)",
-                    padding: "28px 24px",
-                  }}
-                >
-                  <p style={{ fontSize: "32px", color: "var(--accent-soft)", lineHeight: 1, marginBottom: "8px" }}>
-                    &#8222;
-                  </p>
-                  <p style={{ fontSize: "14px", color: "var(--text-1)", lineHeight: 1.7, marginBottom: "20px" }}>
-                    {quote}
-                  </p>
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <div style={{
-                      width: "28px", height: "28px",
-                      background: "var(--accent)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      flexShrink: 0,
-                    }}>
-                      <span style={{ fontSize: "11px", fontWeight: 700, color: "#fff" }}>{initials}</span>
-                    </div>
-                    <span style={{ fontSize: "12px", color: "var(--text-3)", fontWeight: 500 }}>{person}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div style={{ maxWidth: "700px", margin: "0 auto", padding: "72px 40px", textAlign: "center" }}>
+            <p className="label-caps" style={{ marginBottom: "16px" }}>Wir sind neu</p>
+            <h2 style={{
+              fontSize: "28px", fontWeight: 700, letterSpacing: "-0.03em",
+              color: "var(--text-1)", marginBottom: "12px", lineHeight: 1.2,
+            }}>
+              Faktura ist ein junges Produkt.
+            </h2>
+            <p style={{
+              fontSize: "15px", color: "var(--text-2)", lineHeight: 1.7,
+              marginBottom: "28px", maxWidth: "480px", margin: "0 auto 28px",
+            }}>
+              Wir arbeiten jeden Tag daran, es besser zu machen.
+              Wenn du Feedback hast, freuen wir uns darüber.
+            </p>
+            <Link href="/register" style={{ textDecoration: "none" }}>
+              <button className="btn btn-primary" style={{ height: "44px", padding: "0 28px", fontSize: "14px" }}>
+                Kostenlos ausprobieren
+              </button>
+            </Link>
           </div>
         </div>
 
@@ -334,7 +305,7 @@ export default function Home() {
               fontSize: "40px", fontWeight: 700, letterSpacing: "-0.03em",
               color: "#fff", marginBottom: "12px",
             }}>
-              Deine erste Rechnung. In 3 Minuten.
+              Deine erste Rechnung. Schnell erstellt.
             </h2>
             <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.75)", marginBottom: "36px" }}>
               Kostenlos starten – kein Abo, kein Risiko, keine Kreditkarte.

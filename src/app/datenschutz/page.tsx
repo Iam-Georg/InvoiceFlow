@@ -155,6 +155,13 @@ export default function DatenschutzPage() {
           padding: "120px 40px 80px",
         }}
       >
+        <div style={{
+          maxWidth: "800px", margin: "24px auto 0", padding: "16px 24px",
+          background: "#FFF3CD", border: "1px solid #FFE69C",
+          fontSize: "13px", color: "#664D03", lineHeight: 1.6,
+        }}>
+          Diese Seite befindet sich im Aufbau. Die angezeigten Firmendaten sind Platzhalter und werden vor dem offiziellen Launch durch echte Angaben ersetzt.
+        </div>
         <p className="label-caps" style={{ marginBottom: "12px" }}>
           Rechtliches
         </p>

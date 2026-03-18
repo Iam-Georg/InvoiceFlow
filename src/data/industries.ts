@@ -23,7 +23,7 @@ export const INDUSTRIES: Industry[] = [
     category: "kreative",
     benefit: "Nutzungsrechte & Shootings in einer Rechnung",
     icon: "Camera",
-    heroTitle: "Rechnungen für Fotografen — in 60 Sekunden",
+    heroTitle: "Rechnungen für Fotografen — schnell und einfach",
     heroSubtitle:
       "Du fotografierst Hochzeiten, Events und Produkte. Faktura kümmert sich um deine Rechnungen, damit du dich aufs Bild konzentrieren kannst.",
     painPoints: [
@@ -40,9 +40,9 @@ export const INDUSTRIES: Industry[] = [
       "DATEV-Export für deinen Steuerberater am Jahresende",
     ],
     testimonialQuote:
-      "Früher habe ich Rechnungen zwischen zwei Shootings geschrieben — jetzt brauche ich 60 Sekunden mit Faktura.",
+      "Früher habe ich Rechnungen zwischen zwei Shootings geschrieben — jetzt brauche ich wenigen Minuten mit Faktura.",
     metaDescription:
-      "Rechnungsprogramm für Fotografen — Rechnungen in 60 Sekunden erstellen, automatische Zahlungserinnerungen und smarter Zahlungsdruck-Score. Kostenlos starten.",
+      "Rechnungsprogramm für Fotografen — Rechnungen in wenigen Minuten erstellen, automatische Zahlungserinnerungen und smarter Zahlungsdruck-Score. Kostenlos starten.",
     keywords: [
       "rechnungsprogramm fotografen",
       "rechnung fotograf vorlage",
@@ -58,7 +58,7 @@ export const INDUSTRIES: Industry[] = [
     category: "kreative",
     benefit: "Abschlagszahlungen für jede Projektphase",
     icon: "Globe",
-    heroTitle: "Rechnungen für Webdesigner — in 60 Sekunden",
+    heroTitle: "Rechnungen für Webdesigner — schnell und einfach",
     heroSubtitle:
       "Du baust Websites und Shops. Faktura baut deine Rechnungen — mit Abschlagszahlungen, Stundensätzen und allem, was Webprojekte brauchen.",
     painPoints: [
@@ -93,7 +93,7 @@ export const INDUSTRIES: Industry[] = [
     category: "tech",
     benefit: "Tagessätze + DATEV-Export für Konzern-Kunden",
     icon: "Monitor",
-    heroTitle: "Rechnungen für IT-Berater — in 60 Sekunden",
+    heroTitle: "Rechnungen für IT-Berater — schnell und einfach",
     heroSubtitle:
       "Dein Tagessatz steht, dein Projekt läuft. Faktura rechnet deine Stunden ab — GoBD-konform und mit einem Klick beim Steuerberater.",
     painPoints: [
@@ -128,7 +128,7 @@ export const INDUSTRIES: Industry[] = [
     category: "kreative",
     benefit: "Blitz-Rechnungen für viele kleine Aufträge",
     icon: "PenTool",
-    heroTitle: "Rechnungen für Texter — in 60 Sekunden",
+    heroTitle: "Rechnungen für Texter — schnell und einfach",
     heroSubtitle:
       "Du schreibst Texte, die verkaufen. Faktura schreibt Rechnungen, die schnell bezahlt werden — inklusive Wort-Preise und Pauschalbeträge.",
     painPoints: [
@@ -163,7 +163,7 @@ export const INDUSTRIES: Industry[] = [
     category: "kreative",
     benefit: "Entwurf, Reinzeichnung & Nutzungsrechte abrechnen",
     icon: "Palette",
-    heroTitle: "Rechnungen für Grafikdesigner — in 60 Sekunden",
+    heroTitle: "Rechnungen für Grafikdesigner — schnell und einfach",
     heroSubtitle:
       "Du gestaltest Logos, Flyer und Brandings. Faktura gestaltet deine Rechnungen — mit dem gleichen Anspruch an Professionalität.",
     painPoints: [
@@ -198,7 +198,7 @@ export const INDUSTRIES: Industry[] = [
     category: "handwerk",
     benefit: "HOAI-Phasen und Abschlagsrechnungen meistern",
     icon: "Building2",
-    heroTitle: "Rechnungen für Architekten — in 60 Sekunden",
+    heroTitle: "Rechnungen für Architekten — schnell und einfach",
     heroSubtitle:
       "HOAI-Phasen, Abschlagszahlungen und lange Projektlaufzeiten. Faktura bildet deine komplexe Abrechnungsstruktur einfach ab.",
     painPoints: [
@@ -233,7 +233,7 @@ export const INDUSTRIES: Industry[] = [
     category: "beratung",
     benefit: "Coaching-Pakete und Sessions automatisch abrechnen",
     icon: "Heart",
-    heroTitle: "Rechnungen für Coaches — in 60 Sekunden",
+    heroTitle: "Rechnungen für Coaches — schnell und einfach",
     heroSubtitle:
       "Du coachst Menschen zu besseren Ergebnissen. Faktura bringt deine Finanzen zu besseren Ergebnissen — mit automatischen Rechnungen nach jeder Session.",
     painPoints: [
@@ -268,7 +268,7 @@ export const INDUSTRIES: Industry[] = [
     category: "beratung",
     benefit: "Wortpreise, Zeilenpreise und Agentur-Mahnungen",
     icon: "Languages",
-    heroTitle: "Rechnungen für Übersetzer — in 60 Sekunden",
+    heroTitle: "Rechnungen für Übersetzer — schnell und einfach",
     heroSubtitle:
       "Du übersetzt Texte und dolmetschst auf Konferenzen. Faktura übersetzt deinen Aufwand in professionelle Rechnungen.",
     painPoints: [
@@ -303,7 +303,7 @@ export const INDUSTRIES: Industry[] = [
     category: "kreative",
     benefit: "Gagen und Technikpauschalen nach jedem Gig",
     icon: "Music",
-    heroTitle: "Rechnungen für Musiker — in 60 Sekunden",
+    heroTitle: "Rechnungen für Musiker — schnell und einfach",
     heroSubtitle:
       "Du machst Musik, spielst Gigs und produzierst Beats. Faktura sorgt dafür, dass du dafür auch bezahlt wirst.",
     painPoints: [
@@ -320,7 +320,7 @@ export const INDUSTRIES: Industry[] = [
       "Statistiken über dein Musik-Einkommen nach Monaten",
     ],
     testimonialQuote:
-      "Endlich ein Tool, das so schnell ist wie mein Set — Rechnung in 60 Sekunden nach dem Gig.",
+      "Endlich ein Tool, das so schnell ist wie mein Set — Rechnung in wenigen Minuten nach dem Gig.",
     metaDescription:
       "Rechnungsprogramm für Musiker und DJs — Gagen abrechnen, automatische Mahnungen an Veranstalter. Kostenlos starten.",
     keywords: [
@@ -338,7 +338,7 @@ export const INDUSTRIES: Industry[] = [
     category: "kreative",
     benefit: "Pre- bis Post-Production in einer Rechnung",
     icon: "Video",
-    heroTitle: "Rechnungen für Videografen — in 60 Sekunden",
+    heroTitle: "Rechnungen für Videografen — schnell und einfach",
     heroSubtitle:
       "Du produzierst Videos, Imagefilme und Social-Media-Content. Faktura produziert deine Rechnungen — mit einem Bruchteil des Aufwands.",
     painPoints: [
@@ -373,7 +373,7 @@ export const INDUSTRIES: Industry[] = [
     category: "tech",
     benefit: "Sprint-Abrechnungen und Retainer automatisiert",
     icon: "Code",
-    heroTitle: "Rechnungen für Entwickler — in 60 Sekunden",
+    heroTitle: "Rechnungen für Entwickler — schnell und einfach",
     heroSubtitle:
       "Du schreibst Code, der Probleme löst. Faktura schreibt Rechnungen, die schnell bezahlt werden — mit Stundensätzen und Sprint-Abrechnungen.",
     painPoints: [
@@ -408,7 +408,7 @@ export const INDUSTRIES: Industry[] = [
     category: "beratung",
     benefit: "Tagessätze und Reisekosten für Konzern-Kunden",
     icon: "Briefcase",
-    heroTitle: "Rechnungen für Berater — in 60 Sekunden",
+    heroTitle: "Rechnungen für Berater — schnell und einfach",
     heroSubtitle:
       "Du berätst Unternehmen zu Strategie und Prozessen. Faktura optimiert deinen eigenen Prozess — die Rechnungsstellung.",
     painPoints: [
@@ -443,7 +443,7 @@ export const INDUSTRIES: Industry[] = [
     category: "handwerk",
     benefit: "Material und Arbeitsstunden getrennt ausweisen",
     icon: "Wrench",
-    heroTitle: "Rechnungen für Handwerker — in 60 Sekunden",
+    heroTitle: "Rechnungen für Handwerker — schnell und einfach",
     heroSubtitle:
       "Du bist auf der Baustelle, nicht im Büro. Faktura erstellt deine Rechnungen schnell und einfach — auch vom Smartphone.",
     painPoints: [
@@ -460,7 +460,7 @@ export const INDUSTRIES: Industry[] = [
       "Statistiken über dein Einkommen nach Auftragstyp",
     ],
     testimonialQuote:
-      "Ich schreibe meine Rechnungen jetzt auf der Rückfahrt von der Baustelle — in unter 2 Minuten.",
+      "Ich schreibe meine Rechnungen jetzt auf der Rückfahrt von der Baustelle — schnell und einfach.",
     metaDescription:
       "Rechnungsprogramm für Handwerker — Material und Arbeit abrechnen, automatische Mahnungen. Einfach und schnell. Kostenlos.",
     keywords: [
@@ -478,7 +478,7 @@ export const INDUSTRIES: Industry[] = [
     category: "beratung",
     benefit: "Honorare an mehrere Institutionen gleichzeitig",
     icon: "GraduationCap",
-    heroTitle: "Rechnungen für Dozenten — in 60 Sekunden",
+    heroTitle: "Rechnungen für Dozenten — schnell und einfach",
     heroSubtitle:
       "Du unterrichtest an Hochschulen, Akademien oder in Unternehmen. Faktura rechnet deine Honorare sauber und schnell ab.",
     painPoints: [
@@ -513,7 +513,7 @@ export const INDUSTRIES: Industry[] = [
     category: "beratung",
     benefit: "Retainer-Rechnungen automatisch jeden Monat",
     icon: "Headphones",
-    heroTitle: "Rechnungen für Virtuelle Assistenten — in 60 Sekunden",
+    heroTitle: "Rechnungen für Virtuelle Assistenten — schnell und einfach",
     heroSubtitle:
       "Du managst Kalender, E-Mails und Projekte für andere. Faktura managed deine Rechnungen — automatisch und professionell.",
     painPoints: [

@@ -112,40 +112,32 @@ export default function IndustriesOverviewPage() {
           );
         })}
 
-        {/* Social Proof */}
+        {/* Ehrliche Feedback-Box */}
         <section style={{
           padding: "48px 24px",
           borderTop: "1px solid var(--border)",
           borderBottom: "1px solid var(--border)",
           background: "var(--surface)",
         }}>
-          <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-              gap: "24px",
+          <div style={{ maxWidth: "600px", margin: "0 auto", textAlign: "center" }}>
+            <p style={{
+              fontSize: "10px", fontWeight: 800, letterSpacing: "0.08em",
+              textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px",
             }}>
-              {[
-                { quote: "Seit ich Faktura nutze, spare ich 5 Stunden pro Woche an Verwaltungsarbeit.", name: "Lisa M.", role: "Fotografin" },
-                { quote: "Meine Konzern-Kunden nehmen Faktura-Rechnungen ernst — das Layout macht den Unterschied.", name: "Thomas K.", role: "IT-Berater" },
-                { quote: "12 Kunden, 12 monatliche Rechnungen — Faktura erstellt alle automatisch am 1. des Monats.", name: "Sarah B.", role: "Virtuelle Assistentin" },
-              ].map((t) => (
-                <div key={t.name} style={{ padding: "20px 0" }}>
-                  <p style={{
-                    fontSize: "14px", color: "var(--text-2)", lineHeight: 1.7,
-                    fontStyle: "italic", marginBottom: "12px",
-                  }}>
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                  <p style={{ fontSize: "13px", fontWeight: 700, color: "var(--text-1)" }}>
-                    {t.name}
-                  </p>
-                  <p style={{ fontSize: "12px", color: "var(--text-3)" }}>
-                    {t.role}
-                  </p>
-                </div>
-              ))}
-            </div>
+              Wir sind neu
+            </p>
+            <h3 style={{
+              fontSize: "22px", fontWeight: 700, letterSpacing: "-0.02em",
+              color: "var(--text-1)", marginBottom: "10px",
+            }}>
+              Faktura ist ein junges Produkt.
+            </h3>
+            <p style={{
+              fontSize: "14px", color: "var(--text-2)", lineHeight: 1.7,
+            }}>
+              Wir arbeiten jeden Tag daran, es besser zu machen.
+              Wenn du Feedback hast, freuen wir uns darüber.
+            </p>
           </div>
         </section>
 

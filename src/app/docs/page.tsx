@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 type Plan = "free" | "starter" | "professional" | "business";
 
 const PLAN_CFG: Record<Plan, { label: string; bg: string; color: string; border: string }> = {
-  free:         { label: "Kostenlos",    bg: "#F0F0F5",              color: "#5C5C6E", border: "transparent" },
-  starter:      { label: "Starter",      bg: "rgba(0,64,204,0.08)",  color: "#0040CC", border: "rgba(0,64,204,0.15)" },
-  professional: { label: "Professional", bg: "rgba(96,64,204,0.08)", color: "#6040CC", border: "rgba(96,64,204,0.15)" },
-  business:     { label: "Business",     bg: "#0C0C14",              color: "#FFFFFF", border: "transparent" },
+  free:         { label: "Kostenlos",    bg: "var(--badge-draft-bg)", color: "var(--text-2)",  border: "transparent" },
+  starter:      { label: "Starter",      bg: "var(--accent-soft)",    color: "var(--accent)",  border: "var(--accent-soft)" },
+  professional: { label: "Professional", bg: "rgba(96,64,204,0.08)", color: "#6040CC",        border: "rgba(96,64,204,0.15)" },
+  business:     { label: "Business",     bg: "var(--text-1)",         color: "var(--surface)", border: "transparent" },
 };
 
 function Badge({ plan }: { plan: Plan }) {
@@ -37,12 +37,11 @@ function Badge({ plan }: { plan: Plan }) {
 function MockShell({ children, width = "100%" }: { children: React.ReactNode; width?: string }) {
   return (
     <div style={{
-      background: "#ffffff", border: "1px solid rgba(0,0,0,0.08)",
-      boxShadow: "0 2px 8px rgba(0,0,0,0.07), 0 12px 28px rgba(0,0,0,0.05)",
+      background: "var(--surface)", border: "1px solid var(--border)",
+      boxShadow: "var(--shadow-md)",
       width, overflow: "hidden",
     }}>
-      {/* Window chrome */}
-      <div style={{ padding: "7px 12px", background: "#f7f7fa", borderBottom: "1px solid rgba(0,0,0,0.07)", display: "flex", alignItems: "center", gap: "5px" }}>
+      <div style={{ padding: "7px 12px", background: "var(--surface-2)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "5px" }}>
         {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => (
           <div key={c} style={{ width: 8, height: 8, background: c, borderRadius: "50%" }} />
         ))}
@@ -55,25 +54,25 @@ function MockShell({ children, width = "100%" }: { children: React.ReactNode; wi
 /* ── Individual Mockups ──────────────────────────────────────── */
 function MockInvoiceList() {
   const rows = [
-    { nr: "RE-2025-001", cust: "Müller GmbH",  status: "offen",    bg: "rgba(204,112,0,0.08)", tc: "#CC7000",   amt: "1.904,00 €" },
-    { nr: "RE-2025-002", cust: "Meyer & Co.",  status: "bezahlt",  bg: "rgba(0,160,96,0.08)",  tc: "#00A060",   amt: "3.570,00 €" },
-    { nr: "RE-2025-003", cust: "Schulz AG",    status: "entwurf",  bg: "#F0F0F5",              tc: "#5C5C6E",   amt: "714,00 €"   },
-    { nr: "RE-2025-004", cust: "Weber IT",     status: "überfällig",bg: "rgba(204,32,32,0.08)",tc: "#CC2020",  amt: "2.261,00 €" },
+    { nr: "RE-2025-001", cust: "Müller GmbH",  status: "offen",    bg: "var(--warning-bg)", tc: "var(--warning)",   amt: "1.904,00 €" },
+    { nr: "RE-2025-002", cust: "Meyer & Co.",  status: "bezahlt",  bg: "var(--success-bg)", tc: "var(--success)",   amt: "3.570,00 €" },
+    { nr: "RE-2025-003", cust: "Schulz AG",    status: "entwurf",  bg: "var(--badge-draft-bg)", tc: "var(--text-2)",   amt: "714,00 €"   },
+    { nr: "RE-2025-004", cust: "Weber IT",     status: "überfällig",bg: "var(--danger-bg)", tc: "var(--danger)",  amt: "2.261,00 €" },
   ];
   return (
     <MockShell>
-      <div style={{ padding: "10px 14px 6px", borderBottom: "1px solid rgba(0,0,0,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontSize: "11px", fontWeight: 700, color: "#0c0c14" }}>Rechnungen</span>
-        <span style={{ fontSize: "9px", fontWeight: 700, color: "#fff", background: "#0040CC", padding: "2px 8px" }}>+ Neu</span>
+      <div style={{ padding: "10px 14px 6px", borderBottom: "1px solid var(--divider)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-1)" }}>Rechnungen</span>
+        <span style={{ fontSize: "9px", fontWeight: 700, color: "#fff", background: "var(--accent)", padding: "2px 8px" }}>+ Neu</span>
       </div>
       {rows.map((r) => (
-        <div key={r.nr} style={{ display: "flex", alignItems: "center", padding: "7px 14px", borderBottom: "1px solid rgba(0,0,0,0.04)", gap: "8px" }}>
+        <div key={r.nr} style={{ display: "flex", alignItems: "center", padding: "7px 14px", borderBottom: "1px solid var(--divider)", gap: "8px" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: "10px", fontWeight: 700, color: "#0c0c14", lineHeight: 1.3 }}>{r.nr}</p>
-            <p style={{ fontSize: "9px", color: "#9898AA", lineHeight: 1.3 }}>{r.cust}</p>
+            <p style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-1)", lineHeight: 1.3 }}>{r.nr}</p>
+            <p style={{ fontSize: "9px", color: "var(--text-3)", lineHeight: 1.3 }}>{r.cust}</p>
           </div>
           <span style={{ fontSize: "8px", fontWeight: 700, padding: "1px 5px", background: r.bg, color: r.tc, textTransform: "uppercase", letterSpacing: "0.04em" }}>{r.status}</span>
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "#0c0c14", fontVariantNumeric: "tabular-nums" }}>{r.amt}</span>
+          <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-1)", fontVariantNumeric: "tabular-nums" }}>{r.amt}</span>
         </div>
       ))}
     </MockShell>
@@ -83,13 +82,13 @@ function MockInvoiceList() {
 function MockAI() {
   return (
     <MockShell>
-      <div style={{ padding: "10px 14px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
-        <p style={{ fontSize: "10px", fontWeight: 700, color: "#0c0c14", marginBottom: "6px" }}>KI-Rechnungserstellung</p>
-        <div style={{ border: "1px solid rgba(0,0,0,0.08)", padding: "6px 8px", background: "#f7f7fa", fontSize: "9px", color: "#5c5c6e" }}>
+      <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--divider)" }}>
+        <p style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-1)", marginBottom: "6px" }}>KI-Rechnungserstellung</p>
+        <div style={{ border: "1px solid var(--border)", padding: "6px 8px", background: "var(--surface-2)", fontSize: "9px", color: "var(--text-2)" }}>
           Website Redesign, 12h à 75€, plus 3h Beratung à 90€...
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "6px" }}>
-          <span style={{ fontSize: "9px", fontWeight: 700, color: "#fff", background: "#0040CC", padding: "2px 8px" }}>✦ Positionen erzeugen</span>
+          <span style={{ fontSize: "9px", fontWeight: 700, color: "#fff", background: "var(--accent)", padding: "2px 8px" }}>✦ Positionen erzeugen</span>
         </div>
       </div>
       <div style={{ padding: "8px 14px" }}>
@@ -97,14 +96,14 @@ function MockAI() {
           { desc: "Website Redesign", qty: "12h", price: "75,00 €", total: "900,00 €" },
           { desc: "Beratung & Konzept", qty: "3h",  price: "90,00 €", total: "270,00 €" },
         ].map((r, i) => (
-          <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 30px 52px 52px", gap: "6px", padding: "3px 0", borderBottom: i === 0 ? "1px solid rgba(0,0,0,0.05)" : "none", alignItems: "center" }}>
-            <span style={{ fontSize: "9px", color: "#0c0c14", fontWeight: 500 }}>{r.desc}</span>
-            <span style={{ fontSize: "9px", color: "#9898AA", textAlign: "right" }}>{r.qty}</span>
-            <span style={{ fontSize: "9px", color: "#9898AA", textAlign: "right" }}>{r.price}</span>
-            <span style={{ fontSize: "9px", fontWeight: 700, color: "#0c0c14", textAlign: "right" }}>{r.total}</span>
+          <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 30px 52px 52px", gap: "6px", padding: "3px 0", borderBottom: i === 0 ? "1px solid var(--divider)" : "none", alignItems: "center" }}>
+            <span style={{ fontSize: "9px", color: "var(--text-1)", fontWeight: 500 }}>{r.desc}</span>
+            <span style={{ fontSize: "9px", color: "var(--text-3)", textAlign: "right" }}>{r.qty}</span>
+            <span style={{ fontSize: "9px", color: "var(--text-3)", textAlign: "right" }}>{r.price}</span>
+            <span style={{ fontSize: "9px", fontWeight: 700, color: "var(--text-1)", textAlign: "right" }}>{r.total}</span>
           </div>
         ))}
-        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "6px", padding: "4px 6px", background: "#0040CC" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "6px", padding: "4px 6px", background: "var(--accent)" }}>
           <span style={{ fontSize: "10px", fontWeight: 700, color: "#fff" }}>Gesamt: 1.404,00 €</span>
         </div>
       </div>
@@ -115,27 +114,27 @@ function MockAI() {
 function MockPDF() {
   return (
     <MockShell width="200px">
-      <div style={{ padding: "12px 14px", background: "#fafafa" }}>
+      <div style={{ padding: "12px 14px", background: "var(--surface-2)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px" }}>
           <div>
-            <p style={{ fontSize: "11px", fontWeight: 800, color: "#0040CC", letterSpacing: "-0.01em" }}>FAKTURA</p>
-            <p style={{ fontSize: "8px", color: "#9898AA" }}>Jan Müller · Freelancer</p>
+            <p style={{ fontSize: "11px", fontWeight: 800, color: "var(--accent)", letterSpacing: "-0.01em" }}>FAKTURA</p>
+            <p style={{ fontSize: "8px", color: "var(--text-3)" }}>Jan Müller · Freelancer</p>
           </div>
-          <p style={{ fontSize: "9px", fontWeight: 700, color: "#0c0c14" }}>RECHNUNG</p>
+          <p style={{ fontSize: "9px", fontWeight: 700, color: "var(--text-1)" }}>RECHNUNG</p>
         </div>
-        <div style={{ fontSize: "8px", color: "#5c5c6e", marginBottom: "8px", lineHeight: 1.5 }}>
-          <p style={{ fontWeight: 600, color: "#0c0c14" }}>An: Muster GmbH</p>
+        <div style={{ fontSize: "8px", color: "var(--text-2)", marginBottom: "8px", lineHeight: 1.5 }}>
+          <p style={{ fontWeight: 600, color: "var(--text-1)" }}>An: Muster GmbH</p>
           <p>RE-2025-0042</p>
           <p>Fällig: 14.03.2025</p>
         </div>
-        <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: "6px", display: "flex", flexDirection: "column", gap: "3px" }}>
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: "6px", display: "flex", flexDirection: "column", gap: "3px" }}>
           {["Website Redesign", "Beratung"].map((t, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: "8px" }}>
-              <span style={{ color: "#5c5c6e" }}>{t}</span>
-              <span style={{ fontWeight: 600, color: "#0c0c14" }}>{i === 0 ? "900,00 €" : "270,00 €"}</span>
+              <span style={{ color: "var(--text-2)" }}>{t}</span>
+              <span style={{ fontWeight: 600, color: "var(--text-1)" }}>{i === 0 ? "900,00 €" : "270,00 €"}</span>
             </div>
           ))}
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 5px", background: "#0040CC", marginTop: "4px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 5px", background: "var(--accent)", marginTop: "4px" }}>
             <span style={{ fontSize: "8px", fontWeight: 700, color: "#fff" }}>Gesamt inkl. MwSt.</span>
             <span style={{ fontSize: "8px", fontWeight: 700, color: "#fff" }}>1.670,76 €</span>
           </div>
@@ -151,26 +150,26 @@ function MockHealthScore() {
       <div style={{ padding: "12px 14px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "10px" }}>
           <div>
-            <p style={{ fontSize: "9px", fontWeight: 700, color: "#9898AA", textTransform: "uppercase", letterSpacing: "0.06em" }}>Unternehmens-Gesundheit</p>
-            <p style={{ fontSize: "9px", color: "#9898AA", marginTop: "2px" }}>Einzugsquote · Zahlungsdauer · Überfälligkeit</p>
+            <p style={{ fontSize: "9px", fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Unternehmens-Gesundheit</p>
+            <p style={{ fontSize: "9px", color: "var(--text-3)", marginTop: "2px" }}>Einzugsquote · Zahlungsdauer · Überfälligkeit</p>
           </div>
-          <span style={{ fontSize: "8px", fontWeight: 800, padding: "2px 7px", background: "rgba(0,160,96,0.1)", color: "#00A060", textTransform: "uppercase" }}>Gut</span>
+          <span style={{ fontSize: "8px", fontWeight: 800, padding: "2px 7px", background: "var(--success-bg)", color: "var(--success)", textTransform: "uppercase" }}>Gut</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-          <div style={{ flex: 1, height: "5px", background: "#f0f0f5", overflow: "hidden" }}>
-            <div style={{ width: "82%", height: "100%", background: "#00A060" }} />
+          <div style={{ flex: 1, height: "5px", background: "var(--badge-draft-bg)", overflow: "hidden" }}>
+            <div style={{ width: "82%", height: "100%", background: "var(--success)" }} />
           </div>
-          <span style={{ fontSize: "18px", fontWeight: 800, color: "#00A060", letterSpacing: "-0.02em", minWidth: "36px" }}>82</span>
+          <span style={{ fontSize: "18px", fontWeight: 800, color: "var(--success)", letterSpacing: "-0.02em", minWidth: "36px" }}>82</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", borderTop: "1px solid rgba(0,0,0,0.05)", paddingTop: "8px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", borderTop: "1px solid var(--divider)", paddingTop: "8px" }}>
           {[
             { label: "Einzugsquote", val: "89%" },
             { label: "Ø Zahlung",    val: "11 Tage" },
             { label: "Überfällig",   val: "0" },
           ].map(({ label, val }) => (
             <div key={label}>
-              <p style={{ fontSize: "8px", color: "#9898AA", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>{label}</p>
-              <p style={{ fontSize: "13px", fontWeight: 800, color: "#0c0c14" }}>{val}</p>
+              <p style={{ fontSize: "8px", color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>{label}</p>
+              <p style={{ fontSize: "13px", fontWeight: 800, color: "var(--text-1)" }}>{val}</p>
             </div>
           ))}
         </div>
@@ -182,18 +181,18 @@ function MockHealthScore() {
 function MockPressure() {
   return (
     <MockShell>
-      <div style={{ padding: "10px 14px 6px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
-        <span style={{ fontSize: "9px", fontWeight: 700, color: "#9898AA", textTransform: "uppercase", letterSpacing: "0.05em" }}>Rechnungen</span>
+      <div style={{ padding: "10px 14px 6px", borderBottom: "1px solid var(--divider)" }}>
+        <span style={{ fontSize: "9px", fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Rechnungen</span>
       </div>
       {[
-        { nr: "RE-2025-001", cust: "Müller GmbH",  days: "12 Tage überfällig",  score: 76, scoreColor: "#CC2020", scoreBg: "rgba(204,32,32,0.08)",   label: "Hoch" },
-        { nr: "RE-2025-002", cust: "Meyer AG",     days: "3 Tage offen",         score: 31, scoreColor: "#CC7000", scoreBg: "rgba(204,112,0,0.08)",  label: "Mittel" },
-        { nr: "RE-2025-003", cust: "Schulz & Co.", days: "heute fällig",         score: 12, scoreColor: "#00A060", scoreBg: "rgba(0,160,96,0.08)",   label: "Niedrig" },
+        { nr: "RE-2025-001", cust: "Müller GmbH",  days: "12 Tage überfällig",  score: 76, scoreColor: "var(--danger)", scoreBg: "var(--danger-bg)",   label: "Hoch" },
+        { nr: "RE-2025-002", cust: "Meyer AG",     days: "3 Tage offen",         score: 31, scoreColor: "var(--warning)", scoreBg: "var(--warning-bg)",  label: "Mittel" },
+        { nr: "RE-2025-003", cust: "Schulz & Co.", days: "heute fällig",         score: 12, scoreColor: "var(--success)", scoreBg: "var(--success-bg)",   label: "Niedrig" },
       ].map((r) => (
-        <div key={r.nr} style={{ padding: "8px 14px", borderBottom: "1px solid rgba(0,0,0,0.04)", display: "flex", alignItems: "center", gap: "8px" }}>
+        <div key={r.nr} style={{ padding: "8px 14px", borderBottom: "1px solid var(--divider)", display: "flex", alignItems: "center", gap: "8px" }}>
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: "10px", fontWeight: 700, color: "#0c0c14" }}>{r.nr} · {r.cust}</p>
-            <p style={{ fontSize: "9px", color: "#9898AA" }}>{r.days}</p>
+            <p style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-1)" }}>{r.nr} · {r.cust}</p>
+            <p style={{ fontSize: "9px", color: "var(--text-3)" }}>{r.days}</p>
           </div>
           <div style={{ textAlign: "right" }}>
             <p style={{ fontSize: "13px", fontWeight: 800, color: r.scoreColor }}>{r.score}</p>
@@ -213,26 +212,26 @@ function MockStats() {
   ];
   return (
     <MockShell>
-      <div style={{ padding: "10px 14px 6px", borderBottom: "1px solid rgba(0,0,0,0.06)", display: "flex", gap: "10px" }}>
+      <div style={{ padding: "10px 14px 6px", borderBottom: "1px solid var(--divider)", display: "flex", gap: "10px" }}>
         {[
-          { label: "Umsatz 12M", val: "38.420 €", color: "#00A060" },
-          { label: "Überfällig",  val: "1.904 €",  color: "#CC2020" },
-          { label: "Ø Zahlung",   val: "11 Tage",  color: "#CC7000" },
+          { label: "Umsatz 12M", val: "38.420 €", color: "var(--success)" },
+          { label: "Überfällig",  val: "1.904 €",  color: "var(--danger)" },
+          { label: "Ø Zahlung",   val: "11 Tage",  color: "var(--warning)" },
         ].map(({ label, val, color }) => (
           <div key={label} style={{ flex: 1 }}>
-            <p style={{ fontSize: "8px", color: "#9898AA", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</p>
+            <p style={{ fontSize: "8px", color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</p>
             <p style={{ fontSize: "12px", fontWeight: 800, color, letterSpacing: "-0.02em" }}>{val}</p>
           </div>
         ))}
       </div>
       <div style={{ padding: "10px 14px" }}>
-        <p style={{ fontSize: "9px", fontWeight: 600, color: "#9898AA", marginBottom: "8px" }}>Umsatz pro Monat</p>
+        <p style={{ fontSize: "9px", fontWeight: 600, color: "var(--text-3)", marginBottom: "8px" }}>Umsatz pro Monat</p>
         <div style={{ display: "flex", alignItems: "flex-end", gap: "5px", height: "56px" }}>
           {bars.map((b) => (
             <div key={b.month} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", height: "100%", justifyContent: "flex-end" }}>
-              <span style={{ fontSize: "7px", color: "#9898AA" }}>{b.h === 100 ? b.val : ""}</span>
-              <div style={{ width: "100%", height: `${b.h * 0.42}px`, background: b.h === 100 ? "#0040CC" : "rgba(0,64,204,0.2)" }} />
-              <span style={{ fontSize: "7px", color: "#9898AA" }}>{b.month}</span>
+              <span style={{ fontSize: "7px", color: "var(--text-3)" }}>{b.h === 100 ? b.val : ""}</span>
+              <div style={{ width: "100%", height: `${b.h * 0.42}px`, background: b.h === 100 ? "var(--accent)" : "var(--accent-soft)" }} />
+              <span style={{ fontSize: "7px", color: "var(--text-3)" }}>{b.month}</span>
             </div>
           ))}
         </div>
@@ -245,27 +244,25 @@ function MockImport() {
   return (
     <MockShell>
       <div style={{ padding: "12px 14px" }}>
-        {/* Steps */}
         <div style={{ display: "flex", alignItems: "center", marginBottom: "14px" }}>
           {["Methode", "Daten", "Vorschau"].map((s, i) => (
             <div key={s} style={{ display: "flex", alignItems: "center", flex: i < 2 ? 1 : "none" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                 <div style={{
                   width: "16px", height: "16px",
-                  background: i === 0 ? "#0040CC" : i === 1 ? "#0040CC" : "#F0F0F5",
-                  color: i < 2 ? "#fff" : "#9898AA",
+                  background: i < 2 ? "var(--accent)" : "var(--badge-draft-bg)",
+                  color: i < 2 ? "#fff" : "var(--text-3)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: "8px", fontWeight: 800,
                 }}>
                   {i < 2 ? "✓" : "3"}
                 </div>
-                <span style={{ fontSize: "8px", color: i < 2 ? "#0040CC" : "#9898AA", fontWeight: i < 2 ? 700 : 400 }}>{s}</span>
+                <span style={{ fontSize: "8px", color: i < 2 ? "var(--accent)" : "var(--text-3)", fontWeight: i < 2 ? 700 : 400 }}>{s}</span>
               </div>
-              {i < 2 && <div style={{ flex: 1, height: "1px", background: i === 0 ? "#0040CC" : "#E0E0E8", margin: "0 6px" }} />}
+              {i < 2 && <div style={{ flex: 1, height: "1px", background: i === 0 ? "var(--accent)" : "var(--border)", margin: "0 6px" }} />}
             </div>
           ))}
         </div>
-        {/* Mode cards */}
         <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
           {[
             { icon: "⚡", label: "Schnell-Import",  desc: "Betrag & Datum" },
@@ -274,15 +271,15 @@ function MockImport() {
           ].map((m, i) => (
             <div key={m.label} style={{
               display: "flex", alignItems: "center", gap: "8px", padding: "6px 8px",
-              border: `2px solid ${i === 1 ? "#0040CC" : "rgba(0,0,0,0.07)"}`,
-              background: i === 1 ? "rgba(0,64,204,0.04)" : "#fff",
+              border: `2px solid ${i === 1 ? "var(--accent)" : "var(--border)"}`,
+              background: i === 1 ? "var(--accent-soft)" : "var(--surface)",
             }}>
               <span style={{ fontSize: "12px" }}>{m.icon}</span>
               <div style={{ flex: 1 }}>
-                <p style={{ fontSize: "9px", fontWeight: 700, color: "#0c0c14" }}>{m.label}</p>
-                <p style={{ fontSize: "8px", color: "#9898AA" }}>{m.desc}</p>
+                <p style={{ fontSize: "9px", fontWeight: 700, color: "var(--text-1)" }}>{m.label}</p>
+                <p style={{ fontSize: "8px", color: "var(--text-3)" }}>{m.desc}</p>
               </div>
-              {i === 1 && <div style={{ width: "12px", height: "12px", background: "#0040CC", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ fontSize: "8px", color: "#fff" }}>✓</span></div>}
+              {i === 1 && <div style={{ width: "12px", height: "12px", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ fontSize: "8px", color: "#fff" }}>✓</span></div>}
             </div>
           ))}
         </div>
@@ -294,16 +291,16 @@ function MockImport() {
 function MockReminders() {
   return (
     <MockShell>
-      <div style={{ padding: "10px 14px 6px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
-        <p style={{ fontSize: "9px", fontWeight: 700, color: "#9898AA", textTransform: "uppercase", letterSpacing: "0.05em" }}>Automatischer Mahnprozess</p>
+      <div style={{ padding: "10px 14px 6px", borderBottom: "1px solid var(--divider)" }}>
+        <p style={{ fontSize: "9px", fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Automatischer Mahnprozess</p>
       </div>
       <div style={{ padding: "10px 14px", display: "flex", flexDirection: "column", gap: "0" }}>
         {[
-          { day: "Tag 0",  label: "Rechnung gesendet",   color: "#0040CC", done: true },
-          { day: "Tag 14", label: "Fälligkeitsdatum",     color: "#CC7000", done: true },
-          { day: "Tag 21", label: "1. Erinnerung gesendet", color: "#CC7000", done: true },
-          { day: "Tag 35", label: "2. Mahnung",           color: "#CC2020", done: false },
-          { day: "Tag 50", label: "Letzte Mahnung",       color: "#CC2020", done: false },
+          { day: "Tag 0",  label: "Rechnung gesendet",   color: "var(--accent)", done: true },
+          { day: "Tag 14", label: "Fälligkeitsdatum",     color: "var(--warning)", done: true },
+          { day: "Tag 21", label: "1. Erinnerung gesendet", color: "var(--warning)", done: true },
+          { day: "Tag 35", label: "2. Mahnung",           color: "var(--danger)", done: false },
+          { day: "Tag 50", label: "Letzte Mahnung",       color: "var(--danger)", done: false },
         ].map((e, i) => (
           <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "8px", paddingBottom: "8px", position: "relative" }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
@@ -312,11 +309,11 @@ function MockReminders() {
                 background: e.done ? e.color : "transparent",
                 border: `2px solid ${e.color}`,
               }} />
-              {i < 4 && <div style={{ width: "1px", height: "18px", background: "rgba(0,0,0,0.08)" }} />}
+              {i < 4 && <div style={{ width: "1px", height: "18px", background: "var(--border)" }} />}
             </div>
             <div>
-              <p style={{ fontSize: "8px", color: "#9898AA" }}>{e.day}</p>
-              <p style={{ fontSize: "9px", fontWeight: e.done ? 600 : 400, color: e.done ? "#0c0c14" : "#9898AA" }}>{e.label}</p>
+              <p style={{ fontSize: "8px", color: "var(--text-3)" }}>{e.day}</p>
+              <p style={{ fontSize: "9px", fontWeight: e.done ? 600 : 400, color: e.done ? "var(--text-1)" : "var(--text-3)" }}>{e.label}</p>
             </div>
           </div>
         ))}
@@ -328,12 +325,12 @@ function MockReminders() {
 function MockShortcuts() {
   return (
     <MockShell width="220px">
-      <div style={{ padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+      <div style={{ padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid var(--divider)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <span style={{ fontSize: "9px" }}>⌨</span>
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "#0c0c14" }}>Tastenkürzel</span>
+          <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-1)" }}>Tastenkürzel</span>
         </div>
-        <span style={{ fontSize: "10px", color: "#9898AA", cursor: "pointer" }}>✕</span>
+        <span style={{ fontSize: "10px", color: "var(--text-3)", cursor: "pointer" }}>✕</span>
       </div>
       <div style={{ padding: "4px 0" }}>
         {[
@@ -344,8 +341,8 @@ function MockShortcuts() {
           { label: "Hilfe öffnen",  key: "?" },
         ].map(({ label, key }) => (
           <div key={key} style={{ padding: "5px 12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "9px", color: "#5c5c6e" }}>{label}</span>
-            <kbd style={{ background: "#F0F0F5", border: "1px solid rgba(0,0,0,0.1)", padding: "1px 6px", fontSize: "9px", fontWeight: 800, color: "#0c0c14", fontFamily: "monospace" }}>{key}</kbd>
+            <span style={{ fontSize: "9px", color: "var(--text-2)" }}>{label}</span>
+            <kbd style={{ background: "var(--badge-draft-bg)", border: "1px solid var(--border)", padding: "1px 6px", fontSize: "9px", fontWeight: 800, color: "var(--text-1)", fontFamily: "monospace" }}>{key}</kbd>
           </div>
         ))}
       </div>
@@ -356,16 +353,16 @@ function MockShortcuts() {
 function MockCustomer() {
   return (
     <MockShell>
-      <div style={{ padding: "10px 14px 8px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+      <div style={{ padding: "10px 14px 8px", borderBottom: "1px solid var(--divider)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px", marginBottom: "8px" }}>
           {[
-            { label: "Gesamt",   val: "12.480 €", color: "#0040CC" },
-            { label: "Bezahlt",  val: "9.240 €",  color: "#00A060" },
-            { label: "Offen",    val: "3.240 €",  color: "#CC7000" },
-            { label: "Ø Zahlung",val: "9 Tage",   color: "#5C5C6E" },
+            { label: "Gesamt",   val: "12.480 €", color: "var(--accent)" },
+            { label: "Bezahlt",  val: "9.240 €",  color: "var(--success)" },
+            { label: "Offen",    val: "3.240 €",  color: "var(--warning)" },
+            { label: "Ø Zahlung",val: "9 Tage",   color: "var(--text-2)" },
           ].map(({ label, val, color }) => (
-            <div key={label} style={{ background: "#f7f7fa", padding: "6px 8px" }}>
-              <p style={{ fontSize: "7px", color: "#9898AA", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "2px" }}>{label}</p>
+            <div key={label} style={{ background: "var(--surface-2)", padding: "6px 8px" }}>
+              <p style={{ fontSize: "7px", color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "2px" }}>{label}</p>
               <p style={{ fontSize: "11px", fontWeight: 800, color, letterSpacing: "-0.01em" }}>{val}</p>
             </div>
           ))}
@@ -378,16 +375,16 @@ function MockCustomer() {
             { label: "Land",    val: "Deutschland" },
           ].map(({ label, val }) => (
             <div key={label}>
-              <p style={{ fontSize: "7px", color: "#9898AA", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 600 }}>{label}</p>
-              <p style={{ fontSize: "9px", color: "#0c0c14", fontWeight: 500 }}>{val}</p>
+              <p style={{ fontSize: "7px", color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 600 }}>{label}</p>
+              <p style={{ fontSize: "9px", color: "var(--text-1)", fontWeight: 500 }}>{val}</p>
             </div>
           ))}
         </div>
       </div>
       <div style={{ padding: "6px 14px" }}>
-        <p style={{ fontSize: "8px", color: "#9898AA", fontWeight: 600, textTransform: "uppercase", marginBottom: "4px" }}>Rechnungshistorie</p>
+        <p style={{ fontSize: "8px", color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", marginBottom: "4px" }}>Rechnungshistorie</p>
         {["RE-2025-004 · 3.570 €  Bezahlt", "RE-2025-002 · 2.261 €  Offen"].map((r, i) => (
-          <div key={i} style={{ fontSize: "9px", color: "#5c5c6e", padding: "3px 0", borderBottom: "1px solid rgba(0,0,0,0.04)" }}>{r}</div>
+          <div key={i} style={{ fontSize: "9px", color: "var(--text-2)", padding: "3px 0", borderBottom: "1px solid var(--divider)" }}>{r}</div>
         ))}
       </div>
     </MockShell>
@@ -397,8 +394,8 @@ function MockCustomer() {
 function MockAccordion() {
   return (
     <MockShell>
-      <div style={{ padding: "10px 14px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
-        <p style={{ fontSize: "10px", fontWeight: 700, color: "#0c0c14", marginBottom: "8px" }}>Rechnungsdetails</p>
+      <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--divider)" }}>
+        <p style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-1)", marginBottom: "8px" }}>Rechnungsdetails</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
           {[
             { label: "Rechnungsnummer", val: "RE-2025-0042" },
@@ -407,31 +404,30 @@ function MockAccordion() {
             { label: "Fälligkeit",     val: "15.03.2025" },
           ].map(({ label, val }) => (
             <div key={label}>
-              <p style={{ fontSize: "7px", color: "#9898AA", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.04em", marginBottom: "1px" }}>{label}</p>
-              <div style={{ height: "20px", background: "#f7f7fa", border: "1px solid rgba(0,0,0,0.07)", display: "flex", alignItems: "center", padding: "0 6px" }}>
-                <span style={{ fontSize: "9px", color: "#0c0c14" }}>{val}</span>
+              <p style={{ fontSize: "7px", color: "var(--text-3)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.04em", marginBottom: "1px" }}>{label}</p>
+              <div style={{ height: "20px", background: "var(--surface-2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 6px" }}>
+                <span style={{ fontSize: "9px", color: "var(--text-1)" }}>{val}</span>
               </div>
             </div>
           ))}
         </div>
       </div>
-      {/* Accordion trigger */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 14px", background: "#f7f7fa", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
-        <span style={{ fontSize: "9px", fontWeight: 700, color: "#0c0c14" }}>Weitere Einstellungen</span>
-        <span style={{ fontSize: "9px", color: "#9898AA" }}>▼</span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 14px", background: "var(--surface-2)", borderBottom: "1px solid var(--divider)" }}>
+        <span style={{ fontSize: "9px", fontWeight: 700, color: "var(--text-1)" }}>Weitere Einstellungen</span>
+        <span style={{ fontSize: "9px", color: "var(--text-3)" }}>▼</span>
       </div>
       <div style={{ padding: "8px 14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
         <div>
-          <p style={{ fontSize: "7px", color: "#9898AA", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.04em", marginBottom: "2px" }}>E-Mail CC</p>
-          <div style={{ height: "20px", background: "#f7f7fa", border: "1px solid rgba(0,0,0,0.07)", display: "flex", alignItems: "center", padding: "0 6px", gap: "4px" }}>
-            <span style={{ fontSize: "8px", color: "#9898AA" }}>🔒</span>
-            <span style={{ fontSize: "8px", color: "#9898AA" }}>Ab Professional</span>
+          <p style={{ fontSize: "7px", color: "var(--text-3)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.04em", marginBottom: "2px" }}>E-Mail CC</p>
+          <div style={{ height: "20px", background: "var(--surface-2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 6px", gap: "4px" }}>
+            <span style={{ fontSize: "8px", color: "var(--text-3)" }}>🔒</span>
+            <span style={{ fontSize: "8px", color: "var(--text-3)" }}>Ab Professional</span>
           </div>
         </div>
         <div>
-          <p style={{ fontSize: "7px", color: "#9898AA", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.04em", marginBottom: "2px" }}>Wiederholen</p>
-          <div style={{ height: "20px", background: "#f7f7fa", border: "1px solid rgba(0,0,0,0.07)", display: "flex", alignItems: "center", padding: "0 6px" }}>
-            <span style={{ fontSize: "9px", color: "#0c0c14" }}>Monatlich</span>
+          <p style={{ fontSize: "7px", color: "var(--text-3)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.04em", marginBottom: "2px" }}>Wiederholen</p>
+          <div style={{ height: "20px", background: "var(--surface-2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 6px" }}>
+            <span style={{ fontSize: "9px", color: "var(--text-1)" }}>Monatlich</span>
           </div>
         </div>
       </div>
@@ -443,71 +439,118 @@ function MockFeedback() {
   return (
     <MockShell width="220px">
       <div style={{ padding: "10px 12px" }}>
-        <p style={{ fontSize: "10px", fontWeight: 700, color: "#0c0c14", marginBottom: "8px" }}>Feedback senden</p>
+        <p style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-1)", marginBottom: "8px" }}>Feedback senden</p>
         <div style={{ display: "flex", gap: "4px", marginBottom: "8px" }}>
           {[
             { label: "Bug", active: true },
             { label: "Feature", active: false },
             { label: "Lob", active: false },
           ].map(({ label, active }) => (
-            <span key={label} style={{ padding: "2px 8px", fontSize: "9px", fontWeight: 700, background: active ? "#0040CC" : "#f0f0f5", color: active ? "#fff" : "#5c5c6e" }}>{label}</span>
+            <span key={label} style={{ padding: "2px 8px", fontSize: "9px", fontWeight: 700, background: active ? "var(--accent)" : "var(--badge-draft-bg)", color: active ? "#fff" : "var(--text-2)" }}>{label}</span>
           ))}
         </div>
-        <div style={{ height: "18px", border: "1px solid rgba(0,0,0,0.08)", background: "#f7f7fa", marginBottom: "5px", display: "flex", alignItems: "center", padding: "0 6px" }}>
-          <span style={{ fontSize: "9px", color: "#9898AA" }}>Titel...</span>
+        <div style={{ height: "18px", border: "1px solid var(--border)", background: "var(--surface-2)", marginBottom: "5px", display: "flex", alignItems: "center", padding: "0 6px" }}>
+          <span style={{ fontSize: "9px", color: "var(--text-3)" }}>Titel...</span>
         </div>
-        <div style={{ height: "36px", border: "1px solid rgba(0,0,0,0.08)", background: "#f7f7fa", marginBottom: "6px", padding: "4px 6px" }}>
-          <span style={{ fontSize: "9px", color: "#9898AA" }}>Beschreibung...</span>
+        <div style={{ height: "36px", border: "1px solid var(--border)", background: "var(--surface-2)", marginBottom: "6px", padding: "4px 6px" }}>
+          <span style={{ fontSize: "9px", color: "var(--text-3)" }}>Beschreibung...</span>
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <span style={{ padding: "3px 10px", background: "#0040CC", color: "#fff", fontSize: "9px", fontWeight: 700 }}>Senden</span>
+          <span style={{ padding: "3px 10px", background: "var(--accent)", color: "#fff", fontSize: "9px", fontWeight: 700 }}>Senden</span>
         </div>
       </div>
     </MockShell>
   );
 }
 
+/* ── Bento Grid ──────────────────────────────────────────────── */
+type CardSpan = "1x1" | "2x1" | "1x2" | "2x2";
+
+function BentoGrid({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="bento-grid" style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(3, 1fr)",
+      gap: "16px",
+    }}>
+      {children}
+    </div>
+  );
+}
+
+/* ── Stat Card ───────────────────────────────────────────────── */
+function StatCard({ value, label, color }: { value: string; label: string; color?: string }) {
+  return (
+    <div style={{
+      background: "var(--surface)",
+      border: "1px solid var(--border)",
+      boxShadow: "var(--shadow-sm)",
+      padding: "24px",
+      display: "flex", flexDirection: "column",
+      justifyContent: "center", alignItems: "center",
+      textAlign: "center",
+    }}>
+      <p style={{
+        fontSize: "36px", fontWeight: 800,
+        color: color || "var(--accent)",
+        letterSpacing: "-0.03em", lineHeight: 1,
+        marginBottom: "8px",
+      }}>
+        {value}
+      </p>
+      <p style={{ fontSize: "12px", color: "var(--text-3)", fontWeight: 600 }}>
+        {label}
+      </p>
+    </div>
+  );
+}
+
 /* ── Feature Card ────────────────────────────────────────────── */
 function FeatureCard({
-  title, plan, description, bullets, mockup, id,
+  title, plan, description, bullets, mockup, id, span = "1x1",
 }: {
   title: string; plan: Plan; description: string;
-  bullets?: string[]; mockup: React.ReactNode; id?: string;
+  bullets?: string[]; mockup: React.ReactNode; id?: string; span?: CardSpan;
 }) {
+  const gridStyle: React.CSSProperties = {
+    "1x1": {},
+    "2x1": { gridColumn: "span 2" },
+    "1x2": { gridRow: "span 2" },
+    "2x2": { gridColumn: "span 2", gridRow: "span 2" },
+  }[span];
+
   return (
     <div
       id={id}
       style={{
-        background: "#ffffff",
-        border: "1px solid rgba(0,0,0,0.07)",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 6px 20px rgba(0,0,0,0.04)",
+        ...gridStyle,
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        boxShadow: "var(--shadow-sm)",
         overflow: "hidden",
         display: "flex", flexDirection: "column",
       }}
     >
-      {/* Mockup area */}
       <div style={{
-        background: "linear-gradient(145deg, #EEEEF4 0%, #E8E8F0 100%)",
+        background: "var(--surface-2)",
         padding: "28px 24px",
         display: "flex", alignItems: "center", justifyContent: "center",
         minHeight: "220px",
-        borderBottom: "1px solid rgba(0,0,0,0.06)",
+        borderBottom: "1px solid var(--border)",
       }}>
         {mockup}
       </div>
-
-      {/* Description */}
       <div style={{ padding: "20px 24px", flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
-          <p style={{ fontSize: "15px", fontWeight: 700, color: "#0c0c14", letterSpacing: "-0.01em", lineHeight: 1.3 }}>{title}</p>
+          <p style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-1)", letterSpacing: "-0.01em", lineHeight: 1.3 }}>{title}</p>
           <Badge plan={plan} />
         </div>
-        <p style={{ fontSize: "13px", color: "#5c5c6e", lineHeight: 1.65 }}>{description}</p>
+        <p style={{ fontSize: "13px", color: "var(--text-2)", lineHeight: 1.65 }}>{description}</p>
         {bullets && (
           <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "5px", marginTop: "4px" }}>
             {bullets.map((b, i) => (
-              <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "7px", fontSize: "12px", color: "#5c5c6e", lineHeight: 1.5 }}>
-                <span style={{ color: "#0040CC", flexShrink: 0, fontWeight: 800, fontSize: "11px", marginTop: "1px" }}>→</span>
+              <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "7px", fontSize: "12px", color: "var(--text-2)", lineHeight: 1.5 }}>
+                <span style={{ color: "var(--accent)", flexShrink: 0, fontWeight: 800, fontSize: "11px", marginTop: "1px" }}>→</span>
                 {b}
               </li>
             ))}
@@ -523,93 +566,12 @@ function Section({ id, label, children }: { id: string; label: string; children:
   return (
     <section id={id} style={{ scrollMarginTop: "100px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
-        <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#0c0c14", letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>{label}</h2>
-        <div style={{ flex: 1, height: "1px", background: "rgba(0,0,0,0.07)" }} />
+        <h2 style={{ fontSize: "20px", fontWeight: 800, color: "var(--text-1)", letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>{label}</h2>
+        <div style={{ flex: 1, height: "1px", background: "var(--border)" }} />
       </div>
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-        gap: "20px",
-      }}>
+      <BentoGrid>
         {children}
-      </div>
-    </section>
-  );
-}
-
-/* ── Plan Comparison ─────────────────────────────────────────── */
-function PlanComparison() {
-  const plans: { id: Plan; price: string; features: string[] }[] = [
-    {
-      id: "free", price: "0 €/Monat",
-      features: ["5 Rechnungen/Monat", "3 Kunden", "PDF-Export", "E-Mail-Versand", "Dashboard & Statistiken", "Business Health Score", "Zahlungsdruck-Score", "Automatische Erinnerungen", "Tastenkürzel"],
-    },
-    {
-      id: "starter", price: "9 €/Monat",
-      features: ["Unbegrenzte Rechnungen", "Unbegrenzte Kunden", "Rechnung importieren", "Wiederkehrende Rechnungen", "E-Mail-Vorlagen", "Kundenrabatt (%)", "+ alle Kostenlos-Features"],
-    },
-    {
-      id: "professional", price: "19 €/Monat",
-      features: ["KI-Features (Groq)", "E-Mail CC/BCC", "Anhänge", "Kreditlimit", "Steuerbefreiung", "Mehrwährung", "Mehrsprachig", "Kundenkonto-Portal", "Mehrere Ansprechpartner", "+ alle Starter-Features"],
-    },
-    {
-      id: "business", price: "39 €/Monat",
-      features: ["Für Teams & Agenturen", "Prioritäts-Support", "API-Zugang (geplant)", "White-Label (geplant)", "Individuelle Einrichtung", "+ alle Professional-Features"],
-    },
-  ];
-
-  return (
-    <section id="plaene" style={{ scrollMarginTop: "100px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
-        <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#0c0c14", letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>Pläne & Tarife</h2>
-        <div style={{ flex: 1, height: "1px", background: "rgba(0,0,0,0.07)" }} />
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "16px" }}>
-        {plans.map((p) => {
-          const cfg = PLAN_CFG[p.id];
-          return (
-            <div key={p.id} style={{
-              background: p.id === "professional" ? "#0040CC" : "#ffffff",
-              border: p.id === "professional" ? "2px solid #0040CC" : "1px solid rgba(0,0,0,0.07)",
-              boxShadow: p.id === "professional" ? "0 8px 32px rgba(0,64,204,0.25)" : "0 1px 3px rgba(0,0,0,0.05)",
-              overflow: "hidden",
-              position: "relative",
-            }}>
-              {p.id === "professional" && (
-                <div style={{ position: "absolute", top: "12px", right: "12px", background: "#ffffff", color: "#0040CC", fontSize: "8px", fontWeight: 800, padding: "2px 7px", letterSpacing: "0.05em" }}>BELIEBT</div>
-              )}
-              <div style={{ padding: "20px 20px 16px" }}>
-                <p style={{ fontSize: "12px", fontWeight: 800, color: p.id === "professional" ? "rgba(255,255,255,0.6)" : cfg.color, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "6px" }}>
-                  {cfg.label}
-                </p>
-                <p style={{ fontSize: "22px", fontWeight: 800, color: p.id === "professional" ? "#ffffff" : "#0c0c14", letterSpacing: "-0.02em" }}>
-                  {p.price.split("/")[0]}<span style={{ fontSize: "12px", fontWeight: 500, opacity: 0.6 }}>/Mo.</span>
-                </p>
-              </div>
-              <div style={{ padding: "0 20px 20px", borderTop: `1px solid ${p.id === "professional" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.06)"}`, paddingTop: "14px" }}>
-                {p.features.map((f) => (
-                  <p key={f} style={{ fontSize: "12px", color: p.id === "professional" ? "rgba(255,255,255,0.85)" : "#5c5c6e", padding: "3px 0", display: "flex", alignItems: "flex-start", gap: "6px", lineHeight: 1.4 }}>
-                    <span style={{ color: p.id === "professional" ? "#ffffff" : "#0040CC", fontWeight: 700, flexShrink: 0 }}>✓</span>
-                    {f}
-                  </p>
-                ))}
-              </div>
-              <div style={{ padding: "0 20px 20px" }}>
-                <Link href={p.id === "free" ? "/register" : "/billing"} style={{ textDecoration: "none" }}>
-                  <div style={{
-                    padding: "9px 0", textAlign: "center", fontSize: "12px", fontWeight: 700,
-                    background: p.id === "professional" ? "#ffffff" : p.id === "free" ? "#f0f0f5" : "#0040CC",
-                    color: p.id === "professional" ? "#0040CC" : p.id === "free" ? "#5c5c6e" : "#ffffff",
-                    cursor: "pointer",
-                  }}>
-                    {p.id === "free" ? "Kostenlos starten" : "Plan wählen"}
-                  </div>
-                </Link>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      </BentoGrid>
     </section>
   );
 }
@@ -622,32 +584,42 @@ export default function DocsPage() {
     { href: "#analysen",         label: "Analysen" },
     { href: "#automatisierung",  label: "Automatisierung" },
     { href: "#workflow",         label: "Workflow" },
-    { href: "#plaene",           label: "Pläne" },
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#EFEFF4" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg)" }}>
       <MarketingHeader />
+
+      {/* Responsive + hover styles */}
+      <style>{`
+        @media (max-width: 900px) {
+          .bento-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 600px) {
+          .bento-grid { grid-template-columns: 1fr !important; }
+          .bento-grid > * { grid-column: span 1 !important; grid-row: span 1 !important; }
+        }
+        .plan-table tr:hover td { background: var(--surface-2); }
+        .docs-nav-link:hover { color: var(--accent) !important; border-bottom-color: var(--accent) !important; }
+      `}</style>
 
       <main style={{ paddingTop: "58px" }}>
 
         {/* Hero */}
-        <div style={{ background: "#ffffff", borderBottom: "1px solid rgba(0,0,0,0.07)" }}>
+        <div style={{ background: "var(--surface)", borderBottom: "1px solid var(--border)" }}>
           <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "64px 40px 48px" }}>
-            <p style={{ fontSize: "11px", fontWeight: 800, color: "#0040CC", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px" }}>
+            <p style={{ fontSize: "11px", fontWeight: 800, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px" }}>
               Dokumentation
             </p>
-            <h1 style={{ fontSize: "40px", fontWeight: 800, color: "#0c0c14", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "16px", maxWidth: "600px" }}>
+            <h1 style={{ fontSize: "40px", fontWeight: 800, color: "var(--text-1)", letterSpacing: "-0.03em", lineHeight: 1.1, marginBottom: "16px", maxWidth: "600px" }}>
               Alle Funktionen im Überblick
             </h1>
-            <p style={{ fontSize: "16px", color: "#5c5c6e", maxWidth: "560px", lineHeight: 1.6, marginBottom: "32px" }}>
+            <p style={{ fontSize: "16px", color: "var(--text-2)", maxWidth: "560px", lineHeight: 1.6, marginBottom: "32px" }}>
               Faktura ist ein Rechnungsprogramm für Freelancer und Selbstständige. Hier findest du eine vollständige Übersicht aller Funktionen — mit visuellen Vorschauen und Informationen dazu, welcher Plan was enthält.
             </p>
-
-            {/* Plan legend */}
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
-              <span style={{ fontSize: "12px", color: "#9898AA", marginRight: "4px" }}>Verfügbar in:</span>
-              {(Object.entries(PLAN_CFG) as [Plan, typeof PLAN_CFG[Plan]][]).map(([id, cfg]) => (
+              <span style={{ fontSize: "12px", color: "var(--text-3)", marginRight: "4px" }}>Verfügbar in:</span>
+              {(Object.entries(PLAN_CFG) as [Plan, typeof PLAN_CFG[Plan]][]).map(([id]) => (
                 <Badge key={id} plan={id} />
               ))}
             </div>
@@ -657,11 +629,10 @@ export default function DocsPage() {
         {/* Sticky section nav */}
         <div style={{
           position: "sticky", top: "56px", zIndex: 10,
-          background: "rgba(255,255,255,0.95)", backdropFilter: "blur(8px)",
-          borderBottom: "1px solid rgba(0,0,0,0.07)",
-          boxShadow: "0 1px 0 rgba(0,0,0,0.04)",
+          background: "var(--surface)", backdropFilter: "blur(8px)",
+          borderBottom: "1px solid var(--border)",
+          boxShadow: "0 1px 0 var(--divider)",
         }}>
-          <style>{`.docs-nav-link:hover{color:#0040CC!important;border-bottom-color:#0040CC!important}`}</style>
           <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 40px", display: "flex", gap: "0", overflowX: "auto" }}>
             {navLinks.map(({ href, label }) => (
               <a
@@ -670,7 +641,7 @@ export default function DocsPage() {
                 className="docs-nav-link"
                 style={{
                   display: "inline-flex", alignItems: "center", padding: "14px 20px",
-                  fontSize: "13px", fontWeight: 600, color: "#5c5c6e",
+                  fontSize: "13px", fontWeight: 600, color: "var(--text-2)",
                   textDecoration: "none", whiteSpace: "nowrap",
                   borderBottom: "2px solid transparent",
                   transition: "color 0.15s, border-color 0.15s",
@@ -688,12 +659,14 @@ export default function DocsPage() {
           {/* Rechnungen */}
           <Section id="rechnungen" label="Rechnungen">
             <FeatureCard
+              span="2x1"
               title="Rechnungen erstellen"
               plan="free"
               description="Erstelle professionelle Rechnungen in weniger als einer Minute. Wähle einen Kunden, trage Positionen ein, lege Fälligkeit und MwSt.-Satz fest – fertig."
               bullets={["Automatische Rechnungsnummer-Vergabe", "Mehrere Positionen mit Menge × Preis", "MwSt. 0%, 7% oder 19%", "Anmerkungen für Zahlungsbedingungen"]}
               mockup={<MockInvoiceList />}
             />
+            <StatCard value="60s" label="pro Rechnung" />
             <FeatureCard
               title="KI-Rechnungserstellung"
               plan="free"
@@ -708,16 +681,16 @@ export default function DocsPage() {
               bullets={["Anpassbare E-Mail-Betreff- und Textvorlage", "Vorlagen lokal gespeichert", "Versand über Resend (eigene Domain möglich)"]}
               mockup={<div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
                 <MockPDF />
-                <div style={{ background: "#ffffff", border: "1px solid rgba(0,0,0,0.08)", padding: "12px 14px", width: "180px", boxShadow: "0 2px 8px rgba(0,0,0,0.07)" }}>
-                  <p style={{ fontSize: "9px", fontWeight: 700, color: "#9898AA", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "6px" }}>E-Mail senden</p>
+                <div style={{ background: "var(--surface)", border: "1px solid var(--border)", padding: "12px 14px", width: "180px", boxShadow: "var(--shadow-md)" }}>
+                  <p style={{ fontSize: "9px", fontWeight: 700, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "6px" }}>E-Mail senden</p>
                   {["Betreff", "An", "Text"].map((f, i) => (
                     <div key={f} style={{ marginBottom: "4px" }}>
-                      <p style={{ fontSize: "8px", color: "#9898AA", marginBottom: "1px" }}>{f}</p>
-                      <div style={{ height: i === 2 ? "32px" : "16px", background: "#f7f7fa", border: "1px solid rgba(0,0,0,0.07)" }} />
+                      <p style={{ fontSize: "8px", color: "var(--text-3)", marginBottom: "1px" }}>{f}</p>
+                      <div style={{ height: i === 2 ? "32px" : "16px", background: "var(--surface-2)", border: "1px solid var(--border)" }} />
                     </div>
                   ))}
                   <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "6px" }}>
-                    <span style={{ fontSize: "9px", fontWeight: 700, color: "#fff", background: "#0040CC", padding: "3px 10px" }}>Senden</span>
+                    <span style={{ fontSize: "9px", fontWeight: 700, color: "#fff", background: "var(--accent)", padding: "3px 10px" }}>Senden</span>
                   </div>
                 </div>
               </div>}
@@ -741,6 +714,7 @@ export default function DocsPage() {
           {/* Kunden */}
           <Section id="kunden" label="Kunden">
             <FeatureCard
+              span="2x1"
               title="Kundenverwaltung"
               plan="free"
               description="Verwalte alle Kundendaten zentral. Jeder Kunde hat ein eigenes Profil mit vollständigen Kontaktdaten, Statistiken und Rechnungshistorie."
@@ -750,7 +724,7 @@ export default function DocsPage() {
             <FeatureCard
               title="Zahlungsverhalten & Statistiken"
               plan="free"
-              description="Pro Kunde siehst du sofort: Gesamt berechnet, bezahlt, ausstehend und die durchschnittliche Zahlungsdauer. Diese Daten fließen direkt in den Zahlungsdruck-Score ein."
+              description="Pro Kunde siehst du sofort: Gesamt berechnet, bezahlt, ausstehend und die durchschnittliche Zahlungsdauer."
               bullets={["4 Statistik-Karten pro Kunde", "Vollständige Rechnungshistorie", "Link zu jeder Rechnung direkt vom Kundenprofil"]}
               mockup={<MockCustomer />}
             />
@@ -760,26 +734,26 @@ export default function DocsPage() {
               description="Vergib Stammkunden-Rabatte in Prozent direkt im Kundenprofil. Der Rabatt wird als optionales Feld im Akkordeon unter 'Erweiterte Einstellungen' gesetzt."
               bullets={["Prozentangabe (0–100%)", "Sichtbar im Bearbeitungsmodus", "Erweiterbar auf weitere Felder"]}
               mockup={<div style={{
-                background: "#ffffff", border: "1px solid rgba(0,0,0,0.08)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.07)", overflow: "hidden",
+                background: "var(--surface)", border: "1px solid var(--border)",
+                boxShadow: "var(--shadow-md)", overflow: "hidden",
               }}>
-                <div style={{ padding: "8px 14px", background: "#f7f7fa", borderBottom: "1px solid rgba(0,0,0,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "10px", fontWeight: 700, color: "#0c0c14" }}>Erweiterte Einstellungen</span>
-                  <span style={{ fontSize: "9px", color: "#9898AA" }}>▼</span>
+                <div style={{ padding: "8px 14px", background: "var(--surface-2)", borderBottom: "1px solid var(--divider)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-1)" }}>Erweiterte Einstellungen</span>
+                  <span style={{ fontSize: "9px", color: "var(--text-3)" }}>▼</span>
                 </div>
                 <div style={{ padding: "12px 14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                   <div>
-                    <p style={{ fontSize: "8px", color: "#9898AA", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "3px" }}>Kundenrabatt (%)</p>
-                    <div style={{ height: "24px", border: "1px solid rgba(0,0,0,0.08)", background: "#f7f7fa", display: "flex", alignItems: "center", padding: "0 8px" }}>
-                      <span style={{ fontSize: "10px", fontWeight: 700, color: "#0c0c14" }}>10</span>
+                    <p style={{ fontSize: "8px", color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "3px" }}>Kundenrabatt (%)</p>
+                    <div style={{ height: "24px", border: "1px solid var(--border)", background: "var(--surface-2)", display: "flex", alignItems: "center", padding: "0 8px" }}>
+                      <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-1)" }}>10</span>
                     </div>
-                    <p style={{ fontSize: "8px", color: "#00A060", marginTop: "2px" }}>✓ Im Starter-Plan</p>
+                    <p style={{ fontSize: "8px", color: "var(--success)", marginTop: "2px" }}>✓ Im Starter-Plan</p>
                   </div>
                   <div>
-                    <p style={{ fontSize: "8px", color: "#9898AA", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "3px" }}>Kreditlimit (€)</p>
-                    <div style={{ height: "24px", border: "1px solid rgba(0,0,0,0.08)", background: "#f7f7fa", display: "flex", alignItems: "center", padding: "0 8px", gap: "4px" }}>
+                    <p style={{ fontSize: "8px", color: "var(--text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "3px" }}>Kreditlimit (€)</p>
+                    <div style={{ height: "24px", border: "1px solid var(--border)", background: "var(--surface-2)", display: "flex", alignItems: "center", padding: "0 8px", gap: "4px" }}>
                       <span style={{ fontSize: "9px" }}>🔒</span>
-                      <span style={{ fontSize: "8px", color: "#9898AA" }}>Ab Professional</span>
+                      <span style={{ fontSize: "8px", color: "var(--text-3)" }}>Ab Professional</span>
                     </div>
                   </div>
                 </div>
@@ -790,31 +764,34 @@ export default function DocsPage() {
           {/* Analysen */}
           <Section id="analysen" label="Analysen & Einblicke">
             <FeatureCard
+              span="2x1"
               title="Dashboard"
               plan="free"
               description="Der Dashboard gibt dir auf einen Blick: offene Rechnungen, überfällige Beträge, diesen Monat bezahltes und die durchschnittliche Zahlungsdauer – mit Monatschart."
               bullets={["4 Stat-Karten mit Echtzeit-Daten", "Monatliches Balkendiagramm (6 Monate)", "Liste der letzten 5 Rechnungen"]}
               mockup={<MockStats />}
             />
+            <StatCard value="82" label="Health Score Durchschnitt" color="var(--success)" />
             <FeatureCard
               title="Business Health Score"
               plan="free"
-              description="Ein einzigartiges Widget zeigt dir die finanzielle Gesundheit deines Unternehmens auf einer Skala von 0–100. Automatisch berechnet aus drei Kennzahlen."
-              bullets={["Einzugsquote (Anteil bezahlter Rechnungen)", "Durchschnittliche Zahlungsdauer", "Anteil überfälliger Rechnungen", "Status: Gut / Aufmerksamkeit / Kritisch"]}
+              description="Ein einzigartiges Widget zeigt dir die finanzielle Gesundheit deines Unternehmens auf einer Skala von 0–100."
+              bullets={["Einzugsquote (Anteil bezahlter Rechnungen)", "Durchschnittliche Zahlungsdauer", "Status: Gut / Aufmerksamkeit / Kritisch"]}
               mockup={<MockHealthScore />}
             />
             <FeatureCard
               title="Zahlungsdruck-Score"
               plan="free"
               description="Jede offene Rechnung bekommt automatisch einen Zahlungsdruck-Score (0–100). Er zeigt dir sofort, bei welchen Rechnungen Handlungsbedarf besteht."
-              bullets={["Überfälligkeitstage (bis 40 Punkte)", "Kundenhistorie (bis 20 Punkte)", "Anzahl gesendeter Erinnerungen", "Rechnungsbetrag (bis 20 Punkte)"]}
+              bullets={["Überfälligkeitstage (bis 40 Punkte)", "Kundenhistorie (bis 20 Punkte)", "Rechnungsbetrag (bis 20 Punkte)"]}
               mockup={<MockPressure />}
             />
             <FeatureCard
+              span="2x1"
               title="Statistiken & Trends"
               plan="free"
               description="Die Statistikseite zeigt dir Umsatztrend (12 Monate), Statusverteilung aller Rechnungen als Tortendiagramm und eine Überfälligkeits-Alterungsanalyse."
-              bullets={["12-Monats-Umsatzkurve (Recharts)", "Tortendiagramm Statusverteilung", "Aging-Analyse: 1–14, 15–30, 31–60, >60 Tage", "KPI-Karten: Umsatz, Ø Zahlung, Erinnerungen"]}
+              bullets={["12-Monats-Umsatzkurve", "Tortendiagramm Statusverteilung", "Aging-Analyse: 1–14, 15–30, 31–60, >60 Tage"]}
               mockup={<MockStats />}
             />
           </Section>
@@ -822,10 +799,11 @@ export default function DocsPage() {
           {/* Automatisierung */}
           <Section id="automatisierung" label="Automatisierung">
             <FeatureCard
+              span="2x1"
               title="Automatische Erinnerungen"
               plan="free"
               description="Faktura sendet automatisch Zahlungserinnerungen an Kunden, wenn Rechnungen überfällig werden. Du musst nichts manuell tun."
-              bullets={["Konfigurierbar über ENV-Variablen", "Maximale Anzahl pro Lauf einstellbar", "Jede Erinnerung wird in der Datenbank protokolliert", "Cron-Endpunkt: POST /api/cron/check-overdue"]}
+              bullets={["Konfigurierbar über ENV-Variablen", "Maximale Anzahl pro Lauf einstellbar", "Jede Erinnerung wird in der Datenbank protokolliert"]}
               mockup={<MockReminders />}
             />
             <FeatureCard
@@ -834,28 +812,28 @@ export default function DocsPage() {
               description="Sende jederzeit manuell eine Zahlungserinnerung direkt von der Rechnungsdetailseite – mit einem Klick auf 'Erinnerung senden'."
               bullets={["Sofortige Mahnung per E-Mail", "Wird in Erinnerungshistorie gespeichert", "Fließt in den Zahlungsdruck-Score ein"]}
               mockup={<div style={{
-                background: "#ffffff", border: "1px solid rgba(0,0,0,0.08)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.07)", overflow: "hidden",
+                background: "var(--surface)", border: "1px solid var(--border)",
+                boxShadow: "var(--shadow-md)", overflow: "hidden",
               }}>
-                <div style={{ padding: "10px 14px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+                <div style={{ padding: "10px 14px", borderBottom: "1px solid var(--divider)" }}>
                   <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                     {[
-                      { label: "PDF", color: "#f0f0f5", tc: "#5c5c6e" },
-                      { label: "Senden", color: "#f0f0f5", tc: "#5c5c6e" },
-                      { label: "Erinnerung", color: "rgba(204,112,0,0.1)", tc: "#CC7000" },
-                      { label: "Bezahlt ✓", color: "rgba(0,160,96,0.1)", tc: "#00A060" },
+                      { label: "PDF", color: "var(--badge-draft-bg)", tc: "var(--text-2)" },
+                      { label: "Senden", color: "var(--badge-draft-bg)", tc: "var(--text-2)" },
+                      { label: "Erinnerung", color: "var(--warning-bg)", tc: "var(--warning)" },
+                      { label: "Bezahlt ✓", color: "var(--success-bg)", tc: "var(--success)" },
                     ].map(({ label, color, tc }) => (
                       <span key={label} style={{ fontSize: "9px", fontWeight: 700, padding: "3px 9px", background: color, color: tc, cursor: "pointer" }}>{label}</span>
                     ))}
                   </div>
                 </div>
                 <div style={{ padding: "10px 14px" }}>
-                  <div style={{ background: "rgba(204,112,0,0.06)", border: "1px solid rgba(204,112,0,0.15)", padding: "8px 10px", marginBottom: "8px" }}>
-                    <p style={{ fontSize: "9px", fontWeight: 700, color: "#CC7000" }}>Erinnerung gesendet</p>
-                    <p style={{ fontSize: "8px", color: "#9898AA", marginTop: "2px" }}>01.03.2025 – an max@muster.de</p>
+                  <div style={{ background: "var(--warning-bg)", border: "1px solid rgba(204,112,0,0.15)", padding: "8px 10px", marginBottom: "8px" }}>
+                    <p style={{ fontSize: "9px", fontWeight: 700, color: "var(--warning)" }}>Erinnerung gesendet</p>
+                    <p style={{ fontSize: "8px", color: "var(--text-3)", marginTop: "2px" }}>01.03.2025 – an max@muster.de</p>
                   </div>
-                  <div style={{ fontSize: "8px", color: "#5c5c6e", lineHeight: 1.6 }}>
-                    <p>Zahlungsdruck-Score: <strong style={{ color: "#CC2020" }}>76 / 100</strong></p>
+                  <div style={{ fontSize: "8px", color: "var(--text-2)", lineHeight: 1.6 }}>
+                    <p>Zahlungsdruck-Score: <strong style={{ color: "var(--danger)" }}>76 / 100</strong></p>
                     <p>2 Erinnerungen gesendet</p>
                   </div>
                 </div>
@@ -868,30 +846,31 @@ export default function DocsPage() {
             <FeatureCard
               title="Tastenkürzel"
               plan="free"
-              description="Power-User-Feature: Navigiere durch die gesamte App ohne Maus. Drücke ? um die Hilfe zu öffnen, dann navigiere mit Einzeltasten."
-              bullets={["N → Neue Rechnung", "K → Neuer Kunde", "D → Dashboard", "R → Rechnungen", "S → Einstellungen", "? → Diese Hilfe öffnen"]}
+              description="Power-User-Feature: Navigiere durch die gesamte App ohne Maus. Drücke ? um die Hilfe zu öffnen."
+              bullets={["N → Neue Rechnung", "K → Neuer Kunde", "D → Dashboard", "R → Rechnungen", "? → Hilfe öffnen"]}
               mockup={<MockShortcuts />}
             />
             <FeatureCard
+              span="2x1"
               title="Feedback & Support"
               plan="free"
-              description="Das integrierte Feedback-Widget ermöglicht es dir, Bugs, Feature-Wünsche oder Lob direkt aus der App zu senden – ohne extra E-Mail oder Formular."
-              bullets={["Floating-Button unten rechts im Dashboard", "3 Kategorien: Bug / Feature / Lob", "Seiten-Kontext wird automatisch erfasst", "Status-Updates sichtbar in der Support-Übersicht"]}
+              description="Das integrierte Feedback-Widget ermöglicht es dir, Bugs, Feature-Wünsche oder Lob direkt aus der App zu senden."
+              bullets={["Floating-Button unten rechts im Dashboard", "3 Kategorien: Bug / Feature / Lob", "Status-Updates sichtbar in der Support-Übersicht"]}
               mockup={<div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
                 <MockFeedback />
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <div style={{ background: "#ffffff", border: "1px solid rgba(0,0,0,0.08)", padding: "8px 10px", boxShadow: "0 2px 6px rgba(0,0,0,0.06)", width: "140px" }}>
-                    <p style={{ fontSize: "8px", fontWeight: 700, color: "#0c0c14", marginBottom: "2px" }}>Login-Fehler</p>
+                  <div style={{ background: "var(--surface)", border: "1px solid var(--border)", padding: "8px 10px", boxShadow: "var(--shadow-sm)", width: "140px" }}>
+                    <p style={{ fontSize: "8px", fontWeight: 700, color: "var(--text-1)", marginBottom: "2px" }}>Login-Fehler</p>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ fontSize: "7px", color: "#9898AA" }}>Bug</span>
-                      <span style={{ fontSize: "7px", fontWeight: 700, color: "#CC7000", background: "rgba(204,112,0,0.08)", padding: "1px 4px" }}>Offen</span>
+                      <span style={{ fontSize: "7px", color: "var(--text-3)" }}>Bug</span>
+                      <span style={{ fontSize: "7px", fontWeight: 700, color: "var(--warning)", background: "var(--warning-bg)", padding: "1px 4px" }}>Offen</span>
                     </div>
                   </div>
-                  <div style={{ background: "#ffffff", border: "1px solid rgba(0,0,0,0.08)", padding: "8px 10px", boxShadow: "0 2px 6px rgba(0,0,0,0.06)", width: "140px" }}>
-                    <p style={{ fontSize: "8px", fontWeight: 700, color: "#0c0c14", marginBottom: "2px" }}>Dark Mode bitte</p>
+                  <div style={{ background: "var(--surface)", border: "1px solid var(--border)", padding: "8px 10px", boxShadow: "var(--shadow-sm)", width: "140px" }}>
+                    <p style={{ fontSize: "8px", fontWeight: 700, color: "var(--text-1)", marginBottom: "2px" }}>Dark Mode bitte</p>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ fontSize: "7px", color: "#9898AA" }}>Feature</span>
-                      <span style={{ fontSize: "7px", fontWeight: 700, color: "#00A060", background: "rgba(0,160,96,0.08)", padding: "1px 4px" }}>Gelöst</span>
+                      <span style={{ fontSize: "7px", color: "var(--text-3)" }}>Feature</span>
+                      <span style={{ fontSize: "7px", fontWeight: 700, color: "var(--success)", background: "var(--success-bg)", padding: "1px 4px" }}>Gelöst</span>
                     </div>
                   </div>
                 </div>
@@ -899,12 +878,9 @@ export default function DocsPage() {
             />
           </Section>
 
-          {/* Plan Comparison */}
-          <PlanComparison />
-
           {/* CTA */}
           <div style={{
-            background: "#0040CC",
+            background: "var(--accent)",
             padding: "48px 40px",
             textAlign: "center",
           }}>
@@ -919,7 +895,7 @@ export default function DocsPage() {
             </p>
             <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
               <Link href="/register" style={{ textDecoration: "none" }}>
-                <div style={{ padding: "12px 28px", background: "#ffffff", color: "#0040CC", fontSize: "14px", fontWeight: 800, cursor: "pointer" }}>
+                <div style={{ padding: "12px 28px", background: "#ffffff", color: "var(--accent)", fontSize: "14px", fontWeight: 800, cursor: "pointer" }}>
                   Jetzt registrieren
                 </div>
               </Link>

@@ -26,7 +26,7 @@ const PLANS: {
     features: [
       { text: "Bis zu 3 Rechnungen/Monat", included: true },
       { text: "PDF Export", included: true },
-      { text: "1 Kunde", included: true },
+      { text: "3 Kunden", included: true },
       { text: "E-Mail Versand", included: false },
       { text: "Automatische Erinnerungen", included: false },
       { text: "Priorität-Support", included: false },

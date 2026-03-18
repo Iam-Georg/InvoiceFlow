@@ -28,7 +28,7 @@ const SECTIONS = [
   {
     title: "§ 4 Tarife und Leistungsgrenzen",
     content:
-      "Der kostenlose Tarif (Free) ist dauerhaft nutzbar mit eingeschränktem Funktionsumfang (z.\u00a0B. max. 3 Rechnungen/Monat, 1 Kunde). Kostenpflichtige Tarife werden monatlich abgerechnet. Der Anbieter behält sich vor, Tarifpreise mit einer Ankündigungsfrist von 30 Tagen zu ändern. Bestehende Abonnements sind bis zum Ende der Laufzeit geschützt.",
+      "Der kostenlose Tarif (Free) ist dauerhaft nutzbar mit eingeschränktem Funktionsumfang (z.\u00a0B. max. 3 Rechnungen/Monat, 3 Kunden). Kostenpflichtige Tarife werden monatlich abgerechnet. Der Anbieter behält sich vor, Tarifpreise mit einer Ankündigungsfrist von 30 Tagen zu ändern. Bestehende Abonnements sind bis zum Ende der Laufzeit geschützt.",
   },
   {
     title: "§ 5 Zahlungsbedingungen",
@@ -78,6 +78,13 @@ export default function AGBPage() {
           padding: "120px 40px 80px",
         }}
       >
+        <div style={{
+          maxWidth: "800px", margin: "24px auto 0", padding: "16px 24px",
+          background: "#FFF3CD", border: "1px solid #FFE69C",
+          fontSize: "13px", color: "#664D03", lineHeight: 1.6,
+        }}>
+          Diese Seite befindet sich im Aufbau. Die angezeigten Firmendaten sind Platzhalter und werden vor dem offiziellen Launch durch echte Angaben ersetzt.
+        </div>
         <p className="label-caps" style={{ marginBottom: "12px" }}>
           Rechtliches
         </p>

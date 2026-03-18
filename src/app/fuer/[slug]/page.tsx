@@ -502,7 +502,7 @@ export default async function IndustryPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* ── TESTIMONIAL ──────────────────────────────── */}
+        {/* ── EHRLICHE FEEDBACK-BOX ────────────────────── */}
         <section
           style={{
             padding: "48px 24px",
@@ -513,35 +513,28 @@ export default async function IndustryPage({ params }: PageProps) {
         >
           <div
             style={{
-              maxWidth: "640px",
+              maxWidth: "600px",
               margin: "0 auto",
               textAlign: "center",
             }}
           >
-            <div
-              style={{
-                fontSize: "32px",
-                color: "var(--accent)",
-                marginBottom: "16px",
-                lineHeight: 1,
-              }}
-            >
-              &ldquo;
-            </div>
-            <p
-              style={{
-                fontSize: "16px",
-                lineHeight: 1.7,
-                color: "var(--text-1)",
-                fontStyle: "italic",
-                fontWeight: 500,
-                marginBottom: "16px",
-              }}
-            >
-              {industry.testimonialQuote}
+            <p style={{
+              fontSize: "10px", fontWeight: 800, letterSpacing: "0.08em",
+              textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px",
+            }}>
+              Wir sind neu
             </p>
-            <p style={{ fontSize: "12px", color: "var(--text-3)" }}>
-              — Faktura-Nutzer*in, {industry.name.replace(/&.*$/, "").trim()}
+            <h3 style={{
+              fontSize: "22px", fontWeight: 700, letterSpacing: "-0.02em",
+              color: "var(--text-1)", marginBottom: "10px",
+            }}>
+              Faktura ist ein junges Produkt.
+            </h3>
+            <p style={{
+              fontSize: "14px", color: "var(--text-2)", lineHeight: 1.7,
+            }}>
+              Wir arbeiten jeden Tag daran, es besser zu machen.
+              Wenn du Feedback hast, freuen wir uns darüber.
             </p>
           </div>
         </section>
