@@ -20,12 +20,12 @@ export function getDefaultInvoiceEmailTemplate(): EmailTemplatePayload {
       "",
       "anbei erhalten Sie die Rechnung {{invoice_number}}.",
       "Rechnungsdatum: {{issue_date}}",
-      "Faellig am: {{due_date}}",
+      "Fällig am: {{due_date}}",
       "Betrag: {{total}}",
       "",
-      "Vielen Dank fuer die Zusammenarbeit.",
+      "Vielen Dank für die Zusammenarbeit.",
       "",
-      "Mit freundlichen Gruessen",
+      "Mit freundlichen Grüßen",
       "{{sender_name}}",
     ].join("\n"),
   };
@@ -62,14 +62,14 @@ export function getWelcomeEmailHtml(name: string): { subject: string; html: stri
       <div style="font-family: -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; color: #0A0F1E;">
         <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Willkommen bei Faktura!</h2>
         <p style="font-size: 14px; line-height: 1.6;">Hallo ${safeName},</p>
-        <p style="font-size: 14px; line-height: 1.6;">vielen Dank fuer deine Registrierung bei Faktura. Dein Account ist bereit.</p>
+        <p style="font-size: 14px; line-height: 1.6;">vielen Dank für deine Registrierung bei Faktura. Dein Account ist bereit.</p>
         <p style="font-size: 14px; line-height: 1.6;">So startest du am besten:</p>
         <ol style="font-size: 14px; line-height: 1.8; padding-left: 20px;">
           <li>Richte dein Unternehmen unter <strong>Einstellungen</strong> ein</li>
           <li>Lege deinen ersten <strong>Kunden</strong> an</li>
           <li>Erstelle deine erste <strong>Rechnung</strong></li>
         </ol>
-        <p style="font-size: 14px; line-height: 1.6;">Bei Fragen erreichst du uns jederzeit ueber das Feedback-Widget in der App.</p>
+        <p style="font-size: 14px; line-height: 1.6;">Bei Fragen erreichst du uns jederzeit über das Feedback-Widget in der App.</p>
         <p style="font-size: 14px; line-height: 1.6; color: #6B7A90;">Viel Erfolg!<br/><strong style="color: #0A0F1E;">Dein Faktura Team</strong></p>
       </div>
     `,

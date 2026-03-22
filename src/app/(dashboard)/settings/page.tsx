@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { ensureProfile } from "@/lib/profile";
 import type { Profile } from "@/types";
 import { toast } from "sonner";
-import { Loader2, Save, Download, Trash2, FileDown } from "lucide-react";
+import { Loader2, Save, Download, Trash2, FileDown, Lock } from "lucide-react";
+import { PLAN_FEATURES } from "@/lib/plans";
+import type { PlanId } from "@/lib/plans";
 
 interface SettingsForm {
   full_name: string;
@@ -22,6 +24,163 @@ interface SettingsForm {
   default_notes: string;
 }
 
+const labelStyle: React.CSSProperties = {
+  fontSize: "11px",
+  fontWeight: 600,
+  color: "var(--muted-foreground)",
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
+  display: "block",
+  marginBottom: "5px",
+};
+
+const COUNTRIES = [
+  { value: "DE", label: "Deutschland" },
+  { value: "AT", label: "Österreich" },
+  { value: "CH", label: "Schweiz" },
+  { value: "LI", label: "Liechtenstein" },
+  { value: "LU", label: "Luxemburg" },
+  { value: "BE", label: "Belgien" },
+  { value: "NL", label: "Niederlande" },
+  { value: "FR", label: "Frankreich" },
+  { value: "IT", label: "Italien" },
+  { value: "ES", label: "Spanien" },
+  { value: "PT", label: "Portugal" },
+  { value: "PL", label: "Polen" },
+  { value: "CZ", label: "Tschechien" },
+  { value: "DK", label: "Dänemark" },
+  { value: "SE", label: "Schweden" },
+  { value: "NO", label: "Norwegen" },
+  { value: "FI", label: "Finnland" },
+  { value: "GB", label: "Vereinigtes Königreich" },
+  { value: "US", label: "Vereinigte Staaten" },
+];
+
+const PAYMENT_DAYS = [
+  { value: "7", label: "7 Tage" },
+  { value: "14", label: "14 Tage" },
+  { value: "21", label: "21 Tage" },
+  { value: "30", label: "30 Tage" },
+  { value: "45", label: "45 Tage" },
+  { value: "60", label: "60 Tage" },
+  { value: "90", label: "90 Tage" },
+];
+
+function Field({
+  label,
+  k,
+  value,
+  onChange,
+  placeholder = "",
+  type = "text",
+  disabled = false,
+  fullWidth = false,
+}: {
+  label: string;
+  k: keyof SettingsForm;
+  value: string;
+  onChange: (k: keyof SettingsForm, v: string) => void;
+  placeholder?: string;
+  type?: string;
+  disabled?: boolean;
+  fullWidth?: boolean;
+}) {
+  return (
+    <div
+      style={{
+        gridColumn: fullWidth ? "1 / -1" : "auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: "4px",
+      }}
+    >
+      <label style={labelStyle}>{label}</label>
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        disabled={disabled}
+        onChange={(e) => onChange(k, e.target.value)}
+      />
+    </div>
+  );
+}
+
+function SelectField({
+  label,
+  k,
+  value,
+  onChange,
+  options,
+  fullWidth = false,
+}: {
+  label: string;
+  k: keyof SettingsForm;
+  value: string;
+  onChange: (k: keyof SettingsForm, v: string) => void;
+  options: { value: string; label: string }[];
+  fullWidth?: boolean;
+}) {
+  return (
+    <div
+      style={{
+        gridColumn: fullWidth ? "1 / -1" : "auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: "4px",
+      }}
+    >
+      <label style={labelStyle}>{label}</label>
+      <select value={value} onChange={(e) => onChange(k, e.target.value)}>
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function Section({
+  title,
+  description,
+  children,
+  columns = "1fr 1fr",
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  columns?: string;
+}) {
+  return (
+    <div className="card-elevated" style={{ overflow: "hidden" }}>
+      <div
+        style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)" }}
+      >
+        <p
+          style={{ fontSize: "13px", fontWeight: 600, color: "var(--foreground)" }}
+        >
+          {title}
+        </p>
+        <p
+          style={{ fontSize: "12px", color: "var(--muted-foreground)", marginTop: "2px" }}
+        >
+          {description}
+        </p>
+      </div>
+      <div
+        style={{
+          padding: "20px",
+          display: "grid",
+          gridTemplateColumns: columns,
+          gap: "14px",
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const router = useRouter();
   const supabase = createClient();
@@ -33,8 +192,13 @@ export default function SettingsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [exportYear, setExportYear] = useState(String(new Date().getFullYear()));
+  const exportYears = Array.from(
+    { length: new Date().getFullYear() - 2019 },
+    (_, i) => String(new Date().getFullYear() - i),
+  );
   const [exportFormat, setExportFormat] = useState("standard");
   const [userId, setUserId] = useState("");
+  const [userPlan, setUserPlan] = useState<PlanId>("free");
   const [form, setForm] = useState<SettingsForm>({
     full_name: "",
     email: "",
@@ -60,6 +224,7 @@ export default function SettingsPage() {
       }
       setUserId(user.id);
       const profile = (await ensureProfile(supabase, user)) as Profile | null;
+      setUserPlan((profile?.plan ?? "free") as PlanId);
       setForm({
         full_name: profile?.full_name ?? "",
         email: user.email ?? "",
@@ -123,6 +288,11 @@ export default function SettingsPage() {
     try {
       const response = await fetch(
         `/api/export/tax?year=${encodeURIComponent(exportYear)}&format=${exportFormat}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
       );
       if (!response.ok) {
         const payload = (await response.json().catch(() => ({}))) as {
@@ -154,7 +324,11 @@ export default function SettingsPage() {
   async function exportAllData() {
     setDataExportLoading(true);
     try {
-      const res = await fetch("/api/account/export");
+      const res = await fetch("/api/account/export", {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (!res.ok) throw new Error("Export fehlgeschlagen");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -177,7 +351,12 @@ export default function SettingsPage() {
     if (deleteConfirmText !== "LÖSCHEN") return;
     setDeleteLoading(true);
     try {
-      const res = await fetch("/api/account/delete", { method: "POST" });
+      const res = await fetch("/api/account/delete", { 
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(data.error || "Löschung fehlgeschlagen");
@@ -190,101 +369,6 @@ export default function SettingsPage() {
     } finally {
       setDeleteLoading(false);
     }
-  }
-
-  const labelStyle: React.CSSProperties = {
-    fontSize: "11px",
-    fontWeight: 600,
-    color: "var(--muted-foreground)",
-    textTransform: "uppercase",
-    letterSpacing: "0.06em",
-    display: "block",
-    marginBottom: "5px",
-  };
-
-  function Field({
-    label,
-    k,
-    placeholder = "",
-    type = "text",
-    disabled = false,
-    fullWidth = false,
-  }: {
-    label: string;
-    k: keyof SettingsForm;
-    placeholder?: string;
-    type?: string;
-    disabled?: boolean;
-    fullWidth?: boolean;
-  }) {
-    return (
-      <div
-        style={{
-          gridColumn: fullWidth ? "1 / -1" : "auto",
-          display: "flex",
-          flexDirection: "column",
-          gap: "4px",
-        }}
-      >
-        <label style={labelStyle}>{label}</label>
-        <input
-          type={type}
-          placeholder={placeholder}
-          value={form[k]}
-          disabled={disabled}
-          onChange={(e) => set(k, e.target.value)}
-        />
-      </div>
-    );
-  }
-
-  function Section({
-    title,
-    description,
-    children,
-    columns = "1fr 1fr",
-  }: {
-    title: string;
-    description: string;
-    children: React.ReactNode;
-    columns?: string;
-  }) {
-    return (
-      <div className="card-elevated" style={{ overflow: "hidden" }}>
-        <div
-          style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)" }}
-        >
-          <p
-            style={{
-              fontSize: "13px",
-              fontWeight: 600,
-              color: "var(--foreground)",
-            }}
-          >
-            {title}
-          </p>
-          <p
-            style={{
-              fontSize: "12px",
-              color: "var(--muted-foreground)",
-              marginTop: "2px",
-            }}
-          >
-            {description}
-          </p>
-        </div>
-        <div
-          style={{
-            padding: "20px",
-            display: "grid",
-            gridTemplateColumns: columns,
-            gap: "14px",
-          }}
-        >
-          {children}
-        </div>
-      </div>
-    );
   }
 
   if (loading) {
@@ -354,8 +438,8 @@ export default function SettingsPage() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <Section title="Profil" description="Dein Name und deine Login-E-Mail.">
-          <Field label="Name" k="full_name" placeholder="Max Mustermann" />
-          <Field label="E-Mail" k="email" disabled />
+          <Field label="Name" k="full_name" value={form.full_name} onChange={set} placeholder="Max Mustermann" />
+          <Field label="E-Mail" k="email" value={form.email} onChange={set} disabled />
         </Section>
 
         <Section
@@ -363,44 +447,30 @@ export default function SettingsPage() {
           description="Erscheint auf all deinen Rechnungen."
           columns="1fr 2fr"
         >
-          <Field
-            label="Firmenname"
-            k="company_name"
-            placeholder="Muster GmbH"
-            fullWidth
-          />
-          <Field
-            label="Adresse"
-            k="company_address"
-            placeholder="Musterstrasse 1"
-            fullWidth
-          />
-          <Field label="PLZ" k="company_zip" placeholder="10115" />
-          <Field label="Stadt" k="company_city" placeholder="Berlin" />
-          <Field
-            label="Steuernummer / USt-IdNr."
-            k="company_tax_id"
-            placeholder="DE123456789"
-          />
-          <Field label="Land" k="company_country" placeholder="DE" />
+          <Field label="Firmenname" k="company_name" value={form.company_name} onChange={set} placeholder="Muster GmbH" fullWidth />
+          <Field label="Adresse" k="company_address" value={form.company_address} onChange={set} placeholder="Musterstraße 1" fullWidth />
+          <Field label="PLZ" k="company_zip" value={form.company_zip} onChange={set} placeholder="10115" />
+          <Field label="Stadt" k="company_city" value={form.company_city} onChange={set} placeholder="Berlin" />
+          <Field label="Steuernummer / USt-IdNr." k="company_tax_id" value={form.company_tax_id} onChange={set} placeholder="DE123456789" />
+          <SelectField label="Land" k="company_country" value={form.company_country} onChange={set} options={COUNTRIES} />
         </Section>
 
         <Section
           title="Rechnungsstandards"
           description="Voreinstellungen für neue Rechnungen."
         >
-          <Field
-            label="Standard-MwSt. (%)"
-            k="default_tax_rate"
-            type="number"
-            placeholder="19"
-          />
-          <Field
-            label="Zahlungsziel (Tage)"
-            k="default_payment_days"
-            type="number"
-            placeholder="14"
-          />
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            <label style={labelStyle}>Standard-MwSt.</label>
+            <div className="radio-pill-group">
+              <input type="radio" name="defaultTaxRate" id="tax-0" value="0" checked={form.default_tax_rate === "0"} onChange={() => set("default_tax_rate", "0")} />
+              <label htmlFor="tax-0">0 %</label>
+              <input type="radio" name="defaultTaxRate" id="tax-7" value="7" checked={form.default_tax_rate === "7"} onChange={() => set("default_tax_rate", "7")} />
+              <label htmlFor="tax-7">7 %</label>
+              <input type="radio" name="defaultTaxRate" id="tax-19" value="19" checked={form.default_tax_rate === "19"} onChange={() => set("default_tax_rate", "19")} />
+              <label htmlFor="tax-19">19 %</label>
+            </div>
+          </div>
+          <SelectField label="Zahlungsziel" k="default_payment_days" value={form.default_payment_days} onChange={set} options={PAYMENT_DAYS} />
           <div
             style={{
               gridColumn: "1 / -1",
@@ -455,23 +525,43 @@ export default function SettingsPage() {
               <div className="radio-pill-group">
                 <input type="radio" name="exportFormat" id="fmt-standard" value="standard" checked={exportFormat === "standard"} onChange={() => setExportFormat("standard")} />
                 <label htmlFor="fmt-standard">Standard CSV</label>
-                <input type="radio" name="exportFormat" id="fmt-datev" value="datev" checked={exportFormat === "datev"} onChange={() => setExportFormat("datev")} />
-                <label htmlFor="fmt-datev">DATEV</label>
+                <input
+                  type="radio"
+                  name="exportFormat"
+                  id="fmt-datev"
+                  value="datev"
+                  checked={exportFormat === "datev"}
+                  disabled={!PLAN_FEATURES[userPlan]?.datevExport}
+                  onChange={() => setExportFormat("datev")}
+                />
+                <label
+                  htmlFor="fmt-datev"
+                  style={!PLAN_FEATURES[userPlan]?.datevExport ? { opacity: 0.4, cursor: "not-allowed" } : undefined}
+                >
+                  DATEV
+                  {!PLAN_FEATURES[userPlan]?.datevExport && (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", marginLeft: "5px", fontSize: "10px", color: "var(--muted-foreground)", fontWeight: 600 }}>
+                      <Lock size={9} />
+                      Pro
+                    </span>
+                  )}
+                </label>
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "flex-end", gap: "10px" }}>
-              <div style={{ flex: "0 0 100px" }}>
+              <div style={{ flex: "0 0 120px" }}>
                 <p style={{ fontSize: "11px", fontWeight: 600, color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "6px" }}>
                   Jahr
                 </p>
-                <input
-                  type="number"
+                <select
                   value={exportYear}
                   onChange={(e) => setExportYear(e.target.value)}
-                  min={2000}
-                  max={new Date().getFullYear() + 1}
-                  style={{ width: "100px" }}
-                />
+                  style={{ width: "120px" }}
+                >
+                  {exportYears.map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
               </div>
               <button
                 onClick={exportTaxCsv}

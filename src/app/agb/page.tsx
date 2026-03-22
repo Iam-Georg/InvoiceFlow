@@ -13,7 +13,7 @@ const SECTIONS = [
   {
     title: "§ 1 Geltungsbereich",
     content:
-      'Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der webbasierten Rechnungssoftware \u201eFaktura\u201c (nachfolgend \u201eDienst\u201c), betrieben von InvoiceFlow UG (haftungsbeschränkt), Musterstrasse 1, 10115 Berlin (nachfolgend \u201eAnbieter\u201c). Mit der Registrierung akzeptiert der Nutzer diese AGB.',
+      'Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für die Nutzung der webbasierten Rechnungssoftware \u201eFaktura\u201c (nachfolgend \u201eDienst\u201c), betrieben von InvoiceFlow UG (haftungsbeschränkt), Musterstraße 1, 10115 Berlin (nachfolgend \u201eAnbieter\u201c). Mit der Registrierung akzeptiert der Nutzer diese AGB.',
   },
   {
     title: "§ 2 Vertragsschluss und Registrierung",

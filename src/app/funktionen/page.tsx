@@ -25,6 +25,12 @@ import MarketingFooter from "@/components/layout/MarketingFooter";
 
 const FEATURES = [
   {
+    Icon: Zap,
+    title: "KI-Rechnungsentwurf",
+    description:
+      "Beschreibe dein Projekt in einem Satz — Faktura erstellt die Positionen automatisch. Kein anderes Rechnungstool in Deutschland hat das.",
+  },
+  {
     Icon: FileText,
     title: "Rechnungen erstellen",
     description:
@@ -82,7 +88,7 @@ const FEATURES = [
     Icon: Palette,
     title: "Rechnungsvorlagen",
     description:
-      "Gestalten Sie eigene Rechnungsvorlagen mit individuellen Farben, Logo und Schriftarten. Live-Vorschau beim Bearbeiten.",
+      "Gestalte eigene Rechnungsvorlagen mit individuellen Farben, Logo und Schriftarten. Live-Vorschau beim Bearbeiten.",
   },
   {
     Icon: Repeat,
@@ -94,7 +100,7 @@ const FEATURES = [
     Icon: Database,
     title: "DATEV-Export",
     description:
-      "Exportieren Sie Ihre Rechnungsdaten im DATEV-Buchungsstapel-Format für Ihren Steuerberater.",
+      "Exportiere deine Rechnungsdaten im DATEV-Buchungsstapel-Format für deinen Steuerberater.",
   },
 ];
 

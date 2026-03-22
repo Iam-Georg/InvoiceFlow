@@ -8,6 +8,7 @@ import {
   CreditCard,
   FileText,
   HelpCircle,
+  Keyboard,
   LayoutGrid,
   LogOut,
   Palette,
@@ -39,6 +40,7 @@ export default function Sidebar() {
 
   const [userName, setUserName] = useState("");
   const [userInitial, setUserInitial] = useState("?");
+  const [shortcutsEnabled, setShortcutsEnabled] = useState(false);
 
   // Active index based on current path (longest prefix match)
   function getActiveIndex(path: string): number {
@@ -62,6 +64,15 @@ export default function Sidebar() {
 
   // The indicator follows hover, falls back to active
   const indicatorIndex = hoverIndex ?? activeIndex;
+
+  useEffect(() => {
+    setShortcutsEnabled(localStorage.getItem("faktura-shortcuts-enabled") === "true");
+    function onChanged(e: Event) {
+      setShortcutsEnabled((e as CustomEvent<{ enabled: boolean }>).detail.enabled);
+    }
+    window.addEventListener("shortcuts:changed", onChanged);
+    return () => window.removeEventListener("shortcuts:changed", onChanged);
+  }, []);
 
   useEffect(() => {
     async function loadUser() {
@@ -197,11 +208,40 @@ export default function Sidebar() {
           })}
         </nav>
 
-        {/* Shortcut hint */}
+        {/* Shortcuts toggle button */}
         <div style={{ padding: "0 14px 8px", flexShrink: 0 }}>
-          <p style={{ fontSize: "10px", color: "var(--text-3)", letterSpacing: "0.04em" }}>
-            Drücke <kbd style={{ fontFamily: "monospace", fontWeight: 700, color: "var(--text-2)" }}>Shift</kbd> + <kbd style={{ fontFamily: "monospace", fontWeight: 700, color: "var(--text-2)" }}>ß</kbd> für Tastenkürzel
-          </p>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent("shortcuts:open"))}
+            title="Tastenkürzel verwalten"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "7px",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "5px 2px",
+              width: "100%",
+              color: shortcutsEnabled ? "var(--accent)" : "var(--text-3)",
+              transition: "color var(--duration-fast) var(--ease-smooth)",
+            }}
+          >
+            <Keyboard size={12} style={{ flexShrink: 0 }} />
+            <span style={{ fontSize: "11px", letterSpacing: "0.03em" }}>
+              Tastenkürzel {shortcutsEnabled ? "aktiv" : "inaktiv"}
+            </span>
+            <span
+              style={{
+                marginLeft: "auto",
+                width: "6px",
+                height: "6px",
+                borderRadius: "50%",
+                background: shortcutsEnabled ? "var(--success)" : "var(--border)",
+                flexShrink: 0,
+                transition: "background var(--duration-fast) var(--ease-smooth)",
+              }}
+            />
+          </button>
         </div>
 
         {/* User + Logout – pinned to bottom */}

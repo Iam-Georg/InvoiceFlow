@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createRouteSupabaseClient } from "@/lib/supabase-server";
+import { PLAN_FEATURES } from "@/lib/plans";
+import type { PlanId } from "@/lib/plans";
 
 function csvEscape(value: string | number | null | undefined) {
   if (value === null || value === undefined) return "";
@@ -32,11 +34,15 @@ export async function GET(req: NextRequest) {
     .eq("id", user.id)
     .single();
 
-  if (profile?.plan !== "business") {
-    return NextResponse.json(
-      { error: "Steuerexport ist nur im Business-Plan verfuegbar." },
-      { status: 403 },
-    );
+  const format = req.nextUrl.searchParams.get("format") || "standard";
+  if (format === "datev") {
+    const userPlan = (profile?.plan ?? "free") as PlanId;
+    if (!PLAN_FEATURES[userPlan]?.datevExport) {
+      return NextResponse.json(
+        { error: "DATEV-Export ist ab dem Professional-Plan verfügbar." },
+        { status: 403 },
+      );
+    }
   }
 
   const from = `${year}-01-01`;
@@ -56,39 +62,53 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const format = req.nextUrl.searchParams.get("format") || "standard";
+  // UTF-8 BOM — required for correct display in Excel and DATEV software
+  const BOM = "\uFEFF";
 
-  // ── DATEV Buchungsstapel format ──
+  // ── DATEV Buchungsstapel EXTF format ──
   if (format === "datev") {
+    const ts = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 14);
+
+    // EXTF header row — exactly 20 semicolon-separated fields
     const datevHeader = [
       '"EXTF"',
       "700",
       "21",
       '"Buchungsstapel"',
       "12",
-      `"${new Date().toISOString().replace(/[-:T]/g, "").slice(0, 14)}"`,
-      '""',
-      '"SK"',
-      '""',
-      '""',
-      `${year}0101`,
-      "4",
-      `${year}0101`,
-      `${year}1231`,
-      '""',
-      '""',
-      '""',
+      `"${ts}"`,
+      '""',       // Importiert
+      '"SK"',     // Herkunft
+      '""',       // Exportiert von
+      '""',       // Importiert von
+      `${year}0101`, // WJ-Beginn (YYYYMMDD)
+      "4",           // Sachkontonummernlänge
+      `${year}0101`, // Datumvon
+      `${year}1231`, // Datumbis
+      '""',          // Bezeichnung
+      '""',          // Diktatkürzel
+      "0",           // Buchungstyp (0 = ungebucht)
+      "0",           // Rechnungslegungszweck
+      "0",           // Festschreibung
+      '"EUR"',       // WKZ
     ].join(";");
 
+    // Column header row — must follow DATEV EXTF field order exactly
     const datevColumns = [
       "Umsatz (ohne Soll/Haben-Kz)",
       "Soll/Haben-Kennzeichen",
       "WKZ Umsatz",
+      "Kurs",
+      "Basis-Umsatz",
+      "WKZ Basis-Umsatz",
       "Konto",
-      "Gegenkonto (ohne BU-Schluessel)",
+      "Gegenkonto (ohne BU-Schlüssel)",
+      "BU-Schlüssel",
       "Belegdatum",
-      "Buchungstext",
       "Belegfeld 1",
+      "Belegfeld 2",
+      "Skonto",
+      "Buchungstext",
     ].join(";");
 
     const datevRows = (invoices ?? []).map((inv) => {
@@ -100,19 +120,26 @@ export async function GET(req: NextRequest) {
           : Number(inv.tax_rate) === 7
             ? "8300"
             : "8000";
+      const invoiceNr = String(inv.invoice_number ?? "").replace(/"/g, '""');
       return [
         Number(inv.total ?? 0).toFixed(2).replace(".", ","),
         "S",
         "EUR",
-        "10000",
-        erloskonto,
+        "",          // Kurs (leer bei EUR)
+        "",          // Basis-Umsatz (leer bei EUR)
+        "",          // WKZ Basis-Umsatz (leer bei EUR)
+        "10000",     // Konto (Forderungen aus LuL)
+        erloskonto,  // Gegenkonto (Erlöse)
+        "",          // BU-Schlüssel
         belegdatum,
-        `"${String(inv.invoice_number ?? "").replace(/"/g, '""')}"`,
-        `"${String(inv.invoice_number ?? "").replace(/"/g, '""')}"`,
+        `"${invoiceNr}"`, // Belegfeld 1
+        "",               // Belegfeld 2
+        "",               // Skonto
+        `"${invoiceNr}"`, // Buchungstext
       ].join(";");
     });
 
-    const csv = [datevHeader, datevColumns, ...datevRows].join("\r\n");
+    const csv = BOM + [datevHeader, datevColumns, ...datevRows].join("\r\n");
 
     return new NextResponse(csv, {
       status: 200,
@@ -149,7 +176,7 @@ export async function GET(req: NextRequest) {
     csvEscape(Number(inv.total ?? 0).toFixed(2)),
   ]);
 
-  const csv = [header.join(";"), ...rows.map((r) => r.join(";"))].join("\n");
+  const csv = BOM + [header.join(";"), ...rows.map((r) => r.join(";"))].join("\n");
 
   return new NextResponse(csv, {
     status: 200,

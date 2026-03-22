@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import { ensureProfile } from "@/lib/profile";
 import type { Profile, SubscriptionPlan } from "@/types";
-import { Check, CreditCard, Loader2, Minus, ExternalLink } from "lucide-react";
+import { Check, CreditCard, Loader2, Minus } from "lucide-react";
 import { toast } from "sonner";
 
 const PLANS: {
@@ -24,7 +24,7 @@ const PLANS: {
     priceValue: 0,
     description: "Kostenlos starten, keine Kreditkarte nötig.",
     features: [
-      { text: "Bis zu 3 Rechnungen/Monat", included: true },
+      { text: "5 Rechnungen (Gesamt)", included: true },
       { text: "PDF Export", included: true },
       { text: "3 Kunden", included: true },
       { text: "E-Mail Versand", included: false },
@@ -91,10 +91,7 @@ export default function BillingPage() {
 
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
-  const [portalLoading, setPortalLoading] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<SubscriptionPlan>("free");
-  const [hasStripeCustomer, setHasStripeCustomer] = useState(false);
-  const [paymentProvider, setPaymentProvider] = useState<"stripe" | "paypal">("stripe");
 
   useEffect(() => {
     async function load() {
@@ -108,7 +105,6 @@ export default function BillingPage() {
       }
       const profile = (await ensureProfile(sb, user)) as Profile | null;
       setCurrentPlan(profile?.plan ?? "free");
-      setHasStripeCustomer(!!profile?.stripe_customer_id);
       setLoading(false);
     }
     load();
@@ -117,45 +113,20 @@ export default function BillingPage() {
   async function handleCheckout(plan: SubscriptionPlan) {
     setCheckoutLoading(plan);
     try {
-      const endpoint = paymentProvider === "stripe"
-        ? "/api/billing/stripe/checkout"
-        : "/api/billing/paypal/checkout";
-
-      const res = await fetch(endpoint, {
+      const res = await fetch("/api/billing/lemonsqueezy/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan }),
       });
-
       const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok || !data.url) {
         throw new Error(data.error || "Checkout fehlgeschlagen");
       }
-
       window.location.href = data.url;
     } catch (error) {
       const message = error instanceof Error ? error.message : "Checkout fehlgeschlagen";
       toast.error(message);
       setCheckoutLoading(null);
-    }
-  }
-
-  async function handlePortal() {
-    setPortalLoading(true);
-    try {
-      const res = await fetch("/api/billing/stripe/portal", {
-        method: "POST",
-      });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) {
-        throw new Error(data.error || "Portal konnte nicht geöffnet werden");
-      }
-      window.location.href = data.url;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Portal fehlgeschlagen";
-      toast.error(message);
-    } finally {
-      setPortalLoading(false);
     }
   }
 
@@ -416,44 +387,6 @@ export default function BillingPage() {
           );
         })}
       </div>
-
-      {/* Payment Provider Toggle */}
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "24px", gap: "8px" }}>
-        <button
-          onClick={() => setPaymentProvider("stripe")}
-          className={paymentProvider === "stripe" ? "btn btn-primary" : "btn btn-ghost"}
-          style={{ fontSize: "12px", padding: "6px 16px" }}
-        >
-          <CreditCard style={{ width: 12, height: 12 }} />
-          Kreditkarte (Stripe)
-        </button>
-        <button
-          onClick={() => setPaymentProvider("paypal")}
-          className={paymentProvider === "paypal" ? "btn btn-primary" : "btn btn-ghost"}
-          style={{ fontSize: "12px", padding: "6px 16px" }}
-        >
-          PayPal
-        </button>
-      </div>
-
-      {/* Manage Subscription (for existing Stripe customers) */}
-      {hasStripeCustomer && currentPlan !== "free" && (
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "16px" }}>
-          <button
-            onClick={handlePortal}
-            disabled={portalLoading}
-            className="btn btn-ghost"
-            style={{ fontSize: "12px" }}
-          >
-            {portalLoading ? (
-              <Loader2 style={{ width: 12, height: 12, animation: "spin 1s linear infinite" }} />
-            ) : (
-              <ExternalLink style={{ width: 12, height: 12 }} />
-            )}
-            Abonnement verwalten
-          </button>
-        </div>
-      )}
 
       {/* Trust Footer */}
       <p

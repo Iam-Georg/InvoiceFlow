@@ -207,7 +207,7 @@ export default function NewCustomerPage() {
           {field("Name", "name", "Max Mustermann", true)}
           {field("E-Mail", "email", "max@firma.de", true, "email")}
           {field("Firma", "company", "Muster GmbH", false, "text", true)}
-          {field("Adresse", "address", "Musterstrasse 1", false, "text", true)}
+          {field("Adresse", "address", "Musterstraße 1", false, "text", true)}
           {field("PLZ", "zip", "10115")}
           {field("Stadt", "city", "Berlin")}
         </div>

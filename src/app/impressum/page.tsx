@@ -15,7 +15,7 @@ const SECTIONS = [
     content: null,
     items: [
       { label: "Anbieter", value: "InvoiceFlow UG (haftungsbeschränkt)" },
-      { label: "Anschrift", value: "Musterstrasse 1, 10115 Berlin, Deutschland" },
+      { label: "Anschrift", value: "Musterstraße 1, 10115 Berlin, Deutschland" },
       { label: "Vertreten durch", value: "Max Mustermann (Geschäftsführer)" },
       { label: "E-Mail", value: "kontakt@invoiceflow.app" },
       { label: "Telefon", value: "+49 30 12345678" },
@@ -27,7 +27,7 @@ const SECTIONS = [
   {
     title: "Verantwortlich für den Inhalt gemäß § 18 Abs. 2 MStV",
     content:
-      "Max Mustermann, Musterstrasse 1, 10115 Berlin, Deutschland.",
+      "Max Mustermann, Musterstraße 1, 10115 Berlin, Deutschland.",
     items: null,
   },
   {

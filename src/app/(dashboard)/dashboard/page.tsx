@@ -16,9 +16,6 @@ interface Stats {
   overdueTotal: number;
   paidMonth: number;
   avgPaymentDays: number | null;
-  healthScore: number;
-  collectionRate: number;
-  totalInvoiced: number;
 }
 
 interface MonthlyRevenue {
@@ -58,9 +55,6 @@ export default function DashboardPage() {
     overdueTotal: 0,
     paidMonth: 0,
     avgPaymentDays: null,
-    healthScore: 100,
-    collectionRate: 0,
-    totalInvoiced: 0,
   });
   const [recentInvoices, setRecentInvoices] = useState<DashboardInvoice[]>([]);
   const [monthly, setMonthly] = useState<MonthlyRevenue[]>([]);
@@ -105,28 +99,7 @@ export default function DashboardPage() {
             }, 0) / paidWithDates.length
           : null;
 
-      const totalInvoiced = invoices.filter((i) => i.status !== "draft").reduce((s, i) => s + i.total, 0);
-      const totalPaid     = paid.reduce((s, i) => s + i.total, 0);
-      const collectionRate = totalInvoiced > 0 ? totalPaid / totalInvoiced : 0;
-      const roundedAvg    = avgDays ? Math.round(avgDays) : null;
-
-      // Business Health Score (0–100)
-      let health = 100;
-      // Penalty for overdue ratio (up to -40)
-      const nonDraftCount = invoices.filter((i) => i.status !== "draft").length;
-      if (nonDraftCount > 0) health -= (overdue.length / nonDraftCount) * 40;
-      // Penalty for slow payments (up to -30)
-      if (roundedAvg !== null) {
-        if      (roundedAvg > 60) health -= 30;
-        else if (roundedAvg > 30) health -= 20;
-        else if (roundedAvg > 21) health -= 10;
-      }
-      // Penalty for low collection rate (up to -30)
-      if (totalInvoiced > 0) {
-        if      (collectionRate < 0.50) health -= 30;
-        else if (collectionRate < 0.70) health -= 20;
-        else if (collectionRate < 0.85) health -= 10;
-      }
+      const roundedAvg = avgDays ? Math.round(avgDays) : null;
 
       setStats({
         openCount: open.length,
@@ -135,9 +108,6 @@ export default function DashboardPage() {
         overdueTotal: overdue.reduce((s, i) => s + i.total, 0),
         paidMonth: paidMonth.reduce((s, i) => s + i.total, 0),
         avgPaymentDays: roundedAvg,
-        healthScore: Math.round(Math.max(0, Math.min(100, health))),
-        collectionRate,
-        totalInvoiced,
       });
 
       setRecentInvoices(invoices.slice(0, 5));
@@ -175,7 +145,7 @@ export default function DashboardPage() {
       iconBg: "var(--accent-soft)",
     },
     {
-      title: "UEBERFAELLIG",
+      title: "ÜBERFÄLLIG",
       value: loading ? "-" : String(animOverdueCount),
       sub: loading ? "..." : `${formatCurrency(stats.overdueTotal)} offen`,
       icon: AlertTriangle,
@@ -232,68 +202,6 @@ export default function DashboardPage() {
           </article>
         ))}
       </div>
-
-      {/* Business Health Score */}
-      {!loading && stats.totalInvoiced > 0 && (() => {
-        const s = stats.healthScore;
-        const color  = s >= 80 ? "var(--success)"  : s >= 60 ? "var(--warning)"  : "var(--danger)";
-        const bg     = s >= 80 ? "var(--success-bg)" : s >= 60 ? "var(--warning-bg)" : "var(--danger-bg)";
-        const label  = s >= 80 ? "Gut"           : s >= 60 ? "Aufmerksamkeit" : "Kritisch";
-        return (
-          <section className="card-elevated anim-fade-in-up" style={{ padding: "20px 24px", animationDelay: "320ms" }}>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "14px" }}>
-              <div>
-                <p className="label-caps">Unternehmens-Gesundheit</p>
-                <p style={{ fontSize: "11px", color: "var(--text-3)", marginTop: "3px" }}>
-                  Basierend auf Einzugsquote, Zahlungsgeschwindigkeit und offenen Rechnungen
-                </p>
-              </div>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "3px 10px", background: bg, flexShrink: 0 }}>
-                <span style={{ fontSize: "11px", fontWeight: 700, color, letterSpacing: "0.04em" }}>{label}</span>
-              </div>
-            </div>
-
-            {/* Score bar */}
-            <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "14px" }}>
-              <div style={{ flex: 1, height: "6px", background: "var(--surface-2)", overflow: "hidden" }}>
-                <div
-                  style={{
-                    width: `${s}%`,
-                    height: "100%",
-                    background: 'linear-gradient(90deg, var(--danger) 0%, var(--warning) 50%, var(--success) 100%)',
-                    transition: `width 1s var(--ease-smooth)`,
-                  }}
-                />
-              </div>
-              <span style={{ fontSize: "22px", fontWeight: 700, color, letterSpacing: "-0.02em", minWidth: "52px", textAlign: "right" }}>
-                {s}
-              </span>
-            </div>
-
-            {/* Mini stats */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", borderTop: "1px solid var(--border)", paddingTop: "12px" }}>
-              <div>
-                <p style={{ fontSize: "11px", color: "var(--text-3)", marginBottom: "3px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Einzugsquote</p>
-                <p style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-1)" }}>
-                  {(stats.collectionRate * 100).toFixed(0)} %
-                </p>
-              </div>
-              <div>
-                <p style={{ fontSize: "11px", color: "var(--text-3)", marginBottom: "3px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Ø Zahlungsdauer</p>
-                <p style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-1)" }}>
-                  {stats.avgPaymentDays !== null ? `${stats.avgPaymentDays} Tage` : "–"}
-                </p>
-              </div>
-              <div>
-                <p style={{ fontSize: "11px", color: "var(--text-3)", marginBottom: "3px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Überfällig</p>
-                <p style={{ fontSize: "16px", fontWeight: 700, color: stats.overdueCount > 0 ? "var(--danger)" : "var(--text-1)" }}>
-                  {stats.overdueCount} Rechnungen
-                </p>
-              </div>
-            </div>
-          </section>
-        );
-      })()}
 
       <section className="card-elevated" style={{ padding: "24px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "18px" }}>

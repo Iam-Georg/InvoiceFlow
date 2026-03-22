@@ -21,13 +21,15 @@ export default function Home() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
+            entry.target.classList.add("revealed");
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
+      { threshold: 0.1, rootMargin: "0px 0px -60px 0px" },
     );
-    document.querySelectorAll('.scroll-reveal').forEach((el) => observer.observe(el));
+    document
+      .querySelectorAll(".scroll-reveal")
+      .forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
@@ -48,48 +50,133 @@ export default function Home() {
 
       {/* ── MAIN ───────────────────────────────────────────────── */}
       <main style={{ paddingTop: "58px" }}>
-
         {/* ── HERO: Split ──────────────────────────────────────── */}
-        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "80px 40px 72px", background: "radial-gradient(ellipse at 60% 40%, var(--accent-soft) 0%, transparent 60%)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "72px", alignItems: "center" }}>
-
+        <div
+          style={{
+            maxWidth: "1100px",
+            margin: "0 auto",
+            padding: "80px 40px 72px",
+            background:
+              "radial-gradient(ellipse at 60% 40%, var(--accent-soft) 0%, transparent 60%)",
+          }}
+        >
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "72px",
+              alignItems: "center",
+            }}
+          >
             {/* Left – Text */}
             <div>
               {/* Pill */}
-              <div className="anim-fade-in-up" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "5px 12px", background: "var(--accent-soft)", marginBottom: "28px" }}>
-                <div style={{ width: "6px", height: "6px", background: "var(--accent)", flexShrink: 0 }} />
-                <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--accent)", letterSpacing: "0.04em", textTransform: "uppercase" }}>
+              <div
+                className="anim-fade-in-up"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "5px 12px",
+                  background: "var(--accent-soft)",
+                  marginBottom: "28px",
+                }}
+              >
+                <div
+                  style={{
+                    width: "6px",
+                    height: "6px",
+                    background: "var(--accent)",
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    color: "var(--accent)",
+                    letterSpacing: "0.04em",
+                    textTransform: "uppercase",
+                  }}
+                >
                   Kostenlos · Keine Kreditkarte
                 </span>
               </div>
 
-              <h1 className="anim-fade-in-up anim-delay-1" style={{ fontSize: "50px", fontWeight: 700, letterSpacing: "-0.04em", color: "var(--text-1)", lineHeight: 1.07, marginBottom: "20px" }}>
-                Rechnungen<br />
+              <h1
+                className="anim-fade-in-up anim-delay-1"
+                style={{
+                  fontSize: "50px",
+                  fontWeight: 700,
+                  letterSpacing: "-0.04em",
+                  color: "var(--text-1)",
+                  lineHeight: 1.07,
+                  marginBottom: "20px",
+                }}
+              >
+                Rechnungen
+                <br />
                 schreiben,{" "}
-                <span style={{ color: "var(--accent)" }}>die&nbsp;ankommen.</span>
+                <span style={{ color: "var(--accent)" }}>
+                  die&nbsp;ankommen.
+                </span>
               </h1>
 
-              <p className="anim-fade-in-up anim-delay-2" style={{ fontSize: "16px", color: "var(--text-2)", lineHeight: 1.7, marginBottom: "36px", maxWidth: "400px" }}>
-                Professionelle Rechnungen in wenigen Minuten. Zahlungen verfolgen, Mahnungen automatisieren, PDF exportieren.
+              <p
+                className="anim-fade-in-up anim-delay-2"
+                style={{
+                  fontSize: "16px",
+                  color: "var(--text-2)",
+                  lineHeight: 1.7,
+                  marginBottom: "36px",
+                  maxWidth: "400px",
+                }}
+              >
+                Professionelle Rechnungen in wenigen Minuten. Zahlungen
+                verfolgen, Mahnungen automatisieren, PDF exportieren.
               </p>
 
               {/* CTAs */}
-              <div className="anim-fade-in-up anim-delay-3" style={{ display: "flex", gap: "10px", marginBottom: "32px" }}>
+              <div
+                className="anim-fade-in-up anim-delay-3"
+                style={{ display: "flex", gap: "10px", marginBottom: "32px" }}
+              >
                 {isLoggedIn ? (
                   <Link href="/dashboard" style={{ textDecoration: "none" }}>
-                    <button className="btn btn-primary" style={{ height: "44px", padding: "0 28px", fontSize: "14px" }}>
+                    <button
+                      className="btn btn-primary"
+                      style={{
+                        height: "44px",
+                        padding: "0 28px",
+                        fontSize: "14px",
+                      }}
+                    >
                       Zum Dashboard <ArrowRight size={14} />
                     </button>
                   </Link>
                 ) : (
                   <>
                     <Link href="/register" style={{ textDecoration: "none" }}>
-                      <button className="btn btn-primary btn-breathe" style={{ height: "44px", padding: "0 28px", fontSize: "14px" }}>
+                      <button
+                        className="btn btn-primary btn-breathe"
+                        style={{
+                          height: "44px",
+                          padding: "0 28px",
+                          fontSize: "14px",
+                        }}
+                      >
                         Kostenlos starten
                       </button>
                     </Link>
                     <Link href="/login" style={{ textDecoration: "none" }}>
-                      <button className="btn btn-ghost" style={{ height: "44px", padding: "0 22px", fontSize: "14px" }}>
+                      <button
+                        className="btn btn-ghost"
+                        style={{
+                          height: "44px",
+                          padding: "0 22px",
+                          fontSize: "14px",
+                        }}
+                      >
                         Anmelden
                       </button>
                     </Link>
@@ -98,106 +185,358 @@ export default function Home() {
               </div>
 
               {/* Trust-Zeile */}
-              <div className="anim-fade-in-up anim-delay-4" style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-                {["DSGVO-konform", "PDF Export inklusive", "Made in Germany"].map((t) => (
-                  <div key={t} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <div style={{ width: "5px", height: "5px", background: "var(--success)", flexShrink: 0 }} />
-                    <span style={{ fontSize: "12px", color: "var(--text-3)", fontWeight: 500 }}>{t}</span>
+              <div
+                className="anim-fade-in-up anim-delay-4"
+                style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}
+              >
+                {[
+                  "DSGVO-konform",
+                  "PDF Export inklusive",
+                  "Made in Germany",
+                ].map((t) => (
+                  <div
+                    key={t}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "5px",
+                        height: "5px",
+                        background: "var(--success)",
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        color: "var(--text-3)",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {t}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Right – Rechnungs-Mockup */}
-            <div style={{ position: "relative", animation: "floatY 4s ease-in-out infinite" }}>
-
+            <div
+              style={{
+                position: "relative",
+                animation: "floatY 4s ease-in-out infinite",
+              }}
+            >
               {/* Floating status chip oben rechts */}
-              <div style={{
-                position: "absolute", top: "-14px", right: "-8px", zIndex: 2,
-                background: "var(--surface)", boxShadow: "var(--shadow-lg)",
-                padding: "8px 14px", display: "flex", alignItems: "center", gap: "8px",
-              }}>
-                <div style={{ width: "7px", height: "7px", background: "var(--success)", flexShrink: 0 }} />
-                <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-1)" }}>PDF bereit zum Download</span>
+              <div
+                style={{
+                  position: "absolute",
+                  top: "-14px",
+                  right: "-8px",
+                  zIndex: 2,
+                  background: "var(--surface)",
+                  boxShadow: "var(--shadow-lg)",
+                  padding: "8px 14px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <div
+                  style={{
+                    width: "7px",
+                    height: "7px",
+                    background: "var(--success)",
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "var(--text-1)",
+                  }}
+                >
+                  PDF bereit zum Download
+                </span>
               </div>
 
               {/* Haupt-Card */}
-              <div style={{ background: "var(--surface)", boxShadow: "var(--shadow-lg)", overflow: "hidden" }}>
-
+              <div
+                style={{
+                  background: "var(--surface)",
+                  boxShadow: "var(--shadow-lg)",
+                  overflow: "hidden",
+                }}
+              >
                 {/* Card-Header */}
-                <div style={{ padding: "16px 22px", borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--surface-2)" }}>
+                <div
+                  style={{
+                    padding: "16px 22px",
+                    borderBottom: "1px solid var(--border)",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    background: "var(--surface-2)",
+                  }}
+                >
                   <div>
-                    <p className="label-caps" style={{ marginBottom: "3px" }}>Rechnung</p>
-                    <p style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-1)", letterSpacing: "-0.02em" }}>RE-2025-0042</p>
+                    <p className="label-caps" style={{ marginBottom: "3px" }}>
+                      Rechnung
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "16px",
+                        fontWeight: 700,
+                        color: "var(--text-1)",
+                        letterSpacing: "-0.02em",
+                      }}
+                    >
+                      RE-2025-0042
+                    </p>
                   </div>
-                  <span style={{ padding: "3px 10px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", background: "var(--badge-paid-bg)", color: "var(--badge-paid-text)" }}>
+                  <span
+                    style={{
+                      padding: "3px 10px",
+                      fontSize: "10px",
+                      fontWeight: 700,
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                      background: "var(--badge-paid-bg)",
+                      color: "var(--badge-paid-text)",
+                    }}
+                  >
                     Bezahlt
                   </span>
                 </div>
 
                 {/* Kunde */}
-                <div style={{ padding: "12px 22px", borderBottom: "1px solid var(--border)" }}>
-                  <p className="label-caps" style={{ marginBottom: "4px" }}>Kunde</p>
-                  <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-1)" }}>Müller &amp; Partner GmbH</p>
-                  <p style={{ fontSize: "12px", color: "var(--text-3)" }}>kontakt@mueller-partner.de</p>
+                <div
+                  style={{
+                    padding: "12px 22px",
+                    borderBottom: "1px solid var(--border)",
+                  }}
+                >
+                  <p className="label-caps" style={{ marginBottom: "4px" }}>
+                    Kunde
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      color: "var(--text-1)",
+                    }}
+                  >
+                    Müller &amp; Partner GmbH
+                  </p>
+                  <p style={{ fontSize: "12px", color: "var(--text-3)" }}>
+                    kontakt@mueller-partner.de
+                  </p>
                 </div>
 
                 {/* Positionen */}
                 <div style={{ padding: "0 22px" }}>
                   {[
-                    { desc: "Webdesign – Startseite", qty: "1×", price: "1.200,00 €" },
+                    {
+                      desc: "Webdesign – Startseite",
+                      qty: "1×",
+                      price: "1.200,00 €",
+                    },
                     { desc: "SEO Optimierung", qty: "3×", price: "600,00 €" },
-                    { desc: "Projektmanagement", qty: "4 Std.", price: "280,00 €" },
+                    {
+                      desc: "Projektmanagement",
+                      qty: "4 Std.",
+                      price: "280,00 €",
+                    },
                   ].map((item, i) => (
-                    <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid var(--divider)" }}>
+                    <div
+                      key={i}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        padding: "10px 0",
+                        borderBottom: "1px solid var(--divider)",
+                      }}
+                    >
                       <div>
-                        <p style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-1)" }}>{item.desc}</p>
-                        <p style={{ fontSize: "11px", color: "var(--text-3)" }}>{item.qty}</p>
+                        <p
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            color: "var(--text-1)",
+                          }}
+                        >
+                          {item.desc}
+                        </p>
+                        <p style={{ fontSize: "11px", color: "var(--text-3)" }}>
+                          {item.qty}
+                        </p>
                       </div>
-                      <span className="amount" style={{ fontSize: "12px", fontWeight: 600, color: "var(--text-1)" }}>{item.price}</span>
+                      <span
+                        className="amount"
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: 600,
+                          color: "var(--text-1)",
+                        }}
+                      >
+                        {item.price}
+                      </span>
                     </div>
                   ))}
                 </div>
 
                 {/* Total */}
-                <div style={{ padding: "14px 22px", background: "var(--accent)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "11px", fontWeight: 600, color: "rgba(255,255,255,0.75)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Gesamt inkl. MwSt.</span>
-                  <span className="amount" style={{ fontSize: "20px", fontWeight: 700, color: "#fff", letterSpacing: "-0.02em" }}>2.476,00 €</span>
+                <div
+                  style={{
+                    padding: "14px 22px",
+                    background: "var(--accent)",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      color: "rgba(255,255,255,0.75)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    Gesamt inkl. MwSt.
+                  </span>
+                  <span
+                    className="amount"
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: 700,
+                      color: "#fff",
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    2.476,00 €
+                  </span>
                 </div>
               </div>
 
               {/* Floating chip unten links */}
-              <div style={{
-                position: "absolute", bottom: "-14px", left: "-8px",
-                background: "#0B1628", boxShadow: "var(--shadow-lg)",
-                padding: "8px 14px", display: "flex", alignItems: "center", gap: "8px",
-              }}>
-                <span style={{ fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.85)" }}>Erinnerung automatisch gesendet</span>
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "-14px",
+                  left: "-8px",
+                  background: "#0B1628",
+                  boxShadow: "var(--shadow-lg)",
+                  padding: "8px 14px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "rgba(255,255,255,0.85)",
+                  }}
+                >
+                  Erinnerung automatisch gesendet
+                </span>
               </div>
             </div>
           </div>
         </div>
 
         {/* ── WIE ES FUNKTIONIERT ──────────────────────────────── */}
-        <div className="scroll-reveal" style={{ background: "var(--surface)", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-          <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "64px 40px" }}>
-            <p className="label-caps" style={{ textAlign: "center", marginBottom: "48px" }}>So einfach geht&apos;s</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)" }}>
+        <div
+          className="scroll-reveal"
+          style={{
+            background: "var(--surface)",
+            borderTop: "1px solid var(--border)",
+            borderBottom: "1px solid var(--border)",
+          }}
+        >
+          <div
+            style={{
+              maxWidth: "1100px",
+              margin: "0 auto",
+              padding: "64px 40px",
+            }}
+          >
+            <p
+              className="label-caps"
+              style={{ textAlign: "center", marginBottom: "48px" }}
+            >
+              So einfach geht&apos;s
+            </p>
+            <div
+              style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)" }}
+            >
               {[
-                { num: "01", title: "Kunden anlegen", text: "Name, E-Mail, Adresse – einmal hinterlegt, immer abrufbar. Vollständige Rechnungshistorie pro Kunde." },
-                { num: "02", title: "Rechnung erstellen", text: "Positionen, MwSt., Zahlungsziel – alles in einem Formular. Schnell versandbereit." },
-                { num: "03", title: "Senden &amp; tracken", text: "Per E-Mail senden, PDF exportieren, Zahlungseingang verfolgen und automatisch mahnen." },
+                {
+                  num: "01",
+                  title: "Kunden anlegen",
+                  text: "Name, E-Mail, Adresse – einmal hinterlegt, immer abrufbar. Vollständige Rechnungshistorie pro Kunde.",
+                },
+                {
+                  num: "02",
+                  title: "Rechnung erstellen",
+                  text: "Positionen, MwSt., Zahlungsziel – alles in einem Formular. Schnell versandbereit.",
+                },
+                {
+                  num: "03",
+                  title: "Senden &amp; tracken",
+                  text: "Per E-Mail senden, PDF exportieren, Zahlungseingang verfolgen und automatisch mahnen.",
+                },
               ].map(({ num, title, text }, i) => (
                 <div
                   key={num}
                   className={`anim-fade-in-up anim-delay-${i + 1}`}
-                  style={{ padding: "0 40px 0 0", borderLeft: i > 0 ? "1px solid var(--border)" : "none", paddingLeft: i > 0 ? "40px" : "0" }}
+                  style={{
+                    padding: "0 40px 0 0",
+                    borderLeft: i > 0 ? "1px solid var(--border)" : "none",
+                    paddingLeft: i > 0 ? "40px" : "0",
+                  }}
                 >
-                  <p style={{ fontSize: "40px", fontWeight: 700, letterSpacing: "-0.05em", color: "var(--accent-soft)", lineHeight: 1, marginBottom: "16px", fontVariantNumeric: "tabular-nums" }}>
+                  <p
+                    style={{
+                      fontSize: "40px",
+                      fontWeight: 700,
+                      letterSpacing: "-0.05em",
+                      color: "var(--accent-soft)",
+                      lineHeight: 1,
+                      marginBottom: "16px",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
                     {num}
                   </p>
-                  <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-1)", letterSpacing: "-0.01em", marginBottom: "10px" }}>{title}</p>
-                  <p style={{ fontSize: "13px", color: "var(--text-2)", lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: text }} />
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: 700,
+                      color: "var(--text-1)",
+                      letterSpacing: "-0.01em",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    {title}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      color: "var(--text-2)",
+                      lineHeight: 1.6,
+                    }}
+                    dangerouslySetInnerHTML={{ __html: text }}
+                  />
                 </div>
               ))}
             </div>
@@ -205,66 +544,192 @@ export default function Home() {
         </div>
 
         {/* ── SECTION A: Kein Excel. Kein Chaos. ───────────────── */}
-        <div className="scroll-reveal" style={{ background: "#0B1628", padding: "80px 40px" }}>
+        <div
+          className="scroll-reveal"
+          style={{ background: "#0B1628", padding: "80px 40px" }}
+        >
           <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-            <p className="label-caps" style={{ color: "rgba(255,255,255,0.35)", marginBottom: "16px" }}>
+            <p
+              className="label-caps"
+              style={{ color: "rgba(255,255,255,0.35)", marginBottom: "16px" }}
+            >
               Rechnungen schreiben kann einfacher sein
             </p>
-            <h2 style={{
-              fontSize: "42px", fontWeight: 700, letterSpacing: "-0.03em",
-              color: "#fff", marginBottom: "40px", lineHeight: 1.1,
-            }}>
+            <h2
+              style={{
+                fontSize: "42px",
+                fontWeight: 700,
+                letterSpacing: "-0.03em",
+                color: "#fff",
+                marginBottom: "40px",
+                lineHeight: 1.1,
+              }}
+            >
               Dein Rechnungsprozess, vereinfacht.
             </h2>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "16px",
+              }}
+            >
               {/* LEFT: Früher */}
-              <div style={{
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                padding: "28px 28px",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px" }}>
-                  <div style={{ width: "8px", height: "8px", background: "var(--danger)", flexShrink: 0 }} />
-                  <span style={{ fontSize: "13px", fontWeight: 700, color: "rgba(255,255,255,0.55)", letterSpacing: "-0.01em" }}>Früher</span>
+              <div
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  padding: "28px 28px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    marginBottom: "24px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      background: "var(--danger)",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      color: "rgba(255,255,255,0.55)",
+                      letterSpacing: "-0.01em",
+                    }}
+                  >
+                    Früher
+                  </span>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "14px",
+                  }}
+                >
                   {[
-                    "Rechnungen ohne Umwege erstellen",
-                    "Erinnerungen an ausstehende Zahlungen",
-                    "Offene Posten leicht im Blick behalten",
-                    "Daten fürs Steuerbüro schnell bereit",
-                    "Weniger Zeit für Papierkram",
+                    "Excel-Vorlage jedes Mal neu zusammenkopiert",
+                    "Kunden selbst ans Zahlen erinnern",
+                    "Überblick über offene Posten verloren",
+                    "Belege für den Steuerberater stundenlang gesucht",
+                    "ganze Tage für Papierkram verschwendet",
                   ].map((item) => (
-                    <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                      <div style={{ width: "5px", height: "5px", background: "var(--danger)", flexShrink: 0, marginTop: "5px" }} />
-                      <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>{item}</span>
+                    <div
+                      key={item}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: "10px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "5px",
+                          height: "5px",
+                          background: "var(--danger)",
+                          flexShrink: 0,
+                          marginTop: "5px",
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          color: "rgba(255,255,255,0.45)",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {item}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* RIGHT: Mit Faktura */}
-              <div style={{
-                background: "rgba(0,64,204,0.06)",
-                border: "1px solid rgba(0,64,204,0.4)",
-                padding: "28px 28px",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px" }}>
-                  <div style={{ width: "8px", height: "8px", background: "var(--success)", flexShrink: 0 }} />
-                  <span style={{ fontSize: "13px", fontWeight: 700, color: "rgba(255,255,255,0.8)", letterSpacing: "-0.01em" }}>Mit Faktura</span>
+              <div
+                style={{
+                  background: "rgba(0,64,204,0.06)",
+                  border: "1px solid rgba(0,64,204,0.4)",
+                  padding: "28px 28px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    marginBottom: "24px",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      background: "var(--success)",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      color: "rgba(255,255,255,0.8)",
+                      letterSpacing: "-0.01em",
+                    }}
+                  >
+                    mit Faktura
+                  </span>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "14px",
+                  }}
+                >
                   {[
-                    "Rechnung schnell erstellt, professionell",
-                    "Automatische Erinnerungen per E-Mail",
+                    "professionelle Rechnungen schnell erstellt",
+                    "automatische Erinnerungen per E-Mail",
                     "Dashboard mit allen offenen Posten",
                     "CSV-Export für den Steuerberater",
-                    "Mehr Zeit für echte Arbeit",
+                    "mehr Zeit für echte Arbeit",
                   ].map((item) => (
-                    <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                      <div style={{ width: "5px", height: "5px", background: "var(--success)", flexShrink: 0, marginTop: "5px" }} />
-                      <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.75)", lineHeight: 1.5 }}>{item}</span>
+                    <div
+                      key={item}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: "10px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "5px",
+                          height: "5px",
+                          background: "var(--success)",
+                          flexShrink: 0,
+                          marginTop: "5px",
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          color: "rgba(255,255,255,0.75)",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {item}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -273,25 +738,49 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── SECTION B: Ehrliche Feedback-Box ─────────────────── */}
+        {/* ── SECTION B: USP — KI-Rechnungsentwurf ─────────────── */}
         <div className="scroll-reveal" style={{ background: "var(--bg)" }}>
-          <div style={{ maxWidth: "700px", margin: "0 auto", padding: "72px 40px", textAlign: "center" }}>
-            <p className="label-caps" style={{ marginBottom: "16px" }}>Wir sind neu</p>
-            <h2 style={{
-              fontSize: "28px", fontWeight: 700, letterSpacing: "-0.03em",
-              color: "var(--text-1)", marginBottom: "12px", lineHeight: 1.2,
-            }}>
-              Faktura ist ein junges Produkt.
+          <div
+            style={{
+              maxWidth: "700px",
+              margin: "0 auto",
+              padding: "72px 40px",
+              textAlign: "center",
+            }}
+          >
+            <p className="label-caps" style={{ marginBottom: "16px" }}>
+              Nur bei Faktura
+            </p>
+            <h2
+              style={{
+                fontSize: "28px",
+                fontWeight: 700,
+                letterSpacing: "-0.03em",
+                color: "var(--text-1)",
+                marginBottom: "12px",
+                lineHeight: 1.2,
+              }}
+            >
+              Beschreibe dein Projekt.<br />
+              <span style={{ color: "var(--accent)" }}>Deine Rechnung ist fertig.</span>
             </h2>
-            <p style={{
-              fontSize: "15px", color: "var(--text-2)", lineHeight: 1.7,
-              marginBottom: "28px", maxWidth: "480px", margin: "0 auto 28px",
-            }}>
-              Wir arbeiten jeden Tag daran, es besser zu machen.
-              Wenn du Feedback hast, freuen wir uns darüber.
+            <p
+              style={{
+                fontSize: "15px",
+                color: "var(--text-2)",
+                lineHeight: 1.7,
+                maxWidth: "480px",
+                margin: "0 auto 28px",
+              }}
+            >
+              Kein anderes Rechnungstool in Deutschland hat das:
+              Schreib kurz auf was du gemacht hast — Faktura erstellt die Rechnung automatisch.
             </p>
             <Link href="/register" style={{ textDecoration: "none" }}>
-              <button className="btn btn-primary" style={{ height: "44px", padding: "0 28px", fontSize: "14px" }}>
+              <button
+                className="btn btn-primary"
+                style={{ height: "44px", padding: "0 28px", fontSize: "14px" }}
+              >
                 Kostenlos ausprobieren
               </button>
             </Link>
@@ -299,46 +788,70 @@ export default function Home() {
         </div>
 
         {/* ── SECTION C: Bold CTA ───────────────────────────────── */}
-        <div className="scroll-reveal" style={{ background: "var(--accent)", padding: "80px 40px" }}>
-          <div style={{ maxWidth: "700px", margin: "0 auto", textAlign: "center" }}>
-            <h2 style={{
-              fontSize: "40px", fontWeight: 700, letterSpacing: "-0.03em",
-              color: "#fff", marginBottom: "12px",
-            }}>
+        <div
+          className="scroll-reveal"
+          style={{ background: "var(--accent)", padding: "80px 40px" }}
+        >
+          <div
+            style={{ maxWidth: "700px", margin: "0 auto", textAlign: "center" }}
+          >
+            <h2
+              style={{
+                fontSize: "40px",
+                fontWeight: 700,
+                letterSpacing: "-0.03em",
+                color: "#fff",
+                marginBottom: "12px",
+              }}
+            >
               Deine erste Rechnung. Schnell erstellt.
             </h2>
-            <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.75)", marginBottom: "36px" }}>
+            <p
+              style={{
+                fontSize: "16px",
+                color: "rgba(255,255,255,0.75)",
+                marginBottom: "36px",
+              }}
+            >
               Kostenlos starten – kein Abo, kein Risiko, keine Kreditkarte.
             </p>
             <Link href="/register" style={{ textDecoration: "none" }}>
               <button
                 className="btn"
                 style={{
-                  background: "#fff", color: "var(--accent)",
-                  height: "46px", padding: "0 36px",
-                  fontSize: "14px", fontWeight: 700,
+                  background: "#fff",
+                  color: "var(--accent)",
+                  height: "46px",
+                  padding: "0 36px",
+                  fontSize: "14px",
+                  fontWeight: 700,
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 8px 32px rgba(255,255,255,0.3)";
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                    "0 8px 32px rgba(255,255,255,0.3)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                    "none";
                 }}
               >
                 Jetzt kostenlos starten
               </button>
             </Link>
             <p style={{ marginTop: "20px" }}>
-              <Link href="/login" style={{
-                fontSize: "13px", color: "rgba(255,255,255,0.6)",
-                textDecoration: "none",
-              }}>
+              <Link
+                href="/login"
+                style={{
+                  fontSize: "13px",
+                  color: "rgba(255,255,255,0.6)",
+                  textDecoration: "none",
+                }}
+              >
                 Bereits registriert? Jetzt anmelden &rarr;
               </Link>
             </p>
           </div>
         </div>
-
       </main>
 
       <MarketingFooter />

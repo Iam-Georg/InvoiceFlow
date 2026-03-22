@@ -184,7 +184,12 @@ export default function InvoiceDetailPage() {
 
   async function sendReminder() {
     setActionLoading("reminder");
-    const res = await fetch(`/api/invoices/${id}/remind`, { method: "POST" });
+    const res = await fetch(`/api/invoices/${id}/remind`, { 
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     if (!res.ok) {
       toast.error("Fehler beim Senden");
       setActionLoading(null);

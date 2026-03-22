@@ -43,7 +43,7 @@ function reminderTone(riskScore: number) {
   if (riskScore >= 70) {
     return {
       subjectPrefix: "Dringende Zahlungserinnerung",
-      intro: "die Rechnung ist weiterhin offen und bereits deutlich ueberfaellig.",
+      intro: "die Rechnung ist weiterhin offen und bereits deutlich überfällig.",
     };
   }
   if (riskScore >= 50) {

@@ -40,7 +40,7 @@ export const INDUSTRIES: Industry[] = [
       "DATEV-Export für deinen Steuerberater am Jahresende",
     ],
     testimonialQuote:
-      "Früher habe ich Rechnungen zwischen zwei Shootings geschrieben — jetzt brauche ich wenigen Minuten mit Faktura.",
+      "Früher habe ich Rechnungen zwischen zwei Shootings geschrieben — jetzt brauche ich wenige Minuten mit Faktura.",
     metaDescription:
       "Rechnungsprogramm für Fotografen — Rechnungen in wenigen Minuten erstellen, automatische Zahlungserinnerungen und smarter Zahlungsdruck-Score. Kostenlos starten.",
     keywords: [

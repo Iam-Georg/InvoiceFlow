@@ -18,7 +18,7 @@ export default function RegisterPage() {
 
   async function handleRegister() {
     if (!name.trim() || !email.trim() || !password) {
-      toast.error("Bitte alle Felder ausfuellen");
+      toast.error("Bitte alle Felder ausfüllen");
       return;
     }
     if (password.length < 8) {
@@ -26,7 +26,7 @@ export default function RegisterPage() {
       return;
     }
     if (password !== password2) {
-      toast.error("Passwoerter stimmen nicht ueberein");
+      toast.error("Passwörter stimmen nicht überein");
       return;
     }
 
@@ -48,13 +48,18 @@ export default function RegisterPage() {
         if (data.user) {
           await ensureProfile(sb, data.user);
           // Fire-and-forget welcome email
-          fetch("/api/account/welcome", { method: "POST" }).catch(() => {});
+          fetch("/api/account/welcome", { 
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }).catch(() => {});
         }
         toast.success("Account erstellt!");
         router.push("/dashboard");
         router.refresh();
       } else {
-        toast.success("Bitte bestaetige deine E-Mail-Adresse.");
+        toast.success("Bitte bestätige deine E-Mail-Adresse.");
         router.push("/login");
       }
     } catch {
@@ -155,7 +160,7 @@ export default function RegisterPage() {
                 marginBottom: "24px",
               }}
             >
-              Kostenlos starten - keine Kreditkarte noetig.
+              Kostenlos starten - keine Kreditkarte nötig.
             </p>
 
             <div
@@ -171,7 +176,7 @@ export default function RegisterPage() {
                 "Mind. 8 Zeichen",
               )}
               {input(
-                "Passwort bestaetigen",
+                "Passwort bestätigen",
                 password2,
                 setPassword2,
                 "password",

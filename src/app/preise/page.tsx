@@ -22,7 +22,7 @@ const PLANS = [
     price: "0",
     desc: "Ideal zum Ausprobieren",
     features: [
-      "3 Rechnungen / Monat",
+      "5 Rechnungen (Gesamt)",
       "PDF-Export",
       "3 Kunden",
       "E-Mail Support",
@@ -44,9 +44,9 @@ const PLANS = [
       "E-Mail Versand",
       "Erinnerungen",
     ],
-    buttonLabel: "Demnächst verfügbar",
-    buttonHref: "/register",
-    buttonDisabled: true,
+    buttonLabel: "Jetzt upgraden",
+    buttonHref: "/billing",
+    buttonDisabled: false,
     recommended: true,
   },
   {
@@ -60,9 +60,9 @@ const PLANS = [
       "Automatische Mahnungen",
       "Priorität-Support",
     ],
-    buttonLabel: "Demnächst verfügbar",
-    buttonHref: "/register",
-    buttonDisabled: true,
+    buttonLabel: "Jetzt upgraden",
+    buttonHref: "/billing",
+    buttonDisabled: false,
     recommended: false,
   },
   {
@@ -76,9 +76,9 @@ const PLANS = [
       "API-Zugang",
       "Team-Zugang",
     ],
-    buttonLabel: "Demnächst verfügbar",
-    buttonHref: "/register",
-    buttonDisabled: true,
+    buttonLabel: "Jetzt upgraden",
+    buttonHref: "/billing",
+    buttonDisabled: false,
     recommended: false,
   },
 ];
@@ -104,7 +104,7 @@ type FeatureRow = {
 };
 
 const FEATURES: FeatureRow[] = [
-  { name: "Rechnungen", category: "Grundlagen", free: "3/Mo", starter: "10/Mo", professional: "Unbegrenzt", business: "Unbegrenzt" },
+  { name: "Rechnungen", category: "Grundlagen", free: "5 gesamt", starter: "10/Mo", professional: "Unbegrenzt", business: "Unbegrenzt" },
   { name: "Kunden", free: "3", starter: "Unbegrenzt", professional: "Unbegrenzt", business: "Unbegrenzt" },
   { name: "PDF-Export", free: true, starter: true, professional: true, business: true },
   { name: "E-Mail-Versand", free: true, starter: true, professional: true, business: true },
@@ -131,7 +131,7 @@ const FAQ = [
   },
   {
     q: "Wann kommen die bezahlten Pläne?",
-    a: "Die Starter-, Professional- und Business-Pläne sind in Entwicklung. Du wirst informiert, sobald sie verfügbar sind.",
+    a: "Starter, Professional und Business sind jetzt verfügbar. Starte kostenlos und upgrade jederzeit.",
   },
   {
     q: "Bleiben meine Daten in Deutschland?",

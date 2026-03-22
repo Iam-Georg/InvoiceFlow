@@ -292,7 +292,7 @@ export default function NewInvoicePage() {
       </Link>
 
       <div className="card-elevated" style={cardStyle}>
-        <div style={cardHeader}>KI-Rechnungserstellung</div>
+        <div style={cardHeader}>✦ KI-Entwurf: Beschreib dein Projekt — Faktura füllt die Rechnung aus</div>
         <div style={{ padding: "20px", display: "grid", gap: "10px" }}>
           <textarea
             placeholder="Projektbeschreibung eingeben, z.B. Website-Redesign, 12h Entwicklung, 3h Beratung ..."
@@ -410,7 +410,7 @@ export default function NewInvoicePage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 80px 100px 100px 32px",
+              gridTemplateColumns: "1fr 96px 110px 100px 32px",
               gap: "8px",
               marginBottom: "8px",
             }}
@@ -436,7 +436,7 @@ export default function NewInvoicePage() {
               className="line-item-enter"
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 80px 100px 100px 32px",
+                gridTemplateColumns: "1fr 96px 110px 100px 32px",
                 gap: "8px",
                 marginBottom: "8px",
                 alignItems: "center",
@@ -449,34 +449,59 @@ export default function NewInvoicePage() {
                   updateItem(item.id, "description", e.target.value)
                 }
               />
-              <input
-                type="number"
-                min="1"
-                style={{ textAlign: "right" }}
-                value={item.quantity}
-                onChange={(e) =>
-                  updateItem(
-                    item.id,
-                    "quantity",
-                    parseFloat(e.target.value) || 0,
-                  )
-                }
-              />
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                style={{ textAlign: "right" }}
-                placeholder="0,00"
-                value={item.unit_price || ""}
-                onChange={(e) =>
-                  updateItem(
-                    item.id,
-                    "unit_price",
-                    parseFloat(e.target.value) || 0,
-                  )
-                }
-              />
+              <div className="qty-stepper">
+                <button
+                  type="button"
+                  className="qty-btn"
+                  tabIndex={-1}
+                  onClick={() =>
+                    updateItem(item.id, "quantity", Math.max(1, item.quantity - 1))
+                  }
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  min="1"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    updateItem(
+                      item.id,
+                      "quantity",
+                      isNaN(e.target.valueAsNumber) || e.target.valueAsNumber < 1
+                        ? 1
+                        : e.target.valueAsNumber,
+                    )
+                  }
+                />
+                <button
+                  type="button"
+                  className="qty-btn"
+                  tabIndex={-1}
+                  onClick={() =>
+                    updateItem(item.id, "quantity", item.quantity + 1)
+                  }
+                >
+                  +
+                </button>
+              </div>
+              <div className="price-input-wrap">
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  style={{ textAlign: "right" }}
+                  value={item.unit_price}
+                  onChange={(e) =>
+                    updateItem(
+                      item.id,
+                      "unit_price",
+                      isNaN(e.target.valueAsNumber) ? 0 : e.target.valueAsNumber,
+                    )
+                  }
+                />
+                <span className="price-suffix">€</span>
+              </div>
               <span
                 className="amount"
                 style={{

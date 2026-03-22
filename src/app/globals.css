@@ -477,6 +477,105 @@ input[type="color"] {
   animation: slideOutRight var(--duration-fast) var(--ease-smooth) forwards;
 }
 
+/* ── Number inputs – hide native spinners, tabular nums ── */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  font-variant-numeric: tabular-nums;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ── Quantity stepper ── */
+.qty-stepper {
+  display: flex;
+  align-items: stretch;
+  height: 44px;
+  background-color: var(--surface-2);
+  border-bottom: 1.5px solid var(--border);
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-size: 0% 2px;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  transition:
+    background-color var(--duration-fast) var(--ease-smooth),
+    background-size var(--duration-normal) var(--ease-smooth),
+    border-color var(--duration-fast) var(--ease-smooth);
+}
+.qty-stepper:hover:not(:focus-within) {
+  background-color: var(--surface);
+  border-bottom-color: var(--text-3);
+}
+.qty-stepper:focus-within {
+  background-color: var(--surface);
+  background-size: 100% 2px;
+  border-bottom-color: transparent;
+  box-shadow: 0 2px 8px rgba(0, 64, 204, 0.08);
+}
+.qty-stepper input[type="number"] {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  text-align: center;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text-1);
+  background-image: none !important;
+  box-shadow: none !important;
+}
+.qty-btn {
+  flex-shrink: 0;
+  width: 22px;
+  height: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-3);
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition:
+    color var(--duration-fast) var(--ease-smooth),
+    background-color var(--duration-fast) var(--ease-smooth);
+}
+.qty-btn:hover {
+  color: var(--accent);
+  background: rgba(0, 64, 204, 0.06);
+}
+
+/* ── Price input with € suffix ── */
+.price-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.price-input-wrap input[type="number"] {
+  padding-right: 22px;
+}
+.price-input-wrap .price-suffix {
+  position: absolute;
+  right: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  pointer-events: none;
+  transition: color var(--duration-fast) var(--ease-smooth);
+  font-variant-numeric: tabular-nums;
+}
+.price-input-wrap:focus-within .price-suffix {
+  color: var(--accent);
+}
+
 /* ── AI Draft Button Gradient Border ── */
 .btn-ai-gradient {
   background: linear-gradient(90deg, var(--accent), #6b5ce7, var(--accent));

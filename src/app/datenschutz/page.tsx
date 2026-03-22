@@ -13,7 +13,7 @@ const SECTIONS = [
   {
     title: "1. Verantwortlicher",
     paragraphs: [
-      "Verantwortlicher im Sinne der DSGVO ist: InvoiceFlow UG (haftungsbeschränkt), Musterstrasse 1, 10115 Berlin, Deutschland. E-Mail: datenschutz@invoiceflow.app. Telefon: +49 30 12345678. Vertreten durch: Max Mustermann (Geschäftsführer).",
+      "Verantwortlicher im Sinne der DSGVO ist: InvoiceFlow UG (haftungsbeschränkt), Musterstraße 1, 10115 Berlin, Deutschland. E-Mail: datenschutz@invoiceflow.app. Telefon: +49 30 12345678. Vertreten durch: Max Mustermann (Geschäftsführer).",
     ],
   },
   {
